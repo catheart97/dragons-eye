@@ -1,0 +1,17 @@
+@import "../resources/fonts/fira-code.css";
+@import "../resources/fonts/fira-sans.css";
+@import "../resources/fonts/fira-sans-condensed.css";
+@import "../resources/fonts/fira-sans-extra-condensed.css";
+@import "../resources/fonts/material-outlined.css";
+
+.mi {
+    font-family: "Material Icons Outlined";
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
