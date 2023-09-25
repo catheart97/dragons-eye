@@ -31,25 +31,34 @@ export enum BoardDecoratorType {
 }
 
 export enum CreatureType {
-    Player,
-    PlayerAnimal,
-    NPC,
-    Enemy,
-    Animal
+    Humanoid,
+    Animal,
+    Monster
 }
 
-export enum ItemType {
-    Chest
+export enum CreatureAttitude {
+    Player,
+    NPC,
+    Hostile
+}
+
+export enum CreatureSize {
+    Tiny,
+    MediumSmall,
+    Large,
+    Huge,
+    Gargantuan
 }
 
 export type BoardItem = {
-    type: ItemType,
     contents: string[],
 }
 
 export type BoardCreature = {
-    type: CreatureType,
     name: string,
+    type: CreatureType,
+    attitude: CreatureAttitude,
+    size: CreatureSize,
 }
 
 export type BoardDecorator = {
@@ -130,10 +139,10 @@ export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
     [BoardCondition.Healing]: <span className="msf rounded-full bg-white m-1 text-red-600">healing</span>,
     [BoardCondition.Oil]: <span className="msf text-black rounded-full bg-white m-1">water_drop</span>,
     [BoardCondition.Fog]: <span className="msf rounded-full bg-white m-1 text-blue-900">cloud</span>,
-    [BoardCondition.Muted]: <span className="msf">volume_off</span>,
-    [BoardCondition.Blinded]: <span className="msf">visibility_off</span>,
-    [BoardCondition.Invulnerable]: <span className="msf">shield</span>,
-    [BoardCondition.Slow]: <span className="msf">speed</span>
+    [BoardCondition.Muted]: <span className="msf rounded-full bg-white m-1">volume_off</span>,
+    [BoardCondition.Blinded]: <span className="msf rounded-full bg-white m-1">visibility_off</span>,
+    [BoardCondition.Invulnerable]: <span className="msf rounded-full bg-white m-1">shield</span>,
+    [BoardCondition.Slow]: <span className="msf rounded-full bg-white m-1">speed</span>
 }
 
 export interface IBoardUtility {

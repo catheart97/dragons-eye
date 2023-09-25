@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType } from "../Board"
+import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, BaseSize } from "../Board"
 import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
 import { UIGroup } from "../../ui/UIGroup";
@@ -14,10 +14,15 @@ enum DecoratorBoardUtilityMode {
 export class DecoratorBoardUtility implements IBoardUtility {
     board: Board;
     position: BoardPosition | null = null;
+    downPosition: BoardPosition | null = null;
     decoratorType: BoardDecoratorType = BoardDecoratorType.Creature;
     mode: DecoratorBoardUtilityMode = DecoratorBoardUtilityMode.Drag;
-    creatureType: CreatureType = CreatureType.Player;
+    creatureType: CreatureType = CreatureType.Humanoid;
+    creatureAttitude: CreatureAttitude = CreatureAttitude.Hostile;
+    creatureSize: CreatureSize = CreatureSize.MediumSmall;
     text: string = "";
+
+    mouseDown: boolean = false;
 
     renderUI: (() => void) | null = null;
 
@@ -29,13 +34,15 @@ export class DecoratorBoardUtility implements IBoardUtility {
         if (this.mode == DecoratorBoardUtilityMode.Drag) {
             this.position = position;
         }
+        this.downPosition = position;
+        this.mouseDown = true;
     }
 
     onShapeRelease(position: BoardPosition) {
 
         const idxTo = position.x + position.y * this.board.width;
         if (this.mode == DecoratorBoardUtilityMode.Drag) {
-            const idxFrom = this.position!.x + this.position!.y * this.board.width;
+            const idxFrom = this.downPosition!.x + this.downPosition!.y * this.board.width;
 
             if (this.board.decorators[idxFrom] && this.board.decorators[idxTo] == undefined) {
                 this.board.decorators[idxTo] = this.board.decorators[idxFrom];
@@ -44,12 +51,23 @@ export class DecoratorBoardUtility implements IBoardUtility {
 
             this.position = null;
         } else if (this.mode == DecoratorBoardUtilityMode.Place) {
-            if (this.board.decorators[idxTo] == undefined) {
-                this.board.decorators[idxTo] = {
-                    type: this.decoratorType,
-                    data: {
-                        type: CreatureType.Player,
-                        name: "Player"
+            if (this.board.decorators[idxTo] == undefined && this.text.length > 0) {
+                if (this.decoratorType == BoardDecoratorType.Creature) {
+                    this.board.decorators[idxTo] = {
+                        type: this.decoratorType,
+                        data: {
+                            name: this.text,
+                            type: this.creatureType,
+                            attitude: this.creatureAttitude,
+                            size: this.creatureSize
+                        }
+                    }
+                } else {
+                    this.board.decorators[idxTo] = {
+                        type: this.decoratorType,
+                        data: {
+                            contents: this.text.split(',').map((s) => s.trim())
+                        }
                     }
                 }
             }
@@ -57,11 +75,13 @@ export class DecoratorBoardUtility implements IBoardUtility {
             delete this.board.decorators[idxTo];
         }
 
+        this.mouseDown = false;
+
     }
 
 
     onShapeHover(position: BoardPosition) {
-        // this.p1 = position;
+        this.position = position;
     }
 
     userInterface() {
@@ -121,7 +141,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         <span className="mso text-xl">category</span>
                                     </ToolButton>
                                 </UIGroup>
-                                <UIGroup title="Name">
+                                <UIGroup title={this.decoratorType == BoardDecoratorType.Creature ? "Name" : "Contents"}>
                                     <TextInput onChange={(e) => {
                                         this.text = e.target.value;
                                     }} />
@@ -132,36 +152,17 @@ export class DecoratorBoardUtility implements IBoardUtility {
 
                     {
                         this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Creature ? (
+                            <>
                             <UIGroup title="Creature Type">
                                 <ToolButton
                                     className="grow"
                                     onClick={() => {
-                                        this.creatureType = CreatureType.Player;
+                                        this.creatureType = CreatureType.Humanoid;
                                         this.renderUI?.call(this);
                                     }}
-                                    active={this.creatureType == CreatureType.Player}
+                                    active={this.creatureType == CreatureType.Humanoid}
                                 >
-                                    <span className="mso text-xl">domino_mask</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureType = CreatureType.PlayerAnimal;
-                                        this.renderUI?.call(this);
-                                    }}
-                                    active={this.creatureType == CreatureType.PlayerAnimal}
-                                >
-                                    <span className="mso text-xl">pets</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureType = CreatureType.NPC;
-                                        this.renderUI?.call(this);
-                                    }}
-                                    active={this.creatureType == CreatureType.NPC}
-                                >
-                                    <span className="mso text-xl">face</span>
+                                    <span className="mso text-xl">person</span>
                                 </ToolButton>
                                 <ToolButton
                                     className="grow"
@@ -171,19 +172,99 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     }}
                                     active={this.creatureType == CreatureType.Animal}
                                 >
-                                    <span className="mso text-xl">raven</span>
+                                    <span className="mso text-xl">pets</span>
                                 </ToolButton>
                                 <ToolButton
                                     className="grow"
                                     onClick={() => {
-                                        this.creatureType = CreatureType.Enemy;
+                                        this.creatureType = CreatureType.Monster;
                                         this.renderUI?.call(this);
                                     }}
-                                    active={this.creatureType == CreatureType.Enemy}
+                                    active={this.creatureType == CreatureType.Monster}
                                 >
-                                    <span className="mso text-xl">emergency_home</span>
+                                    <span className="mso text-xl">diversity_2</span>
                                 </ToolButton>
                             </UIGroup>
+                            <UIGroup title="Attitude">
+                                <ToolButton
+                                    className="grow"
+                                    onClick={() => {
+                                        this.creatureAttitude = CreatureAttitude.Player;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureAttitude == CreatureAttitude.Player}
+                                >
+                                    <span className="mso text-xl">person</span>
+                                </ToolButton>
+                                <ToolButton
+                                    className="grow"
+                                    onClick={() => {
+                                        this.creatureAttitude = CreatureAttitude.NPC;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureAttitude == CreatureAttitude.NPC}
+                                >
+                                    <span className="mso text-xl">robot</span>
+                                </ToolButton>
+                                <ToolButton
+                                    className="grow"
+                                    onClick={() => {
+                                        this.creatureAttitude = CreatureAttitude.Hostile;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureAttitude == CreatureAttitude.Hostile}
+                                >
+                                    <span className="mso text-xl">swords</span>
+                                </ToolButton>
+                            </UIGroup>
+                            <UIGroup title="Size">
+                                <ToolButton
+                                    onClick={() => {
+                                        this.creatureSize = CreatureSize.Tiny;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureSize == CreatureSize.Tiny}
+                                >
+                                    <span className="mso text-xl">crib</span>
+                                </ToolButton>
+                                <ToolButton
+                                    onClick={() => {
+                                        this.creatureSize = CreatureSize.MediumSmall;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureSize == CreatureSize.MediumSmall}
+                                >
+                                    <span className="mso text-xl">person</span>
+                                </ToolButton>
+                                <ToolButton
+                                    onClick={() => {
+                                        this.creatureSize = CreatureSize.Large;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureSize == CreatureSize.Large}
+                                >
+                                    <span className="mso text-xl">directions_car</span>
+                                </ToolButton>
+                                <ToolButton
+                                    onClick={() => {
+                                        this.creatureSize = CreatureSize.Huge;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureSize == CreatureSize.Huge}
+                                >
+                                    <span className="mso text-xl">home</span>
+                                </ToolButton>
+                                <ToolButton
+                                    onClick={() => {
+                                        this.creatureSize = CreatureSize.Gargantuan;
+                                        this.renderUI?.call(this);
+                                    }}
+                                    active={this.creatureSize == CreatureSize.Gargantuan}
+                                >
+                                    <span className="mso text-xl">domain</span>
+                                </ToolButton>
+                            </UIGroup>
+                            </>
                         ) : null
                     }
                 </div>
@@ -192,9 +273,38 @@ export class DecoratorBoardUtility implements IBoardUtility {
     }
 
     customComponent() {
-        return (
-            <></>
-        )
+        if (this.mouseDown && this.mode == DecoratorBoardUtilityMode.Drag) {
+            const p0x = this.downPosition!.x * BaseSize + 0.5 * BaseSize;
+            const p0y = this.downPosition!.y * BaseSize + 0.5 * BaseSize;
+
+            const p1x = this.position!.x * BaseSize + 0.5 * BaseSize;
+            const p1y = this.position!.y * BaseSize + 0.5 * BaseSize;
+
+            const angle = Math.atan2(p1y - p0y, p1x - p0x) * 180 / Math.PI;
+            const distance = Math.sqrt((p1x - p0x) * (p1x - p0x) + (p1y - p0y) * (p1y - p0y));
+
+            return (
+                <div className="absolute text-center text-white whitespace-nowrap pointer-events-none flex justify-center items-center" style={{
+                    left: p0x + 'rem',
+                    top: p0y + 'rem',
+                    width: Math.sqrt((p1x - p0x) * (p1x - p0x) + (p1y - p0y) * (p1y - p0y)) + 'rem',
+                    height: BaseSize / 10 + 'rem',
+                    transform: 'rotate(' + angle + 'deg)',
+                    transformOrigin: '0% 50%',
+                    backgroundColor: 'rgba(0,0,0,0.5)'
+                }}>
+                    <div className="font-mono" style={{
+                        transform: 'rotate(' + -angle + 'deg)'
+                    }}>
+                        { (distance / BaseSize * 1.5).toFixed(2) } m <br/>
+                        { (distance / BaseSize * 5).toFixed(2) } ft
+                    </div>
+                </div>
+            )
+
+        } else {
+            return <></>
+        }
     }
 
 }

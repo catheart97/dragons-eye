@@ -14,8 +14,11 @@
     "@loaders.gl/core": "^3.4.14",
     "@loaders.gl/gltf": "^3.4.14",
     "@math.gl/core": "^3.6.3",
+    "@popperjs/core": "^2.11.8",
+    "i": "^0.3.7",
     "iota-array": "^1.0.0",
     "material-icons": "^1.13.11",
+    "npm": "^10.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0"

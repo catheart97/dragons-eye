@@ -38,17 +38,17 @@ function App() {
                 board={board.current}
                 utility={utilities.current[currentUtility]}
             />
-            <div className='absolute right-0 bottom-0 w-96 p-3 pointer-events-none flex flex-col gap-1'>
+            <div className='absolute right-0 bottom-0 w-96 p-3 pointer-events-none flex flex-col gap-1 z-50'>
 
                 {
                     utilities.current[currentUtility] != undefined ? (
-                        <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end'>
+                        <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end pointer-events-auto'>
                             {utilities.current[currentUtility]!.userInterface()}
                         </div>
                     ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
                 }
 
-                <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end'>
+                <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end pointer-events-auto'>
                     <ToolButton
                         onClick={() => {
                             setCurrentUtility(0);

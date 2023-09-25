@@ -1,6 +1,26 @@
 import React from "react"
 
-import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons } from "./Board"
+import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons, BoardDecoratorType, BoardCreature, CreatureType, CreatureAttitude, CreatureSize } from "./Board"
+
+const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
+    [CreatureAttitude.Player]: '#22c55e',
+    [CreatureAttitude.NPC]: '#a78bfa',
+    [CreatureAttitude.Hostile]: '#f87171'
+}
+
+const CreatureTypeIcons: { [key in CreatureType]: JSX.Element } = {
+    [CreatureType.Humanoid]: <span className="msf">person</span>,
+    [CreatureType.Animal]: <span className="msf">pets</span>,
+    [CreatureType.Monster]: <span className="msf">diversity_2</span>
+}
+
+const CreatureSizeDimension: { [key in CreatureSize]: number } = {
+    [CreatureSize.Tiny]: 1,
+    [CreatureSize.MediumSmall]: 2,
+    [CreatureSize.Large]: 4,
+    [CreatureSize.Huge]: 8,
+    [CreatureSize.Gargantuan]: 16,
+}
 
 export const BoardShapeComponent = (props: {
     board: Board,
@@ -55,9 +75,32 @@ export const BoardShapeComponent = (props: {
             }
             {
                 props.board.decorators[idx] ? (
-                    <div className="absolute top-0 right-0 bottom-0 pointer-events-none rounded-full">
-                        <span className="msf text-2xl bg-white rounded-full">person</span>
-                    </div>
+                    props.board.decorators[idx]!.type === BoardDecoratorType.Creature ? (
+                        <div className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none rounded-full flex items-center justify-center p-1 z-10">
+                            <div className="bg-white h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center" style={{
+                                backgroundColor: CreatureAttitudeColors[(props.board.decorators[idx].data as BoardCreature).attitude],
+                                width: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
+                                height: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
+                                minHeight: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
+                                minWidth: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
+                                fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
+                            }}>
+                                <div 
+                                    style={{
+                                        fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
+                                    }}
+                                    className="pt-4"
+                                >
+                                    {CreatureTypeIcons[(props.board.decorators[idx].data as BoardCreature).type]}
+                                </div>
+                                <div style={{
+                                    fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 4 + 'rem'
+                                }}>
+                                    {(props.board.decorators[idx].data as BoardCreature).name.charAt(0).toUpperCase()}
+                                </div>
+                            </div>
+                        </div>
+                    ) : null
                 ) : null
             }
         </div>
