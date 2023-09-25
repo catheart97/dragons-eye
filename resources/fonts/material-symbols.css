@@ -1,0 +1,47 @@
+/* fallback */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-variation-settings: 'FILL' 0;
+  src: url('./symbold2.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Symbols Filled';
+  font-style: normal;
+  font-weight: 400;
+  font-variation-settings: 'FILL' 1;
+  src: url('./symbold2.woff2') format('woff2');
+}
+
+.mso {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.msf {
+  font-family: 'Material Symbols Filled';
+  font-variation-settings: 'FILL' 1;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
