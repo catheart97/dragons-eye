@@ -1,5 +1,3 @@
-import React from "react"
-
 import { Board, BoardPosition, BoardTerrain, IBoardUtility, BaseSize, TerrainColors } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 
@@ -10,7 +8,7 @@ export class TerrainBoardUtility implements IBoardUtility {
     private downTile: BoardPosition | null = null
     private hoverTile: BoardPosition | null = null
 
-    renderUI : (() => void) | null = null;
+    forceUpdate : (() => void) | null = null;
 
     constructor(board: Board, targetTerrain: BoardTerrain) {
         this.board = board
@@ -75,7 +73,7 @@ export class TerrainBoardUtility implements IBoardUtility {
                                     key={i}
                                     onClick={() => {
                                         this.targetTerrain = v;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.targetTerrain == v}
                                 ><div className='w-4 h-4 border-2 border-dashed border-black' style={{

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { ToolButton } from "../../ui/ToolButton";
 import { BoardPosition, BoardCondition, IBoardUtility, BaseSize, SpellShape } from "../Board"
 
@@ -9,7 +7,7 @@ export class SpellBoardUtility implements IBoardUtility {
 
     spellshape: SpellShape | null = null;
     areaEffect: BoardCondition | null = null;
-    renderUI: (() => void) | null = null;
+    forceUpdate: (() => void) | null = null;
 
     constructor() { }
 
@@ -39,7 +37,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = null;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == null}
                         >
@@ -48,7 +46,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = SpellShape.Cone;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == SpellShape.Cone}
                         >
@@ -57,7 +55,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = SpellShape.OuterCone;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == SpellShape.OuterCone}
                         >
@@ -66,7 +64,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = SpellShape.Cube;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == SpellShape.Cube}
                         >
@@ -75,7 +73,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = SpellShape.Cylinder;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == SpellShape.Cylinder}
                         >
@@ -84,7 +82,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.spellshape = SpellShape.Sphere;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.spellshape == SpellShape.Sphere}
                         >
@@ -100,7 +98,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = null;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == null}
                             disabled={this.spellshape == null}
@@ -110,7 +108,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Fire;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Fire}
                             disabled={this.spellshape == null}
@@ -120,7 +118,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Acid;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Acid}
                             disabled={this.spellshape == null}
@@ -130,7 +128,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Ice;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Ice}
                             disabled={this.spellshape == null}
@@ -140,7 +138,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Lightning;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Lightning}
                             disabled={this.spellshape == null}
@@ -150,7 +148,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Wet;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Wet}
                             disabled={this.spellshape == null}
@@ -160,7 +158,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Poison;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Poison}
                             disabled={this.spellshape == null}
@@ -170,7 +168,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Healing;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Healing}
                             disabled={this.spellshape == null}
@@ -180,7 +178,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Oil;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Oil}
                             disabled={this.spellshape == null}
@@ -190,7 +188,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Fog;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Fog}
                             disabled={this.spellshape == null}
@@ -200,7 +198,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Muted;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Muted}
                             disabled={this.spellshape == null}
@@ -210,7 +208,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.areaEffect = BoardCondition.Blinded;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.areaEffect == BoardCondition.Blinded}
                             disabled={this.spellshape == null}

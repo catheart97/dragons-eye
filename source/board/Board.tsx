@@ -151,6 +151,6 @@ export interface IBoardUtility {
     onShapeHover?: (position: BoardPosition) => void
     customComponent?: () => JSX.Element
 
-    renderUI: (() => void) | null
+    forceUpdate: (() => void) | null
     userInterface: () => JSX.Element
 }

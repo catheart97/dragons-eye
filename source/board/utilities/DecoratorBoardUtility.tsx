@@ -1,5 +1,3 @@
-import React from "react";
-
 import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, BaseSize } from "../Board"
 import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
@@ -24,7 +22,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
 
     mouseDown: boolean = false;
 
-    renderUI: (() => void) | null = null;
+    forceUpdate: (() => void) | null = null;
 
     constructor(board: Board) {
         this.board = board;
@@ -92,7 +90,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.mode = DecoratorBoardUtilityMode.Place;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.mode == DecoratorBoardUtilityMode.Place}
                         >
@@ -101,7 +99,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.mode = DecoratorBoardUtilityMode.Drag;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.mode == DecoratorBoardUtilityMode.Drag}
                         >
@@ -110,7 +108,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         <ToolButton
                             onClick={() => {
                                 this.mode = DecoratorBoardUtilityMode.Delete;
-                                this.renderUI?.call(this);
+                                this.forceUpdate?.call(this);
                             }}
                             active={this.mode == DecoratorBoardUtilityMode.Delete}
                         >
@@ -125,7 +123,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     <ToolButton
                                         onClick={() => {
                                             this.decoratorType = BoardDecoratorType.Creature;
-                                            this.renderUI?.call(this);
+                                            this.forceUpdate?.call(this);
                                         }}
                                         active={this.decoratorType == BoardDecoratorType.Creature}
                                     >
@@ -134,7 +132,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     <ToolButton
                                         onClick={() => {
                                             this.decoratorType = BoardDecoratorType.Item;
-                                            this.renderUI?.call(this);
+                                            this.forceUpdate?.call(this);
                                         }}
                                         active={this.decoratorType == BoardDecoratorType.Item}
                                     >
@@ -158,7 +156,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureType = CreatureType.Humanoid;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureType == CreatureType.Humanoid}
                                 >
@@ -168,7 +166,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureType = CreatureType.Animal;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureType == CreatureType.Animal}
                                 >
@@ -178,7 +176,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureType = CreatureType.Monster;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureType == CreatureType.Monster}
                                 >
@@ -190,7 +188,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureAttitude = CreatureAttitude.Player;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureAttitude == CreatureAttitude.Player}
                                 >
@@ -200,7 +198,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureAttitude = CreatureAttitude.NPC;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureAttitude == CreatureAttitude.NPC}
                                 >
@@ -210,7 +208,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     className="grow"
                                     onClick={() => {
                                         this.creatureAttitude = CreatureAttitude.Hostile;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureAttitude == CreatureAttitude.Hostile}
                                 >
@@ -221,7 +219,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <ToolButton
                                     onClick={() => {
                                         this.creatureSize = CreatureSize.Tiny;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureSize == CreatureSize.Tiny}
                                 >
@@ -230,7 +228,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <ToolButton
                                     onClick={() => {
                                         this.creatureSize = CreatureSize.MediumSmall;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureSize == CreatureSize.MediumSmall}
                                 >
@@ -239,7 +237,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <ToolButton
                                     onClick={() => {
                                         this.creatureSize = CreatureSize.Large;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureSize == CreatureSize.Large}
                                 >
@@ -248,7 +246,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <ToolButton
                                     onClick={() => {
                                         this.creatureSize = CreatureSize.Huge;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureSize == CreatureSize.Huge}
                                 >
@@ -257,7 +255,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <ToolButton
                                     onClick={() => {
                                         this.creatureSize = CreatureSize.Gargantuan;
-                                        this.renderUI?.call(this);
+                                        this.forceUpdate?.call(this);
                                     }}
                                     active={this.creatureSize == CreatureSize.Gargantuan}
                                 >

@@ -1,18 +1,14 @@
 import React from "react"
 
-import { Board, BoardPosition, BoardTerrain, IBoardUtility, BaseSize, TerrainColors } from "./Board"
+import { Board, IBoardUtility } from "./Board"
 import { BoardShapeComponent } from "./BoardShapeComponent"
+import { useForceUpdate } from "../utility"
 
 export const BoardComponent = (props: {
     board: Board,
     utility?: IBoardUtility
 }) => {
-
-    const [renderUIHelper, setRenderUIHelper] = React.useState<boolean>(false)
-    const renderUI = () => {
-        setRenderUIHelper(!renderUIHelper);
-    }
-    const hovered = React.useRef<BoardPosition | null>(null)
+    const renderUI = useForceUpdate();
 
     React.useEffect(() => {
         if (props.utility) {
@@ -30,7 +26,6 @@ export const BoardComponent = (props: {
                     board={props.board}
                     key={j + i * props.board.width}
                     onHover={(p) => {
-                        hovered.current = p
                         if (props.utility && props.utility.onShapeHover) {
                             props.utility.onShapeHover(p)
                         }
@@ -73,21 +68,6 @@ export const BoardComponent = (props: {
                         props.utility.customComponent()
                     ) : (
                         <></>
-                    )
-                }
-            </div>
-
-
-            <div className='absolute h-8 left-0 bottom-0 bg-neutral-50 rounded m-2 p-2'>
-                {
-                    hovered.current ? (
-                        <div className='flex items-center h-full'>
-                            <div className='font-mono'>({hovered.current.x}, {hovered.current.y})</div>&nbsp;- {
-                                BoardTerrain[props.board.terrain[hovered.current.x + hovered.current.y * props.board.width]]
-                            }
-                        </div>
-                    ) : (
-                        <div></div>
                     )
                 }
             </div>

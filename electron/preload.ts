@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import fsExtra from 'fs-extra'
 
 // --------- Expose some API to the Renderer process ---------
+contextBridge.exposeInMainWorld('fsExtra', fsExtra)
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.

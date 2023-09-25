@@ -1,6 +1,4 @@
-import React from "react"
-
-import { Board, BoardPosition, BoardTerrain, IBoardUtility, BaseSize, TerrainColors, BoardCondition, ConditionIcons } from "../Board"
+import { Board, BoardPosition, IBoardUtility, BaseSize, BoardCondition, ConditionIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 
 export class ConditionBoardUtility implements IBoardUtility {
@@ -10,7 +8,7 @@ export class ConditionBoardUtility implements IBoardUtility {
     private downTile: BoardPosition | null = null
     private hoverTile: BoardPosition | null = null
 
-    renderUI : (() => void) | null = null;
+    forceUpdate : (() => void) | null = null;
 
     constructor(board: Board, targetCondition: BoardCondition | null) {
         this.board = board
@@ -83,7 +81,7 @@ export class ConditionBoardUtility implements IBoardUtility {
                                 key={i}
                                 onClick={() => {
                                     this.targetCondition = v;
-                                    this.renderUI ? this.renderUI() : null;
+                                    this.forceUpdate ? this.forceUpdate() : null;
                                 }}
                                 active={this.targetCondition == v}
                             >

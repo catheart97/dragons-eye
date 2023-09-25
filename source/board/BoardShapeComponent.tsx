@@ -1,6 +1,5 @@
-import React from "react"
-
-import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons, BoardDecoratorType, BoardCreature, CreatureType, CreatureAttitude, CreatureSize } from "./Board"
+import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons, BoardDecoratorType, BoardCreature, CreatureType, CreatureAttitude, CreatureSize, BoardItem } from "./Board"
+import { Tooltip, TooltipContent, TooltipTarget } from "../ui/Tooltip"
 
 const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
     [CreatureAttitude.Player]: '#22c55e',
@@ -46,7 +45,7 @@ export const BoardShapeComponent = (props: {
         }
     }
 
-    return (
+    const content = (
         <div
             className={
                 'relative border-[1px] border-black border-dashed relative'
@@ -61,7 +60,8 @@ export const BoardShapeComponent = (props: {
                 backgroundColor: TerrainColors[props.board.terrain[idx]]
             }}
             onMouseOver={() => { props.onHover ? props.onHover(props.position) : null }}
-            onMouseDown={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
+            // onMouseDown={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
+            onClick={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
             onMouseUp={() => { props.onMouseUp ? props.onMouseUp(props.position) : null }}
         >
             {
@@ -85,11 +85,11 @@ export const BoardShapeComponent = (props: {
                                 minWidth: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
                                 fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
                             }}>
-                                <div 
+                                <div
                                     style={{
                                         fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
                                     }}
-                                    className="pt-4"
+                                    className="flex justify-center items-center"
                                 >
                                     {CreatureTypeIcons[(props.board.decorators[idx].data as BoardCreature).type]}
                                 </div>
@@ -100,9 +100,42 @@ export const BoardShapeComponent = (props: {
                                 </div>
                             </div>
                         </div>
-                    ) : null
+                    ) : (
+                        <div className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none rounded-full flex items-center justify-center p-1 z-10">
+                            <div className="bg-white h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center bg-black">
+                                <span className="msf text-2xl text-white">takeout_dining</span>
+                            </div>
+                        </div>
+                    )
                 ) : null
             }
         </div>
+    )
+
+    return (
+        props.board.decorators[idx] ? (
+            <Tooltip>
+                <TooltipTarget>
+                    {content}
+                </TooltipTarget>
+                <TooltipContent>
+                    {
+                        props.board.decorators[idx].type === BoardDecoratorType.Creature ? (
+                            (props.board.decorators[idx].data as BoardCreature).name
+                        ) : (
+                            <>
+                                {
+                                    (props.board.decorators[idx].data as BoardItem).contents.forEach((v, i) => {
+                                        return (
+                                            <div key={i}>{v}</div>
+                                        )
+                                    })
+                                }
+                            </>   
+                        )
+                    }
+                </TooltipContent>
+            </Tooltip>
+        ) : content
     )
 }

@@ -2,35 +2,68 @@ import * as React from 'react'
 
 import 'material-icons/iconfont/material-icons.css';
 import { ToolButton } from './ui/ToolButton';
-import { Board, BoardCondition, BoardTerrain, ConditionIcons, IBoardUtility, TerrainColors, constructRandomBoard } from './board/Board';
+import { Board, BoardTerrain, IBoardUtility, constructRandomBoard } from './board/Board';
 import { TerrainBoardUtility } from './board/utilities/TerrainBoardUtility';
 import { SpellBoardUtility } from './board/utilities/SpellBoardUtility';
 import { BoardComponent } from './board/BoardComponent';
 import { ConditionBoardUtility } from './board/utilities/ConditionBoardUtility';
 import { DecoratorBoardUtility } from './board/utilities/DecoratorBoardUtility';
+import { useForceUpdate } from './utility';
 
-function App() {
+const App = () => {
     const board = React.useRef<Board>(constructRandomBoard(100, 100));
+    const fileName = React.useRef<string>('');
+    const forceUpdate = useForceUpdate();
 
-    const [renderUIHelper, setRenderUIHelper] = React.useState<boolean>(false);
-    const renderUI = () => {
-        setRenderUIHelper(!renderUIHelper);
-    }
+    const registerListener = React.useRef<boolean>(false);
 
-    const [currentUtility, setCurrentUtility] = React.useState<number>(0);
-    const utilities = React.useRef<Array<IBoardUtility | undefined>>([
-        undefined,
-        new SpellBoardUtility(),
-        new TerrainBoardUtility(board.current, BoardTerrain.Grass),
-        new ConditionBoardUtility(board.current, null),
-        new DecoratorBoardUtility(board.current)
-    ]);
-
-    utilities.current.forEach(element => {
-        if (element != undefined) {
-            element.renderUI = renderUI;
+    React.useEffect(() => {
+        if (!registerListener.current) {
+            registerListener.current = true;
+            window.ipcRenderer.on('r-new-file', () => {
+                board.current = constructRandomBoard(100, 100);
+                forceUpdate();
+            });
+            window.ipcRenderer.on('r-open-file', (_e, fn : string) => {
+                console.log(fn);
+                const data = window.fsExtra.readJsonSync(fn);
+                board.current = data as Board;
+                fileName.current = fn;
+                forceUpdate();
+            });
+            window.ipcRenderer.on('r-save-file', () => {
+                if (fileName.current == "") {
+                    window.ipcRenderer.send('m-save-file-as');
+                } else {
+                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                }
+            });
+            window.ipcRenderer.on('r-save-file-as', (_e, fn: string) => {
+                fileName.current = fn;
+                console.log(fn);
+                window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+            });
         }
-    });
+    }, [])
+
+    const setupUtilities = () => {
+        utilities.current = [
+            undefined,
+            new SpellBoardUtility(),
+            new TerrainBoardUtility(board.current, BoardTerrain.Grass),
+            new ConditionBoardUtility(board.current, null),
+            new DecoratorBoardUtility(board.current)
+        ];
+        utilities.current.forEach(element => {
+            if (element != undefined) {
+                element.forceUpdate = forceUpdate;
+            }
+        });
+    }
+    
+    const [currentUtility, setCurrentUtility] = React.useState<number>(0);
+    const utilities = React.useRef<Array<IBoardUtility | undefined>>([]);
+    React.useEffect(setupUtilities, [board.current]);
 
     return (
         <div className='w-full h-screen relative'>
