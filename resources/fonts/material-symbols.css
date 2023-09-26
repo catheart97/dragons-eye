@@ -4,7 +4,7 @@
   font-style: normal;
   font-weight: 400;
   font-variation-settings: 'FILL' 0;
-  src: url('./symbold2.woff2') format('woff2');
+  src: url('./mdsymbols.woff2') format('woff2');
 }
 
 @font-face {
@@ -12,7 +12,7 @@
   font-style: normal;
   font-weight: 400;
   font-variation-settings: 'FILL' 1;
-  src: url('./symbold2.woff2') format('woff2');
+  src: url('./mdsymbols.woff2') format('woff2');
 }
 
 .mso {

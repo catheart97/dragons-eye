@@ -59,7 +59,7 @@ const BoardUtilty = () => {
                         forceUpdate();
                     },
                     failure: () => {
-                        console.log("failure");
+                        console.log("Board creation cancelled");
                     }
                 }, "New Board")
 
