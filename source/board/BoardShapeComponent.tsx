@@ -82,7 +82,7 @@ export const BoardShapeComponent = (props: {
                         </div>
                     ) : (
                         <div className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none rounded-full flex items-center justify-center p-1 z-10">
-                            <div className="h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center bg-black" style={
+                            <div className="h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black border-2 border-neutral-50 text-white align-center bg-black" style={
                                 props.board.decorators[idx].attachment.type == ItemType.Tree ? {
                                     width: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
                                     height: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
