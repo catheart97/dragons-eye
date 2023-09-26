@@ -1,4 +1,4 @@
-import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, BaseSize } from "../Board"
+import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, BaseSize, ItemType, ItemTypeIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
 import { UIGroup } from "../../ui/UIGroup";
@@ -13,12 +13,42 @@ export class DecoratorBoardUtility implements IBoardUtility {
     board: Board;
     position: BoardPosition | null = null;
     downPosition: BoardPosition | null = null;
-    decoratorType: BoardDecoratorType = BoardDecoratorType.Creature;
+
     mode: DecoratorBoardUtilityMode = DecoratorBoardUtilityMode.Drag;
+
+    decoratorType: BoardDecoratorType = BoardDecoratorType.Creature;
+
     creatureType: CreatureType = CreatureType.Humanoid;
     creatureAttitude: CreatureAttitude = CreatureAttitude.Hostile;
     creatureSize: CreatureSize = CreatureSize.MediumSmall;
-    text: string = "";
+    creatureName: string = "";
+
+    itemType: ItemType = ItemType.Treasure;
+
+    doorData: "locked" | "unlocked" = "locked";
+    trapData: {
+        armed: boolean,
+        effect: string
+    } = {
+        armed: false,
+        effect: ""
+    };
+    treasureData: string[] = [];
+    containerData: string[] = [];
+    furnitureData: {
+        type: string,
+        contents: string[]
+    } = {
+        type: "",
+        contents: []
+    };
+    lightSourceData: string = "";
+    noteData: string = "";
+    treeData: {
+        size: CreatureSize
+    } = {
+        size: CreatureSize.MediumSmall
+    };
 
     mouseDown: boolean = false;
 
@@ -37,9 +67,8 @@ export class DecoratorBoardUtility implements IBoardUtility {
     }
 
     onShapeRelease(position: BoardPosition) {
-
         const idxTo = position.x + position.y * this.board.width;
-        if (this.mode == DecoratorBoardUtilityMode.Drag) {
+        if (this.mode == DecoratorBoardUtilityMode.Drag && this.downPosition) {
             const idxFrom = this.downPosition!.x + this.downPosition!.y * this.board.width;
 
             if (this.board.decorators[idxFrom] && this.board.decorators[idxTo] == undefined) {
@@ -48,13 +77,14 @@ export class DecoratorBoardUtility implements IBoardUtility {
             }
 
             this.position = null;
-        } else if (this.mode == DecoratorBoardUtilityMode.Place) {
-            if (this.board.decorators[idxTo] == undefined && this.text.length > 0) {
+        }
+        if (this.mode == DecoratorBoardUtilityMode.Place) {
+            if (this.board.decorators[idxTo] == undefined) {
                 if (this.decoratorType == BoardDecoratorType.Creature) {
                     this.board.decorators[idxTo] = {
                         type: this.decoratorType,
-                        data: {
-                            name: this.text,
+                        attachment: {
+                            name: this.creatureName,
                             type: this.creatureType,
                             attitude: this.creatureAttitude,
                             size: this.creatureSize
@@ -63,18 +93,25 @@ export class DecoratorBoardUtility implements IBoardUtility {
                 } else {
                     this.board.decorators[idxTo] = {
                         type: this.decoratorType,
-                        data: {
-                            contents: this.text.split(',').map((s) => s.trim())
+                        attachment: {
+                            type: this.itemType,
+                            data: this.itemType == ItemType.Door ? this.doorData :
+                                this.itemType == ItemType.Trap ? this.trapData :
+                                    this.itemType == ItemType.Treasure ? this.treasureData :
+                                        this.itemType == ItemType.Container ? this.containerData :
+                                            this.itemType == ItemType.Furniture ? this.furnitureData :
+                                                this.itemType == ItemType.LightSource ? this.lightSourceData :
+                                                    this.itemType == ItemType.Note ? this.noteData : this.treeData
                         }
                     }
                 }
             }
-        } else {
-            delete this.board.decorators[idxTo];
         }
 
+        if (this.mode == DecoratorBoardUtilityMode.Delete) {
+            delete this.board.decorators[idxTo];
+        }
         this.mouseDown = false;
-
     }
 
 
@@ -139,10 +176,263 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         <span className="mso text-xl">category</span>
                                     </ToolButton>
                                 </UIGroup>
-                                <UIGroup title={this.decoratorType == BoardDecoratorType.Creature ? "Name" : "Contents"}>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item ? (
+                            <>
+                                <UIGroup title="Item Type">
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Treasure;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Treasure}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Treasure]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Door;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Door}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Door]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Trap;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Trap}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Trap]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Container;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Container}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Container]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Furniture;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Furniture}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Furniture]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.LightSource;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.LightSource}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.LightSource]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Note;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Note}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Note]}
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Tree;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Tree}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Tree]}
+                                    </ToolButton>
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    { 
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Door ? (
+                            <>
+                                <UIGroup title="Door State">
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.doorData = "locked";
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.doorData == "locked"}
+                                    >
+                                        <span className="mso text-xl">lock</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.doorData = "unlocked";
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.doorData == "unlocked"}
+                                    >
+                                        <span className="mso text-xl">lock_open</span>
+                                    </ToolButton>
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Trap ? (
+                            <>
+                                <UIGroup title="Trap State">
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.trapData.armed = !this.trapData.armed;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.trapData.armed}
+                                    >
+                                        <span className="mso text-xl">bolt</span>
+                                    </ToolButton>
+                                </UIGroup>
+                                <UIGroup title="Trap Effect">
                                     <TextInput onChange={(e) => {
-                                        this.text = e.target.value;
+                                        this.trapData.effect = e.target.value;
                                     }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Treasure ? (
+                            <>
+                                <UIGroup title="Treasure Contents">
+                                    <TextInput onChange={(e) => {
+                                        this.treasureData = e.target.value.split('\n');
+                                    }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Container ? (
+                            <>
+                                <UIGroup title="Container Contents">
+                                    <TextInput onChange={(e) => {
+                                        this.containerData = e.target.value.split('\n');
+                                    }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Furniture ? (
+                            <>
+                                <UIGroup title="Furniture Type">
+                                    <TextInput onChange={(e) => {
+                                        this.furnitureData.type = e.target.value;
+                                    }} />
+                                </UIGroup>
+                                <UIGroup title="Furniture Contents">
+                                    <TextInput onChange={(e) => {
+                                        this.furnitureData.contents = e.target.value.split('\n');
+                                    }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.LightSource ? (
+                            <>
+                                <UIGroup title="Light Source">
+                                    <TextInput onChange={(e) => {
+                                        this.lightSourceData = e.target.value;
+                                    }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Note ? (
+                            <>
+                                <UIGroup title="Note">
+                                    <TextInput onChange={(e) => {
+                                        this.noteData = e.target.value;
+                                    }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Tree ? (
+                            <>
+                                <UIGroup title="Tree Size">
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.treeData.size = CreatureSize.Tiny;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.treeData.size == CreatureSize.Tiny}
+                                    >
+                                        <span className="mso text-xl">crib</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.treeData.size = CreatureSize.MediumSmall;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.treeData.size == CreatureSize.MediumSmall}
+                                    >
+                                        <span className="mso text-xl">person</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.treeData.size = CreatureSize.Large;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.treeData.size == CreatureSize.Large}
+                                    >
+                                        <span className="mso text-xl">directions_car</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.treeData.size = CreatureSize.Huge;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.treeData.size == CreatureSize.Huge}
+                                    >
+                                        <span className="mso text-xl">home</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.treeData.size = CreatureSize.Gargantuan;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.treeData.size == CreatureSize.Gargantuan}
+                                    >
+                                        <span className="mso text-xl">domain</span>
+                                    </ToolButton>
                                 </UIGroup>
                             </>
                         ) : null
@@ -151,117 +441,122 @@ export class DecoratorBoardUtility implements IBoardUtility {
                     {
                         this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Creature ? (
                             <>
-                            <UIGroup title="Creature Type">
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureType = CreatureType.Humanoid;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureType == CreatureType.Humanoid}
-                                >
-                                    <span className="mso text-xl">person</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureType = CreatureType.Animal;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureType == CreatureType.Animal}
-                                >
-                                    <span className="mso text-xl">pets</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureType = CreatureType.Monster;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureType == CreatureType.Monster}
-                                >
-                                    <span className="mso text-xl">diversity_2</span>
-                                </ToolButton>
-                            </UIGroup>
-                            <UIGroup title="Attitude">
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureAttitude = CreatureAttitude.Player;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureAttitude == CreatureAttitude.Player}
-                                >
-                                    <span className="mso text-xl">person</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureAttitude = CreatureAttitude.NPC;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureAttitude == CreatureAttitude.NPC}
-                                >
-                                    <span className="mso text-xl">robot</span>
-                                </ToolButton>
-                                <ToolButton
-                                    className="grow"
-                                    onClick={() => {
-                                        this.creatureAttitude = CreatureAttitude.Hostile;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureAttitude == CreatureAttitude.Hostile}
-                                >
-                                    <span className="mso text-xl">swords</span>
-                                </ToolButton>
-                            </UIGroup>
-                            <UIGroup title="Size">
-                                <ToolButton
-                                    onClick={() => {
-                                        this.creatureSize = CreatureSize.Tiny;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureSize == CreatureSize.Tiny}
-                                >
-                                    <span className="mso text-xl">crib</span>
-                                </ToolButton>
-                                <ToolButton
-                                    onClick={() => {
-                                        this.creatureSize = CreatureSize.MediumSmall;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureSize == CreatureSize.MediumSmall}
-                                >
-                                    <span className="mso text-xl">person</span>
-                                </ToolButton>
-                                <ToolButton
-                                    onClick={() => {
-                                        this.creatureSize = CreatureSize.Large;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureSize == CreatureSize.Large}
-                                >
-                                    <span className="mso text-xl">directions_car</span>
-                                </ToolButton>
-                                <ToolButton
-                                    onClick={() => {
-                                        this.creatureSize = CreatureSize.Huge;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureSize == CreatureSize.Huge}
-                                >
-                                    <span className="mso text-xl">home</span>
-                                </ToolButton>
-                                <ToolButton
-                                    onClick={() => {
-                                        this.creatureSize = CreatureSize.Gargantuan;
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                    active={this.creatureSize == CreatureSize.Gargantuan}
-                                >
-                                    <span className="mso text-xl">domain</span>
-                                </ToolButton>
-                            </UIGroup>
+                                <UIGroup title="Creature Type">
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureType = CreatureType.Humanoid;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureType == CreatureType.Humanoid}
+                                    >
+                                        <span className="mso text-xl">person</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureType = CreatureType.Animal;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureType == CreatureType.Animal}
+                                    >
+                                        <span className="mso text-xl">pets</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureType = CreatureType.Monster;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureType == CreatureType.Monster}
+                                    >
+                                        <span className="mso text-xl">diversity_2</span>
+                                    </ToolButton>
+                                </UIGroup>
+                                <UIGroup title="Attitude">
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureAttitude = CreatureAttitude.Player;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureAttitude == CreatureAttitude.Player}
+                                    >
+                                        <span className="mso text-xl">person</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureAttitude = CreatureAttitude.NPC;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureAttitude == CreatureAttitude.NPC}
+                                    >
+                                        <span className="mso text-xl">robot</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        className="grow"
+                                        onClick={() => {
+                                            this.creatureAttitude = CreatureAttitude.Hostile;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureAttitude == CreatureAttitude.Hostile}
+                                    >
+                                        <span className="mso text-xl">swords</span>
+                                    </ToolButton>
+                                </UIGroup>
+                                <UIGroup title="Size">
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.Tiny;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.Tiny}
+                                    >
+                                        <span className="mso text-xl">crib</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.MediumSmall;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.MediumSmall}
+                                    >
+                                        <span className="mso text-xl">person</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.Large;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.Large}
+                                    >
+                                        <span className="mso text-xl">directions_car</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.Huge;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.Huge}
+                                    >
+                                        <span className="mso text-xl">home</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.Gargantuan;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.Gargantuan}
+                                    >
+                                        <span className="mso text-xl">domain</span>
+                                    </ToolButton>
+                                </UIGroup>
+                                <UIGroup title="Name">
+                                    <TextInput onChange={(e) => {
+                                        this.creatureName = e.target.value;
+                                    }} />
+                                </UIGroup>
                             </>
                         ) : null
                     }
@@ -294,8 +589,8 @@ export class DecoratorBoardUtility implements IBoardUtility {
                     <div className="font-mono" style={{
                         transform: 'rotate(' + -angle + 'deg)'
                     }}>
-                        { (distance / BaseSize * 1.5).toFixed(2) } m <br/>
-                        { (distance / BaseSize * 5).toFixed(2) } ft
+                        {(distance / BaseSize * 1.5).toFixed(2)} m <br />
+                        {(distance / BaseSize * 5).toFixed(2)} ft
                     </div>
                 </div>
             )

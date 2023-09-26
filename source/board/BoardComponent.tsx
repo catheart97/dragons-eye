@@ -49,27 +49,43 @@ export const BoardComponent = (props: {
         rows.push(row)
     }
 
+    const [zoom, setZoom] = React.useState<number>(1);
+
     return (
         <div
-            className='relative h-[inherit] w-[inherit]'
+            className='overflow-scroll select-none h-[inherit] w-[inherit] min-h-[inherit] min-w-[inherit] max-h-[inherit] max-w-[inherit] bg-neutral-400'
+            style={{
+                zoom: zoom
+            }}
+            onWheel={(e) => {
+                if (e.ctrlKey) {
+                    setZoom(Math.min(Math.max(zoom - e.deltaY / 1000, 0.1), 2));
+                }
+            }}
         >
-            <div className='absolute top-0 left-0 right-0 bottom-0 overflow-scroll flex flex-col select-none'>
-                {
-                    rows.map((row, index) => {
-                        return (
-                            <div className='flex' key={index}>
-                                {row}
-                            </div>
-                        )
-                    })
-                }
-                {
-                    props.utility && props.utility.customComponent ? (
-                        props.utility.customComponent()
-                    ) : (
-                        <></>
-                    )
-                }
+            <div className="flex justify-center items-center min-h-full">
+                <div className="relative">
+                    <div>
+                        {
+                            rows.map((row, index) => {
+                                return (
+                                    <div className='flex' key={index}>
+                                        {row}
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                        {
+                            props.utility && props.utility.customComponent ? (
+                                props.utility.customComponent()
+                            ) : (
+                                <></>
+                            )
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     )

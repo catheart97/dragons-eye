@@ -1,25 +1,5 @@
-import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons, BoardDecoratorType, BoardCreature, CreatureType, CreatureAttitude, CreatureSize, BoardItem } from "./Board"
+import { Board, BoardPosition, BoardTerrain, BaseSize, TerrainColors, BoardCondition, ConditionIcons, BoardDecoratorType, BoardCreature, BoardItem, ItemTypeIcons, CreatureAttitudeColors, CreatureSizeDimension, CreatureTypeIcons, ItemType, DoorData, TrapData, TreasureData, ContainerData, NoteData, FurnitureData, LightSourceData, TreeData } from "./Board"
 import { Tooltip, TooltipContent, TooltipTarget } from "../ui/Tooltip"
-
-const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
-    [CreatureAttitude.Player]: '#22c55e',
-    [CreatureAttitude.NPC]: '#a78bfa',
-    [CreatureAttitude.Hostile]: '#f87171'
-}
-
-const CreatureTypeIcons: { [key in CreatureType]: JSX.Element } = {
-    [CreatureType.Humanoid]: <span className="msf">person</span>,
-    [CreatureType.Animal]: <span className="msf">pets</span>,
-    [CreatureType.Monster]: <span className="msf">diversity_2</span>
-}
-
-const CreatureSizeDimension: { [key in CreatureSize]: number } = {
-    [CreatureSize.Tiny]: 1,
-    [CreatureSize.MediumSmall]: 2,
-    [CreatureSize.Large]: 4,
-    [CreatureSize.Huge]: 8,
-    [CreatureSize.Gargantuan]: 16,
-}
 
 export const BoardShapeComponent = (props: {
     board: Board,
@@ -60,8 +40,8 @@ export const BoardShapeComponent = (props: {
                 backgroundColor: TerrainColors[props.board.terrain[idx]]
             }}
             onMouseOver={() => { props.onHover ? props.onHover(props.position) : null }}
-            // onMouseDown={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
             onClick={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
+            onMouseDown={() => { props.onMouseDown ? props.onMouseDown(props.position) : null }}
             onMouseUp={() => { props.onMouseUp ? props.onMouseUp(props.position) : null }}
         >
             {
@@ -78,32 +58,42 @@ export const BoardShapeComponent = (props: {
                     props.board.decorators[idx]!.type === BoardDecoratorType.Creature ? (
                         <div className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none rounded-full flex items-center justify-center p-1 z-10">
                             <div className="bg-white h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center" style={{
-                                backgroundColor: CreatureAttitudeColors[(props.board.decorators[idx].data as BoardCreature).attitude],
-                                width: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
-                                height: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
-                                minHeight: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
-                                minWidth: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] + 'rem',
-                                fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
+                                backgroundColor: CreatureAttitudeColors[(props.board.decorators[idx].attachment as BoardCreature).attitude],
+                                width: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] + 'rem',
+                                height: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] + 'rem',
+                                minHeight: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] + 'rem',
+                                minWidth: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] + 'rem',
+                                fontSize: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] / 2 + 'rem'
                             }}>
                                 <div
                                     style={{
-                                        fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 2 + 'rem'
+                                        fontSize: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] / 2 + 'rem'
                                     }}
                                     className="flex justify-center items-center"
                                 >
-                                    {CreatureTypeIcons[(props.board.decorators[idx].data as BoardCreature).type]}
+                                    {CreatureTypeIcons[(props.board.decorators[idx].attachment as BoardCreature).type]}
                                 </div>
                                 <div style={{
-                                    fontSize: CreatureSizeDimension[(props.board.decorators[idx].data as BoardCreature).size] / 4 + 'rem'
+                                    fontSize: CreatureSizeDimension[(props.board.decorators[idx].attachment as BoardCreature).size] / 4 + 'rem'
                                 }}>
-                                    {(props.board.decorators[idx].data as BoardCreature).name.charAt(0).toUpperCase()}
+                                    {(props.board.decorators[idx].attachment as BoardCreature).name.charAt(0).toUpperCase()}
                                 </div>
                             </div>
                         </div>
                     ) : (
                         <div className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none rounded-full flex items-center justify-center p-1 z-10">
-                            <div className="bg-white h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center bg-black">
-                                <span className="msf text-2xl text-white">takeout_dining</span>
+                            <div className="h-full w-full rounded-full flex justify-center items-center shadow border-0 border-black text-white align-center bg-black" style={
+                                props.board.decorators[idx].attachment.type == ItemType.Tree ? {
+                                    width: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
+                                    height: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
+                                    minHeight: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
+                                    minWidth: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] + 'rem',
+                                    fontSize: CreatureSizeDimension[((props.board.decorators[idx].attachment as BoardItem).data as TreeData).size] / 2 + 'rem'
+                                } : {}
+                            }>
+                                {
+                                    ItemTypeIcons[(props.board.decorators[idx].attachment as BoardItem).type]
+                                }
                             </div>
                         </div>
                     )
@@ -121,17 +111,77 @@ export const BoardShapeComponent = (props: {
                 <TooltipContent>
                     {
                         props.board.decorators[idx].type === BoardDecoratorType.Creature ? (
-                            (props.board.decorators[idx].data as BoardCreature).name
+                            (props.board.decorators[idx].attachment as BoardCreature).name
                         ) : (
-                            <>
+                            <div className="flex flex-col gap-1">
                                 {
-                                    (props.board.decorators[idx].data as BoardItem).contents.forEach((v, i) => {
-                                        return (
-                                            <div key={i}>{v}</div>
-                                        )
-                                    })
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Door ? (
+                                        <>{(props.board.decorators[idx].attachment as BoardItem).data as DoorData}</>
+                                    ) : null
                                 }
-                            </>   
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Trap ? (
+                                        <>
+                                            <div>{((props.board.decorators[idx].attachment as BoardItem).data as TrapData).armed}</div>
+                                            <div>
+                                            {((props.board.decorators[idx].attachment as BoardItem).data as TrapData).effect}
+                                            </div>
+                                        </>
+                                    ) : null
+                                }
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Treasure ? (
+                                        ((props.board.decorators[idx].attachment as BoardItem).data as TreasureData).map((v, i) => {
+                                            return (
+                                                <div key={i}>
+                                                    {v}
+                                                </div>
+                                            )
+                                        })
+                                    ) : null
+                                }
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Container ? (
+                                        ((props.board.decorators[idx].attachment as BoardItem).data as ContainerData).map((v, i) => {
+                                            return (
+                                                <div key={i}>
+                                                    {v}
+                                                </div>
+                                            )
+                                        })
+                                    ) : null
+                                }
+
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Note ? (
+                                        ((props.board.decorators[idx].attachment as BoardItem).data as NoteData)
+                                    ) : null
+                                }
+ 
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.LightSource ? (
+                                        ((props.board.decorators[idx].attachment as BoardItem).data as LightSourceData)
+                                    ) : null
+                                }
+
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Furniture ? (
+                                        <div>{((props.board.decorators[idx].attachment as BoardItem).data as FurnitureData).type}</div>
+                                    ) : null
+                                }
+                                {
+                                    (props.board.decorators[idx].attachment as BoardItem).type == ItemType.Furniture ? (
+                                        ((props.board.decorators[idx].attachment as BoardItem).data as FurnitureData).contents.map((v, i) => { 
+                                            return (
+                                                <div key={i}>
+                                                    {v}
+                                                </div>
+                                            )
+                                        })
+                                    ) : null
+                                }
+
+                            </div>   
                         )
                     }
                 </TooltipContent>

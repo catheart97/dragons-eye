@@ -18,6 +18,7 @@ export class TerrainBoardUtility implements IBoardUtility {
     onShapeClick(position: BoardPosition) {
         this.downTile = position;
         this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
+        console.log("down");
     }
 
     onShapeHover(position: BoardPosition) {
@@ -25,6 +26,9 @@ export class TerrainBoardUtility implements IBoardUtility {
     }
 
     onShapeRelease(position: BoardPosition) {
+
+        console.log(this.downTile);
+
         if (position.x === this.downTile?.x && position.y === this.downTile?.y) {
             this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
         } else {

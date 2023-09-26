@@ -1,7 +1,50 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } from 'electron'
 import path from 'node:path'
+import NPMLicenses from '../license.json?raw';
+
+type License = {
+  name: string;
+  licenseType: string;
+  author: string | "n/a";
+  departement?: string;
+  licensePeriod?: string;
+  link?: string;
+  remoteVersion?: string;
+  installedVersion?: string;
+  relatedTo?: string;
+  definedVersion?: string;
+}
+
 
 const isProd = import.meta.env.PROD;
+
+const buildLicense = (licenses: License[]) => {
+
+  let output = `This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Open Source License Notices
+
+`
+  for (const license of licenses) {
+    if (license.author === "n/a") {
+      output += `${license.name} (${license.licenseType}))\n`;
+    } else {
+      output += `${license.name} (${license.licenseType}) by ${license.author})\n`;
+    }
+  }
+  return output;
+}
 
 // The built directory structure
 //
@@ -70,8 +113,7 @@ function createWindow() {
         label: 'New',
         accelerator: 'CmdOrCtrl+N',
         click: () => {
-          console.log('New')
-          win!.webContents.send('r-new-file');
+          win!.webContents.send('r-new-file', 10, 10);
         }
       },
       {
@@ -89,6 +131,28 @@ function createWindow() {
           if (!fn) return;
           win!.webContents.send('r-open-file', fn[0]);
         }
+      },
+      {
+        label: 'Import',
+        submenu: [
+          {
+            label: "Watabou's One Page Dungeon",
+            click: () => {
+              const fn = dialog.showOpenDialogSync({
+                filters: [
+                  { name: "Watabou's One Page Dungeon JSON", extensions: ['json'] },
+                  { name: 'All Files', extensions: ['*'] }
+                ],
+                properties: ['openFile']
+              });
+
+              if (!fn) return;
+
+              win!.webContents.send('r-import-onepagedungeon', fn[0]);
+              console.log("Importing " + fn[0]);
+            }
+          }
+        ]
       },
       {
         label: 'Save',
@@ -139,6 +203,25 @@ function createWindow() {
     }));
   }
   Menu.setApplicationMenu(menu);
+
+  const LicenseText = buildLicense([
+    ...JSON.parse(NPMLicenses), 
+    {
+      name: "Material Design Icons",
+      licenseType: "Apache-2.0",
+      author: "Google Inc."
+    },
+    {
+      name: "Google Fonts",
+      licenseType: "Apache-2.0",
+      author: "Google Inc."
+    }
+  ])
+  
+  app.setAboutPanelOptions({
+    "copyright": "Ronja Schnur (catheart97)",
+    "credits": LicenseText
+  })
 
   ipcMain.on("m-save-file-as", (_event, _arg) => {
     const fn = dialog.showSaveDialogSync({
