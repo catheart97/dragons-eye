@@ -1,45 +1,23 @@
 {
   "name": "dragons-eye",
   "private": true,
+  "author": "Ronja Schnur (catheart97)",
   "version": "0.1.7",
-  "build": {
-    "mac": {
-      "fileAssociations": [
-        {
-          "ext": "deb",
-          "name": "Dragon's Eye Board",
-          "role": "Editor"
-        },
-        {
-          "ext": "json",
-          "name": "Dragon's Eye Board",
-          "role": "Editor"
-        }
-      ]
-    }
-  },
   "scripts": {
     "dev": "vite",
     "predev": "license-report > license.json",
     "prebuild": "license-report > license.json",
-    "build": "npm version patch && tsc && vite build && electron-builder",
+    "preprod": "license-report > license.json",
+    "prod": "npm version patch && tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@babylonjs/core": "^6.21.2",
-    "@babylonjs/loaders": "^6.21.2",
-    "@loaders.gl/core": "^3.4.14",
-    "@loaders.gl/gltf": "^3.4.14",
-    "@math.gl/core": "^3.6.3",
     "@popperjs/core": "^2.11.8",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1",
-    "i": "^0.3.7",
-    "iota-array": "^1.0.0",
     "license-report": "^6.4.0",
-    "material-icons": "^1.13.11",
-    "npm": "^10.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0",

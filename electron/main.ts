@@ -234,6 +234,11 @@ function createWindow() {
         if (!fn) return;
         win!.webContents.send('r-save-file-as', fn);
     });
+
+    ipcMain.on("m-ready", (_event, _arg) => {
+        console.log("m-ready");
+        if (fn != null) win!.webContents.send('r-open-file', fn);
+    });
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -245,6 +250,12 @@ app.on('window-all-closed', () => {
         win = null
     }
 })
+
+let fn : string | null = null;
+app.on("open-file", (_event, arg) => {
+    fn = arg;
+    win?.webContents?.send('r-open-file', arg);
+});
 
 app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the

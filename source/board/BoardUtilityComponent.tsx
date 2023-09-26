@@ -103,6 +103,7 @@ const BoardUtilty = () => {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
             });
+            window.ipcRenderer.send('m-ready');
         }
         forceUpdate()
     }, [])
