@@ -167,7 +167,7 @@ function createWindow() {
                 click: () => {
                     const fn = dialog.showSaveDialogSync({
                         filters: [
-                            { name: "Dragon's Eye Board", extensions: ['json', 'deb'] },
+                            { name: "Dragon's Eye Board", extensions: ['deb', "json"] },
                             { name: 'All Files', extensions: ['*'] }
                         ],
                         properties: ['createDirectory']
@@ -226,7 +226,7 @@ function createWindow() {
     ipcMain.on("m-save-file-as", (_event, _arg) => {
         const fn = dialog.showSaveDialogSync({
             filters: [
-                { name: 'Board JSON', extensions: ['json'] },
+                { name: "Dragon's Eye Board", extensions: ['deb', 'json'] },
                 { name: 'All Files', extensions: ['*'] }
             ],
             properties: ['createDirectory']

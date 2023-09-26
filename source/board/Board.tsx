@@ -5,7 +5,8 @@ export enum BoardTerrain {
     Scrub,
     Sand,
     Dirt,
-    Wall
+    Wall,
+    Wood
 }
 
 export const TerrainColors: { [key in BoardTerrain] : string } = {
@@ -15,7 +16,8 @@ export const TerrainColors: { [key in BoardTerrain] : string } = {
     [BoardTerrain.Scrub]: '#365314',
     [BoardTerrain.Sand]: '#fef08a',
     [BoardTerrain.Dirt]: '#854d0e',
-    [BoardTerrain.Wall]: '#020617'
+    [BoardTerrain.Wall]: '#020617',
+    [BoardTerrain.Wood]: '#a27035'
 }
 
 export const BaseSize = 3;

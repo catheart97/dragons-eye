@@ -36,7 +36,7 @@ const BoardUtilty = () => {
                             className='grow w-full'
                             defaultValue={w}
                             min={2}
-                            max={150}
+                            max={300}
                             onChange={(e) => {
                                 w = e.target.valueAsNumber;
                             }}
@@ -47,7 +47,7 @@ const BoardUtilty = () => {
                             className='grow'
                             defaultValue={h}
                             min={2}
-                            max={150}
+                            max={300}
                             onChange={(e) => {
                                 h = e.target.valueAsNumber;
                             }}
@@ -62,9 +62,6 @@ const BoardUtilty = () => {
                         console.log("Board creation cancelled");
                     }
                 }, "New Board")
-
-                board.current = constructRandomBoard(w, h);
-                forceUpdate();
             });
             window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
                 try {

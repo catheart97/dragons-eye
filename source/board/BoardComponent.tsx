@@ -63,7 +63,7 @@ export const BoardComponent = (props: {
                 }
             }}
         >
-            <div className="flex justify-center items-center min-h-full">
+            <div className="min-h-full">
                 <div className="relative">
                     <div>
                         {

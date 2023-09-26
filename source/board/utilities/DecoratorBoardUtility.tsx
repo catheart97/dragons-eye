@@ -91,17 +91,18 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         }
                     }
                 } else {
+                    const data = this.itemType == ItemType.Door ? this.doorData :
+                    this.itemType == ItemType.Trap ? this.trapData :
+                        this.itemType == ItemType.Treasure ? this.treasureData :
+                            this.itemType == ItemType.Container ? this.containerData :
+                                this.itemType == ItemType.Furniture ? this.furnitureData :
+                                    this.itemType == ItemType.LightSource ? this.lightSourceData :
+                                        this.itemType == ItemType.Note ? this.noteData : this.treeData;
                     this.board.decorators[idxTo] = {
                         type: this.decoratorType,
                         attachment: {
-                            type: this.itemType,
-                            data: this.itemType == ItemType.Door ? this.doorData :
-                                this.itemType == ItemType.Trap ? this.trapData :
-                                    this.itemType == ItemType.Treasure ? this.treasureData :
-                                        this.itemType == ItemType.Container ? this.containerData :
-                                            this.itemType == ItemType.Furniture ? this.furnitureData :
-                                                this.itemType == ItemType.LightSource ? this.lightSourceData :
-                                                    this.itemType == ItemType.Note ? this.noteData : this.treeData
+                            type: structuredClone(this.itemType),
+                            data: structuredClone(data)
                         }
                     }
                 }
