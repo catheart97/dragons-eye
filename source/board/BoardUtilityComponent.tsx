@@ -16,7 +16,7 @@ import { NumberInput } from '../ui/NumberInput';
 import { UIGroup } from '../ui/UIGroup';
 
 const BoardUtilty = () => {
-    const board = React.useRef<Board>(constructRandomBoard(20, 20));
+    const board = React.useRef<Board>(constructRandomBoard(10, 10));
     const fileName = React.useRef<string>('');
     const forceUpdate = useForceUpdate();
 
@@ -67,27 +67,41 @@ const BoardUtilty = () => {
                 forceUpdate();
             });
             window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
-                board.current = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
-                forceUpdate();
+                try {
+                    board.current = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
+                    forceUpdate();
+                } catch (e : any) {
+                    dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+                }
             });
             window.ipcRenderer.on('r-open-file', (_e, fn: string) => {
-                console.log(fn);
-                const data = window.fsExtra.readJsonSync(fn);
-                board.current = data as Board;
-                fileName.current = fn;
-                forceUpdate();
+                try {
+                    const data = window.fsExtra.readJsonSync(fn);
+                    board.current = data as Board;
+                    fileName.current = fn;
+                    forceUpdate();
+                } catch (e : any) {
+                    dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+                }
             });
             window.ipcRenderer.on('r-save-file', () => {
                 if (fileName.current == "") {
                     window.ipcRenderer.send('m-save-file-as');
                 } else {
-                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                    try {
+                        window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                    } catch (e : any) {
+                        dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+                    }
                 }
             });
             window.ipcRenderer.on('r-save-file-as', (_e, fn: string) => {
                 fileName.current = fn;
-                console.log(fn);
-                window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                try {
+                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                } catch (e : any) {
+                    dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+                }
             });
         }
         forceUpdate()
