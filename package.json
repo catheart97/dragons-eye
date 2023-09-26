@@ -2,6 +2,22 @@
   "name": "dragons-eye",
   "private": true,
   "version": "0.1.6",
+  "build": {
+    "mac": {
+      "fileAssociations": [
+        {
+          "ext": "deb",
+          "name": "Dragon's Eye Board",
+          "role": "Editor"
+        },
+        {
+          "ext": "json",
+          "name": "Dragon's Eye Board",
+          "role": "Editor"
+        }
+      ]
+    }
+  },
   "scripts": {
     "dev": "vite",
     "predev": "license-report > license.json",
