@@ -17,7 +17,11 @@
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "extraResource": [
+      "build/file.icns"
+    ],
+    "extendInfo": "build/Info.plist"
   },
   "win": {
     "target": [
