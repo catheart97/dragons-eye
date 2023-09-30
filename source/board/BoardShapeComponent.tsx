@@ -46,7 +46,7 @@ export const BoardShapeComponent = (props: {
         >
             {
                 props.board.conditions[idx] ? (
-                    <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                    <div className={"absolute top-0 left-0 right-0 bottom-0 pointer-events-none " + (props.board.conditions[idx] == BoardCondition.Fog ? "z-20 bg-white" : "")}>
                         {
                             ConditionIcons[props.board.conditions[idx]]
                         }
