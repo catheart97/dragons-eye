@@ -16,7 +16,7 @@ import { NumberInput } from '../ui/NumberInput';
 import { UIGroup } from '../ui/UIGroup';
 
 const BoardUtilty = () => {
-    const board = React.useRef<Board>(constructRandomBoard(10, 10));
+    const board = React.useRef<Board>(constructRandomBoard(25, 25));
     const fileName = React.useRef<string>('');
     const forceUpdate = useForceUpdate();
 

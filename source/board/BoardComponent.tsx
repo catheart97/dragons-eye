@@ -63,8 +63,10 @@ export const BoardComponent = (props: {
                 }
             }}
         >
-            <div className="min-h-full">
-                <div className="relative">
+            <div className="min-h-full flex items-center" style={{
+                justifyContent: 'safe center'
+            }}>
+                <div className="relative m-auto">
                     <div>
                         {
                             rows.map((row, index) => {
