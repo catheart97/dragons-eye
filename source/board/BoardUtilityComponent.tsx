@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import 'material-icons/iconfont/material-icons.css';
 import { ToolButton } from '../ui/ToolButton';
-import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructFromOnePageDungeon, constructRandomBoard } from '../board/Board';
+import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon, constructRandomBoard } from '../board/Board';
 import { TerrainBoardUtility } from '../board/utilities/TerrainBoardUtility';
 import { SpellBoardUtility } from '../board/utilities/SpellBoardUtility';
 import { BoardComponent } from '../board/BoardComponent';
@@ -16,10 +16,10 @@ import { NumberInput } from '../ui/NumberInput';
 import { UIGroup } from '../ui/UIGroup';
 
 const BoardUtilty = () => {
-    const board = React.useRef<Board>(constructRandomBoard(25, 25));
+    const board = React.useRef<Board>(constructDefaultBoard(15, 15));
     const fileName = React.useRef<string>('');
     const forceUpdate = useForceUpdate();
-
+ 
     const dialogHandle = React.useRef<DialogHandle>(null);
     const registerListener = React.useRef<boolean>(false);
 
@@ -55,7 +55,7 @@ const BoardUtilty = () => {
                     </UIGroup>
                 </div>, {
                     success: () => {
-                        board.current = constructRandomBoard(w, h);
+                        board.current = constructDefaultBoard(w, h);
                         forceUpdate();
                     },
                     failure: () => {

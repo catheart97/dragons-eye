@@ -8,7 +8,20 @@ export const BoardComponent = (props: {
     board: Board,
     utility?: IBoardUtility
 }) => {
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const renderUI = useForceUpdate();
+
+    React.useEffect(() => {
+        if (rootRef.current) {
+            // scroll to center
+            const viewportRect = rootRef.current.getBoundingClientRect();
+            rootRef.current.scrollTo({
+                top: (rootRef.current.scrollHeight - viewportRect.height) / 2,
+                left: (rootRef.current.scrollWidth - viewportRect.width) / 2,
+                behavior: 'smooth'
+            })
+        }
+    }, [])
 
     React.useEffect(() => {
         if (props.utility) {
@@ -53,6 +66,7 @@ export const BoardComponent = (props: {
 
     return (
         <div
+            ref={rootRef}
             className='overflow-scroll select-none h-[inherit] w-[inherit] min-h-[inherit] min-w-[inherit] max-h-[inherit] max-w-[inherit] bg-neutral-400'
             style={{
                 zoom: zoom
@@ -66,26 +80,28 @@ export const BoardComponent = (props: {
             <div className="min-h-full flex items-center" style={{
                 justifyContent: 'safe center'
             }}>
-                <div className="relative m-auto">
-                    <div>
-                        {
-                            rows.map((row, index) => {
-                                return (
-                                    <div className='flex' key={index}>
-                                        {row}
-                                    </div>
+                <div className="p-72">
+                    <div className="relative">
+                        <div>
+                            {
+                                rows.map((row, index) => {
+                                    return (
+                                        <div className='flex' key={index}>
+                                            {row}
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                            {
+                                props.utility && props.utility.customComponent ? (
+                                    props.utility.customComponent()
+                                ) : (
+                                    <></>
                                 )
-                            })
-                        }
-                    </div>
-                    <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
-                        {
-                            props.utility && props.utility.customComponent ? (
-                                props.utility.customComponent()
-                            ) : (
-                                <></>
-                            )
-                        }
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

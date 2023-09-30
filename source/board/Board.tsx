@@ -372,3 +372,27 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
         decorators
     };
 }
+
+/**
+ * Constructs a board with wall boarders and a floor of stone
+ * @param w 
+ * @param h 
+ */
+export const constructDefaultBoard = (w: number, h: number): Board => {
+    const board = new Array<BoardTerrain>(w * h);
+    board.fill(BoardTerrain.Wall);
+    for (let i = 0; i < w * h; i++) {
+        const x = i % w;
+        const y = Math.floor(i / w);
+        if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+            board[i] = BoardTerrain.Stone;
+        }
+    }
+    return {
+        width: w,
+        height: h,
+        terrain: board,
+        conditions: {},
+        decorators: {}
+    }
+}
