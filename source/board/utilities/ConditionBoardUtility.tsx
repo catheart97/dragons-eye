@@ -1,5 +1,6 @@
 import { Board, BoardPosition, IBoardUtility, BaseSize, BoardCondition, ConditionIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
+import { CanvasBaseSize } from "../BoardComponent"
 
 export class ConditionBoardUtility implements IBoardUtility {
     private board: Board
@@ -43,6 +44,7 @@ export class ConditionBoardUtility implements IBoardUtility {
             }
         }
         this.downTile = null;
+        this.forceUpdate?.call(this);
     }
 
     customComponent() {
@@ -52,14 +54,14 @@ export class ConditionBoardUtility implements IBoardUtility {
             return (
                 <div
                     style={{
-                        left: Math.min(this.hoverTile.x, this.downTile.x) * BaseSize + 'rem',
-                        top: Math.min(this.hoverTile.y, this.downTile.y) * BaseSize + 'rem',
-                        width: dx * BaseSize + 'rem',
-                        height: dy * BaseSize + 'rem',
-                        minWidth: dx * BaseSize + 'rem',
-                        minHeight: dy * BaseSize + 'rem',
-                        maxWidth: dx * BaseSize + 'rem',
-                        maxHeight: dy * BaseSize + 'rem',
+                        left: Math.min(this.hoverTile.x, this.downTile.x) * CanvasBaseSize + 'px',
+                        top: Math.min(this.hoverTile.y, this.downTile.y) * CanvasBaseSize + 'px',
+                        width: dx * CanvasBaseSize + 'px',
+                        height: dy * CanvasBaseSize + 'px',
+                        minWidth: dx * CanvasBaseSize + 'px',
+                        minHeight: dy * CanvasBaseSize + 'px',
+                        maxWidth: dx * CanvasBaseSize + 'px',
+                        maxHeight: dy * CanvasBaseSize + 'px',
                     }}
                     className={'border-4 border-red-500 absolute pointer-events-none'}
                 >

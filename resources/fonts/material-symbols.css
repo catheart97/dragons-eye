@@ -1,22 +1,14 @@
 /* fallback */
 @font-face {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols';
   font-style: normal;
   font-weight: 400;
   font-variation-settings: 'FILL' 0;
   src: url('./mdsymbols.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Material Symbols Filled';
-  font-style: normal;
-  font-weight: 400;
-  font-variation-settings: 'FILL' 1;
-  src: url('./mdsymbols.woff2') format('woff2');
-}
-
 .mso {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols';
   font-weight: normal;
   font-style: normal;
   line-height: 1;
@@ -31,7 +23,7 @@
 }
 
 .msf {
-  font-family: 'Material Symbols Filled';
+  font-family: 'Material Symbols';
   font-variation-settings: 'FILL' 1;
   font-weight: normal;
   font-style: normal;

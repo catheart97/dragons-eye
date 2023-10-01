@@ -1,5 +1,6 @@
 import { ToolButton } from "../../ui/ToolButton";
-import { BoardPosition, BoardCondition, IBoardUtility, BaseSize, SpellShape } from "../Board"
+import { BoardPosition, BoardCondition, IBoardUtility, SpellShape } from "../Board"
+import { CanvasBaseSize } from "../BoardComponent";
 
 export class SpellBoardUtility implements IBoardUtility {
     p0: BoardPosition | null = null
@@ -226,7 +227,7 @@ export class SpellBoardUtility implements IBoardUtility {
             return <></>
         }
 
-        const r = Math.sqrt(Math.pow(this.p0.x - this.p1.x, 2) + Math.pow(this.p0.y - this.p1.y, 2)) * BaseSize * 2 + BaseSize;
+        const r = Math.sqrt(Math.pow(this.p0.x - this.p1.x, 2) + Math.pow(this.p0.y - this.p1.y, 2)) * CanvasBaseSize * 2 + CanvasBaseSize;
 
         const angle = Math.atan2(this.p1.y - this.p0.y, this.p1.x - this.p0.x) * 180 / Math.PI;
 
@@ -235,14 +236,14 @@ export class SpellBoardUtility implements IBoardUtility {
         return (
             <div
                 style={{
-                    width: r + 'rem',
-                    height: r + 'rem',
-                    minWidth: r + 'rem',
-                    minHeight: r + 'rem',
-                    maxWidth: r + 'rem',
-                    maxHeight: r + 'rem',
-                    left: (((this.p0.x + 1) * BaseSize - BaseSize / 2) - r / 2) + 'rem',
-                    top: (((this.p0.y + 1) * BaseSize - BaseSize / 2) - r / 2) + 'rem',
+                    width: r,
+                    height: r,
+                    minWidth: r,
+                    minHeight: r,
+                    maxWidth: r,
+                    maxHeight: r,
+                    left: (((this.p0.x + 1) * CanvasBaseSize - CanvasBaseSize / 2) - r / 2),
+                    top: (((this.p0.y + 1) * CanvasBaseSize - CanvasBaseSize / 2) - r / 2),
                     transform: 'rotate(' + angle + 'deg)'
                 }}
                 className='absolute pointer-events-none border-red-500'
@@ -280,7 +281,7 @@ export class SpellBoardUtility implements IBoardUtility {
                                     transform: 'rotate(' + coneAngle + 'deg)'
                                 }}>
                                     <div className='absolute top-1/2 bottom-1/2 left-1/2 border-t-4 border-dashed' style={{
-                                        width: `${r / 4 * Math.sqrt(5)}rem`
+                                        width: `${r / 4 * Math.sqrt(5)}px`
                                     }}>&nbsp;</div>
                                 </div>
 
@@ -288,7 +289,7 @@ export class SpellBoardUtility implements IBoardUtility {
                                     transform: 'rotate(' + -(coneAngle) + 'deg)'
                                 }}>
                                     <div className='absolute top-1/2 bottom-1/2 left-1/2 border-t-4 border-dashed' style={{
-                                        width: `${r / 4 * Math.sqrt(5)}rem`
+                                        width: `${r / 4 * Math.sqrt(5)}px`
                                     }}>&nbsp;</div>
                                 </div>
                             </>
@@ -303,21 +304,21 @@ export class SpellBoardUtility implements IBoardUtility {
                                 </div>
 
                                 <div className='absolute top-0 bottom-0 right-0' style={{
-                                    top: r / 4 + r / 2 + 'rem',
-                                    left: -((Math.sqrt(5) - 2) * r / 2) / 2 + 'rem',
+                                    top: r / 4 + r / 2,
+                                    left: -((Math.sqrt(5) - 2) * r / 2) / 2,
                                 }}>
                                     <div className='absolute border-t-4 border-dashed h-0' style={{
-                                        width: `${r / 2 * Math.sqrt(5)}rem`,
+                                        width: `${r / 2 * Math.sqrt(5)}px`,
                                         transform: 'rotate(' + (coneAngle) + 'deg)'
                                     }}></div>
                                 </div>
 
                                 <div className='absolute top-0 bottom-0 right-0' style={{
-                                    top: r / 4 + 'rem',
-                                    left: -((Math.sqrt(5) - 2) * r / 2) / 2 + 'rem',
+                                    top: r / 4,
+                                    left: -((Math.sqrt(5) - 2) * r / 2) / 2,
                                 }}>
                                     <div className='absolute border-t-4 border-dashed h-0' style={{
-                                        width: `${r / 2 * Math.sqrt(5)}rem`,
+                                        width: `${r / 2 * Math.sqrt(5)}px`,
                                         transform: 'rotate(' + -(coneAngle) + 'deg)'
                                     }}></div>
                                 </div>
@@ -328,8 +329,8 @@ export class SpellBoardUtility implements IBoardUtility {
                     <div className='absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center flex-col text-white font-mono whitespace-nowrap' style={{
                         transform: 'rotate(' + (-angle) + 'deg)'
                     }}>
-                        <div className='font-mono'>{(r / BaseSize * 1.5).toFixed(2)} m</div>
-                        <div className='font-mono'>{(r / BaseSize * 5).toFixed(2)} ft</div>
+                        <div className='font-mono'>{(r / CanvasBaseSize * 1.5).toFixed(2)} m</div>
+                        <div className='font-mono'>{(r / CanvasBaseSize * 5).toFixed(2)} ft</div>
                     </div>
 
                 </div>

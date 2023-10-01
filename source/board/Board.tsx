@@ -1,27 +1,3 @@
-export enum BoardTerrain {
-    Grass,
-    Water,
-    Stone,
-    Scrub,
-    Sand,
-    Dirt,
-    Wall,
-    Wood
-}
-
-export const TerrainColors: { [key in BoardTerrain] : string } = {
-    [BoardTerrain.Grass]: '#a3e635',
-    [BoardTerrain.Water]: '#7dd3fc',
-    [BoardTerrain.Stone]: '#9ca3af',
-    [BoardTerrain.Scrub]: '#365314',
-    [BoardTerrain.Sand]: '#fef08a',
-    [BoardTerrain.Dirt]: '#854d0e',
-    [BoardTerrain.Wall]: '#020617',
-    [BoardTerrain.Wood]: '#a27035'
-}
-
-export const BaseSize = 3;
-
 export type BoardPosition = {
     x: number,
     y: number
@@ -54,13 +30,7 @@ export enum CreatureSize {
 
 export enum ItemType {
     Door,
-    Trap,
-    Treasure,
-    Container,
-    Furniture,
-    LightSource,
-    Note,
-    Tree
+    Trap
 }
 
 export type DoorData = "locked" | "unlocked";
@@ -83,7 +53,7 @@ export type TreeData = {
 
 export type BoardItem = {
     type: ItemType,
-    data: DoorData | TrapData | TreasureData | ContainerData | FurnitureData | LightSourceData | NoteData | TreeData
+    data: DoorData | TrapData
 }
 
 export type BoardCreature = {
@@ -104,6 +74,7 @@ export type Board = {
     terrain: Array<BoardTerrain>
     conditions: { [key: number] : BoardCondition }
     decorators: { [key: number] : BoardDecorator }
+    hidden?: { [key: number] : boolean }
 }
 
 export enum SpellShape {
@@ -132,6 +103,47 @@ export enum BoardCondition {
     Slow
 }
 
+export enum BoardTerrain {
+    Grass,
+    Water,
+    Stone,
+    Scrub,
+    Sand,
+    Dirt,
+    Wall,
+    Wood
+}
+
+export const TerrainColors: { [key in BoardTerrain] : string } = {
+    [BoardTerrain.Grass]: '#a3e635',
+    [BoardTerrain.Water]: '#7dd3fc',
+    [BoardTerrain.Stone]: '#9ca3af',
+    [BoardTerrain.Scrub]: '#365314',
+    [BoardTerrain.Sand]: '#fef08a',
+    [BoardTerrain.Dirt]: '#854d0e',
+    [BoardTerrain.Wall]: '#000000',
+    [BoardTerrain.Wood]: '#a27035'
+}
+
+export const ConditionColors: { [key in BoardCondition] : string } = {
+    [BoardCondition.None]: '#ffffff',
+    [BoardCondition.Fire]: '#ef4444',
+    [BoardCondition.Acid]: '#166534',
+    [BoardCondition.Ice]: '#0284c7',
+    [BoardCondition.Lightning]: '#075985',
+    [BoardCondition.Wet]: '#38bdf8',
+    [BoardCondition.Poison]: '#000000',
+    [BoardCondition.Healing]: '#dc2626',
+    [BoardCondition.Oil]: '#000000',
+    [BoardCondition.Fog]: '#1e3a8a',
+    [BoardCondition.Muted]: '#000000',
+    [BoardCondition.Blinded]: '#000000',
+    [BoardCondition.Invulnerable]: '#000000',
+    [BoardCondition.Slow]: '#000000'
+}
+
+export const BaseSize = 3;
+
 export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
     [BoardCondition.None]: <></>,
     [BoardCondition.Fire]: <span className="msf text-red-500 rounded-full bg-white m-1">local_fire_department</span>,
@@ -149,15 +161,26 @@ export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
     [BoardCondition.Slow]: <span className="msf rounded-full bg-white m-1">speed</span>
 }
 
+export const ConditionCanvasIcons: { [key in BoardCondition] : string } = {
+    [BoardCondition.None]: "",
+    [BoardCondition.Fire]: "local_fire_department",
+    [BoardCondition.Acid]: "science",
+    [BoardCondition.Ice]: "ac_unit",
+    [BoardCondition.Lightning]: "bolt",
+    [BoardCondition.Wet]: "water_drop",
+    [BoardCondition.Poison]: "skull",
+    [BoardCondition.Healing]: "healing",
+    [BoardCondition.Oil]: "water_drop",
+    [BoardCondition.Fog]: "cloud",
+    [BoardCondition.Muted]: "volume_off",
+    [BoardCondition.Blinded]: "visibility_off",
+    [BoardCondition.Invulnerable]: "shield",
+    [BoardCondition.Slow]: "speed"
+}
+
 export const ItemTypeIcons: { [key in ItemType] : React.ReactNode } = {
     [ItemType.Door]: <span className="msf">door_front</span>,
-    [ItemType.Trap]: <span className="msf">crisis_alert</span>,
-    [ItemType.Treasure]: <span className="msf">payments</span>,
-    [ItemType.Container]: <span className="msf">archive</span>,
-    [ItemType.Furniture]: <span className="msf">shelves</span>,
-    [ItemType.LightSource]: <span className="msf">lightbulb</span>,
-    [ItemType.Note]: <span className="msf">note</span>,
-    [ItemType.Tree]: <span className="msf">park</span>
+    [ItemType.Trap]: <span className="msf">crisis_alert</span>
 }
 
 export const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
@@ -166,10 +189,16 @@ export const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
     [CreatureAttitude.Hostile]: '#f87171'
 }
 
+export const CanvasCreatureTypeIcons: { [key in CreatureType]: string } = {
+    [CreatureType.Humanoid]: "person",
+    [CreatureType.Animal]: "pets",
+    [CreatureType.Monster]: "diversity_2"
+}
+
 export const CreatureTypeIcons: { [key in CreatureType]: JSX.Element } = {
-    [CreatureType.Humanoid]: <span className="msf">person</span>,
-    [CreatureType.Animal]: <span className="msf">pets</span>,
-    [CreatureType.Monster]: <span className="msf">diversity_2</span>
+    [CreatureType.Humanoid]: <span className="msf">{CanvasCreatureTypeIcons[CreatureType.Humanoid]}</span>,
+    [CreatureType.Animal]: <span className="msf">{CanvasCreatureTypeIcons[CreatureType.Animal]}</span>,
+    [CreatureType.Monster]: <span className="msf">{CanvasCreatureTypeIcons[CreatureType.Monster]}</span>
 }
 
 export const CreatureSizeDimension: { [key in CreatureSize]: number } = {
@@ -347,22 +376,22 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
                 type: BoardDecoratorType.Item,
                 attachment: {
                     type: ItemType.Door,
-                    data: [ "unlocked" ]
+                    data: "unlocked"
                 }
             }
         }
     }
 
     // place notes
-    for (const note of data.notes) {
-        decorators[Math.floor(note.pos.y) + Math.floor(note.pos.x) * maxY] = {
-            type: BoardDecoratorType.Item,
-            attachment: {
-                type: ItemType.Note,
-                data: note.text
-            }
-        }
-    }
+    // for (const note of data.notes) {
+    //     decorators[Math.floor(note.pos.y) + Math.floor(note.pos.x) * maxY] = {
+    //         type: BoardDecoratorType.Item,
+    //         attachment: {
+    //             type: ItemType.Note,
+    //             data: note.text
+    //         }
+    //     }
+    // }
 
     return {
         width: maxY,

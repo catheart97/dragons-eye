@@ -2,7 +2,7 @@
   "name": "dragons-eye",
   "private": true,
   "author": "Ronja Schnur (catheart97)",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "scripts": {
     "dev": "vite",
     "predev": "license-report > license.json",

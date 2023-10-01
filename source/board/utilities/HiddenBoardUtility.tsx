@@ -1,25 +1,39 @@
-import { Board, BoardPosition, BoardTerrain, IBoardUtility, TerrainColors } from "../Board"
+import { Board, BoardPosition, IBoardUtility, BoardCondition, ConditionIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
 
-export class TerrainBoardUtility implements IBoardUtility {
+export class HiddenBoardUtility implements IBoardUtility {
     private board: Board
-    private targetTerrain: BoardTerrain
+    private targetCondition: boolean
 
     private downTile: BoardPosition | null = null
     private hoverTile: BoardPosition | null = null
 
     forceUpdate: (() => void) | null = null;
 
-    constructor(board: Board, targetTerrain: BoardTerrain) {
+    constructor(board: Board, targetCondition: boolean) {
         this.board = board
-        this.targetTerrain = targetTerrain
+        this.targetCondition = false
     }
 
     onShapeClick(position: BoardPosition) {
         this.downTile = position;
-        this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
-        console.log("down");
+
+    }
+
+    private setBoardCondition(position: BoardPosition, condition: boolean) {
+        if (condition) {
+            if (!this.board.hidden) {
+                this.board.hidden = {}
+            }
+            this.board.hidden[position.x + position.y * this.board.width] = condition;
+        } else {
+            if (!this.board.hidden) {
+                this.board.hidden = {}
+            } else {
+                delete this.board.hidden[position.x + position.y * this.board.width];
+            }
+        }
     }
 
     onShapeHover(position: BoardPosition) {
@@ -27,20 +41,16 @@ export class TerrainBoardUtility implements IBoardUtility {
     }
 
     onShapeRelease(position: BoardPosition) {
-
-        console.log(this.downTile);
-
         if (position.x === this.downTile?.x && position.y === this.downTile?.y) {
-            this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
+            this.setBoardCondition(position, this.targetCondition);
         } else {
             for (let x = Math.min(position.x, this.downTile!.x); x <= Math.max(position.x, this.downTile!.x); x++) {
                 for (let y = Math.min(position.y, this.downTile!.y); y <= Math.max(position.y, this.downTile!.y); y++) {
-                    this.board.terrain[x + y * this.board.width] = this.targetTerrain;
+                    this.setBoardCondition({ x: x, y: y }, this.targetCondition);
                 }
             }
         }
         this.downTile = null;
-
         this.forceUpdate?.call(this);
     }
 
@@ -62,7 +72,7 @@ export class TerrainBoardUtility implements IBoardUtility {
                     }}
                     className={'border-4 border-red-500 absolute pointer-events-none'}
                 >
-                    <div className={"h-full w-full opacity-80 " + TerrainColors[this.targetTerrain]}></div>
+                    <div className={"h-full w-full opacity-80 bg-neutral-500"}></div>
                 </div>
             )
         } else {
@@ -73,23 +83,27 @@ export class TerrainBoardUtility implements IBoardUtility {
     userInterface() {
         return (
             <>
-                {
-                    (Object.values(BoardTerrain).filter((v) => typeof v !== 'string') as BoardTerrain[]).map((v, i) => {
-                        return (
-                            <ToolButton
-                                key={i}
-                                onClick={() => {
-                                    this.targetTerrain = v;
-                                    this.forceUpdate?.call(this);
-                                }}
-                                active={this.targetTerrain == v}
-                            ><div className='w-4 h-4 border-2 border-dashed border-black' style={{
-                                backgroundColor: TerrainColors[v]
-                            }}>
-                                </div></ToolButton>
-                        )
-                    })
-                }
+                <ToolButton
+                    onClick={() => {
+                        this.targetCondition = false;
+                        this.forceUpdate ? this.forceUpdate() : null;
+                    }}
+                    active={this.targetCondition == false}
+                >
+                    <div className='w-4 h-4 border-2 border-dashed border-black bg-white flex items-center justify-center text-xs' >
+                    </div>
+                </ToolButton>
+                <ToolButton
+                    onClick={() => {
+                        this.targetCondition = true;
+                        this.forceUpdate ? this.forceUpdate() : null;
+                    }}
+                    active={this.targetCondition == true}
+                >
+                    <div className='w-4 h-4 border-2 border-dashed border-black bg-white flex items-center justify-center text-xs' >
+                        <span className="msf">visibility_off</span>
+                    </div>
+                </ToolButton>
             </>
         )
     }

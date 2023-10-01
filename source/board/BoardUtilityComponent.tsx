@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import 'material-icons/iconfont/material-icons.css';
 import { ToolButton } from '../ui/ToolButton';
-import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon, constructRandomBoard } from '../board/Board';
+import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon } from '../board/Board';
 import { TerrainBoardUtility } from '../board/utilities/TerrainBoardUtility';
 import { SpellBoardUtility } from '../board/utilities/SpellBoardUtility';
-import { BoardComponent } from '../board/BoardComponent';
+import { BoardComponent, BoardComponentHandle } from '../board/BoardComponent';
 import { ConditionBoardUtility } from '../board/utilities/ConditionBoardUtility';
 import { DecoratorBoardUtility } from '../board/utilities/DecoratorBoardUtility';
 import { useForceUpdate } from '../utility';
@@ -14,11 +14,18 @@ import { InteractBoardUtility } from './utilities/InteractBoardUtility';
 import { Dialog, DialogHandle } from '../ui/Dialog';
 import { NumberInput } from '../ui/NumberInput';
 import { UIGroup } from '../ui/UIGroup';
+import { HiddenBoardUtility } from './utilities/HiddenBoardUtility';
 
 const BoardUtilty = () => {
     const board = React.useRef<Board>(constructDefaultBoard(15, 15));
+    const boardComponentRef = React.useRef<BoardComponentHandle>(null);
+
     const fileName = React.useRef<string>('');
     const forceUpdate = useForceUpdate();
+    const renderUI = () => {
+        boardComponentRef.current!.update();
+        forceUpdate();
+    }
  
     const dialogHandle = React.useRef<DialogHandle>(null);
     const registerListener = React.useRef<boolean>(false);
@@ -56,7 +63,8 @@ const BoardUtilty = () => {
                 </div>, {
                     success: () => {
                         board.current = constructDefaultBoard(w, h);
-                        forceUpdate();
+                        setupUtilities();
+                        renderUI();
                     },
                     failure: () => {
                         console.log("Board creation cancelled");
@@ -66,7 +74,8 @@ const BoardUtilty = () => {
             window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
                 try {
                     board.current = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
-                    forceUpdate();
+                    setupUtilities();
+                    renderUI();
                 } catch (e : any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
@@ -76,7 +85,7 @@ const BoardUtilty = () => {
                     const data = window.fsExtra.readJsonSync(fn);
                     board.current = data as Board;
                     fileName.current = fn;
-                    forceUpdate();
+                    renderUI();
                 } catch (e : any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
@@ -102,7 +111,7 @@ const BoardUtilty = () => {
             });
             window.ipcRenderer.send('m-ready');
         }
-        forceUpdate()
+        renderUI()
     }, [])
 
     const setupUtilities = () => {
@@ -111,10 +120,11 @@ const BoardUtilty = () => {
             new SpellBoardUtility(),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new ConditionBoardUtility(board.current, null),
-            new DecoratorBoardUtility(board.current)
+            new DecoratorBoardUtility(board.current),
+            new HiddenBoardUtility(board.current, false),
         ];
         utilities.current.forEach(element => {
-            element.forceUpdate = forceUpdate;
+            element.forceUpdate = renderUI;
         });
     }
 
@@ -125,6 +135,7 @@ const BoardUtilty = () => {
         <>
             <div className='w-full h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center'>
                 <BoardComponent
+                    ref={boardComponentRef}
                     board={board.current}
                     utility={utilities.current[currentUtility]}
                 />
@@ -170,6 +181,14 @@ const BoardUtilty = () => {
                             active={currentUtility === 3}
                         >
                             <span className="mso text-xl">question_mark</span>
+                        </ToolButton>
+                        <ToolButton
+                            onClick={() => {
+                                setCurrentUtility(5);
+                            }}
+                            active={currentUtility === 5}
+                        >
+                            <span className="mso text-xl">visibility_off</span>
                         </ToolButton>
                         <ToolButton
                             onClick={() => {

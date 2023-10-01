@@ -1,7 +1,8 @@
-import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, BaseSize, ItemType, ItemTypeIcons } from "../Board"
+import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, ItemType, ItemTypeIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
 import { UIGroup } from "../../ui/UIGroup";
+import { CanvasBaseSize } from "../BoardComponent";
 
 enum DecoratorBoardUtilityMode {
     Drag,
@@ -23,7 +24,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
     creatureSize: CreatureSize = CreatureSize.MediumSmall;
     creatureName: string = "";
 
-    itemType: ItemType = ItemType.Treasure;
+    itemType: ItemType = ItemType.Door;
 
     doorData: "locked" | "unlocked" = "locked";
     trapData: {
@@ -33,29 +34,13 @@ export class DecoratorBoardUtility implements IBoardUtility {
         armed: false,
         effect: ""
     };
-    treasureData: string[] = [];
-    containerData: string[] = [];
-    furnitureData: {
-        type: string,
-        contents: string[]
-    } = {
-        type: "",
-        contents: []
-    };
-    lightSourceData: string = "";
-    noteData: string = "";
-    treeData: {
-        size: CreatureSize
-    } = {
-        size: CreatureSize.MediumSmall
-    };
 
     mouseDown: boolean = false;
 
     forceUpdate: (() => void) | null = null;
 
     constructor(board: Board) {
-        this.board = board;
+        this.board = board; 
     }
 
     onShapeClick(position: BoardPosition) {
@@ -91,13 +76,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         }
                     }
                 } else {
-                    const data = this.itemType == ItemType.Door ? this.doorData :
-                    this.itemType == ItemType.Trap ? this.trapData :
-                        this.itemType == ItemType.Treasure ? this.treasureData :
-                            this.itemType == ItemType.Container ? this.containerData :
-                                this.itemType == ItemType.Furniture ? this.furnitureData :
-                                    this.itemType == ItemType.LightSource ? this.lightSourceData :
-                                        this.itemType == ItemType.Note ? this.noteData : this.treeData;
+                    const data = this.itemType == ItemType.Door ? this.doorData : this.trapData 
                     this.board.decorators[idxTo] = {
                         type: this.decoratorType,
                         attachment: {
@@ -113,6 +92,8 @@ export class DecoratorBoardUtility implements IBoardUtility {
             delete this.board.decorators[idxTo];
         }
         this.mouseDown = false;
+
+        this.forceUpdate?.call(this);
     }
 
 
@@ -187,16 +168,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 <UIGroup title="Item Type">
                                     <ToolButton
                                         onClick={() => {
-                                            this.itemType = ItemType.Treasure;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.Treasure}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.Treasure]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
                                             this.itemType = ItemType.Door;
                                             this.forceUpdate?.call(this);
                                         }}
@@ -214,56 +185,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         className="text-xl"
                                     >
                                         {ItemTypeIcons[ItemType.Trap]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.itemType = ItemType.Container;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.Container}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.Container]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.itemType = ItemType.Furniture;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.Furniture}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.Furniture]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.itemType = ItemType.LightSource;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.LightSource}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.LightSource]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.itemType = ItemType.Note;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.Note}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.Note]}
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.itemType = ItemType.Tree;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.itemType == ItemType.Tree}
-                                        className="text-xl"
-                                    >
-                                        {ItemTypeIcons[ItemType.Tree]}
                                     </ToolButton>
                                 </UIGroup>
                             </>
@@ -315,125 +236,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     <TextInput onChange={(e) => {
                                         this.trapData.effect = e.target.value;
                                     }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Treasure ? (
-                            <>
-                                <UIGroup title="Treasure Contents">
-                                    <TextInput onChange={(e) => {
-                                        this.treasureData = e.target.value.split('\n');
-                                    }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Container ? (
-                            <>
-                                <UIGroup title="Container Contents">
-                                    <TextInput onChange={(e) => {
-                                        this.containerData = e.target.value.split('\n');
-                                    }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Furniture ? (
-                            <>
-                                <UIGroup title="Furniture Type">
-                                    <TextInput onChange={(e) => {
-                                        this.furnitureData.type = e.target.value;
-                                    }} />
-                                </UIGroup>
-                                <UIGroup title="Furniture Contents">
-                                    <TextInput onChange={(e) => {
-                                        this.furnitureData.contents = e.target.value.split('\n');
-                                    }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.LightSource ? (
-                            <>
-                                <UIGroup title="Light Source">
-                                    <TextInput onChange={(e) => {
-                                        this.lightSourceData = e.target.value;
-                                    }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Note ? (
-                            <>
-                                <UIGroup title="Note">
-                                    <TextInput onChange={(e) => {
-                                        this.noteData = e.target.value;
-                                    }} />
-                                </UIGroup>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Tree ? (
-                            <>
-                                <UIGroup title="Tree Size">
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.treeData.size = CreatureSize.Tiny;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.treeData.size == CreatureSize.Tiny}
-                                    >
-                                        <span className="mso text-xl">crib</span>
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.treeData.size = CreatureSize.MediumSmall;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.treeData.size == CreatureSize.MediumSmall}
-                                    >
-                                        <span className="mso text-xl">person</span>
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.treeData.size = CreatureSize.Large;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.treeData.size == CreatureSize.Large}
-                                    >
-                                        <span className="mso text-xl">directions_car</span>
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.treeData.size = CreatureSize.Huge;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.treeData.size == CreatureSize.Huge}
-                                    >
-                                        <span className="mso text-xl">home</span>
-                                    </ToolButton>
-                                    <ToolButton
-                                        onClick={() => {
-                                            this.treeData.size = CreatureSize.Gargantuan;
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                        active={this.treeData.size == CreatureSize.Gargantuan}
-                                    >
-                                        <span className="mso text-xl">domain</span>
-                                    </ToolButton>
                                 </UIGroup>
                             </>
                         ) : null
@@ -568,21 +370,21 @@ export class DecoratorBoardUtility implements IBoardUtility {
 
     customComponent() {
         if (this.mouseDown && this.mode == DecoratorBoardUtilityMode.Drag) {
-            const p0x = this.downPosition!.x * BaseSize + 0.5 * BaseSize;
-            const p0y = this.downPosition!.y * BaseSize + 0.5 * BaseSize;
+            const p0x = this.downPosition!.x * CanvasBaseSize + 0.5 * CanvasBaseSize;
+            const p0y = this.downPosition!.y * CanvasBaseSize + 0.5 * CanvasBaseSize;
 
-            const p1x = this.position!.x * BaseSize + 0.5 * BaseSize;
-            const p1y = this.position!.y * BaseSize + 0.5 * BaseSize;
+            const p1x = this.position!.x * CanvasBaseSize + 0.5 * CanvasBaseSize;
+            const p1y = this.position!.y * CanvasBaseSize + 0.5 * CanvasBaseSize;
 
             const angle = Math.atan2(p1y - p0y, p1x - p0x) * 180 / Math.PI;
             const distance = Math.sqrt((p1x - p0x) * (p1x - p0x) + (p1y - p0y) * (p1y - p0y));
 
             return (
                 <div className="absolute text-center text-white whitespace-nowrap pointer-events-none flex justify-center items-center" style={{
-                    left: p0x + 'rem',
-                    top: p0y + 'rem',
-                    width: Math.sqrt((p1x - p0x) * (p1x - p0x) + (p1y - p0y) * (p1y - p0y)) + 'rem',
-                    height: BaseSize / 10 + 'rem',
+                    left: p0x + 'px',
+                    top: p0y + 'px',
+                    width: Math.sqrt((p1x - p0x) * (p1x - p0x) + (p1y - p0y) * (p1y - p0y)) + 'px',
+                    height: CanvasBaseSize / 10 + 'px',
                     transform: 'rotate(' + angle + 'deg)',
                     transformOrigin: '0% 50%',
                     backgroundColor: 'rgba(0,0,0,0.5)'
@@ -590,8 +392,8 @@ export class DecoratorBoardUtility implements IBoardUtility {
                     <div className="font-mono" style={{
                         transform: 'rotate(' + -angle + 'deg)'
                     }}>
-                        {(distance / BaseSize * 1.5).toFixed(2)} m <br />
-                        {(distance / BaseSize * 5).toFixed(2)} ft
+                        {(distance / CanvasBaseSize * 1.5).toFixed(2)} m <br />
+                        {(distance / CanvasBaseSize * 5).toFixed(2)} ft
                     </div>
                 </div>
             )
