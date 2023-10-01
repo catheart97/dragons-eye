@@ -60,6 +60,14 @@ export class InteractBoardUtility implements IBoardUtility {
                                         <></>
                                     )
                                 }
+                                
+                                {
+                                    decorator.attachment.type == ItemType.Note ? (
+                                        decorator.attachment.data
+                                    ) : (
+                                        <></>
+                                    )
+                                }
                             </>
                         ) : <></>
                     }

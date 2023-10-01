@@ -1,32 +1,50 @@
 import * as React from 'react'
 
-import 'material-icons/iconfont/material-icons.css';
 import { ToolButton } from '../ui/ToolButton';
-import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon } from '../board/Board';
-import { TerrainBoardUtility } from '../board/utilities/TerrainBoardUtility';
-import { SpellBoardUtility } from '../board/utilities/SpellBoardUtility';
-import { BoardComponent, BoardComponentHandle } from '../board/BoardComponent';
-import { ConditionBoardUtility } from '../board/utilities/ConditionBoardUtility';
-import { DecoratorBoardUtility } from '../board/utilities/DecoratorBoardUtility';
-import { useForceUpdate } from '../utility';
+import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon } from './Board';
+import { TerrainBoardUtility } from './utilities/TerrainBoardUtility';
+import { SpellBoardUtility } from './utilities/SpellBoardUtility';
+import { BoardComponent, BoardComponentHandle } from './BoardComponent';
+import { ConditionBoardUtility } from './utilities/ConditionBoardUtility';
+import { DecoratorBoardUtility } from './utilities/DecoratorBoardUtility';
 
 import { InteractBoardUtility } from './utilities/InteractBoardUtility';
 import { Dialog, DialogHandle } from '../ui/Dialog';
 import { NumberInput } from '../ui/NumberInput';
 import { UIGroup } from '../ui/UIGroup';
 import { HiddenBoardUtility } from './utilities/HiddenBoardUtility';
+import { Rect } from '../Rect';
+import { ImportanceRectUtility } from './utilities/ImportanceRectBoardUtility';
 
-const BoardUtilty = () => {
-    const board = React.useRef<Board>(constructDefaultBoard(15, 15));
+export type DMViewProps = {
+    board: React.MutableRefObject<Board>;
+    update: () => void;
+    importanceRect: Rect | null;
+    setImportanceRect: (rect: Rect | null) => void;
+}
+
+export type DMViewHandle = {
+    update: () => void
+}
+
+const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> = (props, ref) => {
+    const board = props.board;
     const boardComponentRef = React.useRef<BoardComponentHandle>(null);
 
     const fileName = React.useRef<string>('');
-    const forceUpdate = useForceUpdate();
     const renderUI = () => {
         boardComponentRef.current!.update();
-        forceUpdate();
+        props.update();
     }
- 
+
+    const handle: DMViewHandle = {
+        update: () => {
+            renderUI();
+        }
+    }
+
+    React.useImperativeHandle(ref, () => handle);
+
     const dialogHandle = React.useRef<DialogHandle>(null);
     const registerListener = React.useRef<boolean>(false);
 
@@ -76,7 +94,7 @@ const BoardUtilty = () => {
                     board.current = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
                     setupUtilities();
                     renderUI();
-                } catch (e : any) {
+                } catch (e: any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
             });
@@ -86,7 +104,7 @@ const BoardUtilty = () => {
                     board.current = data as Board;
                     fileName.current = fn;
                     renderUI();
-                } catch (e : any) {
+                } catch (e: any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
             });
@@ -96,7 +114,7 @@ const BoardUtilty = () => {
                 } else {
                     try {
                         window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
-                    } catch (e : any) {
+                    } catch (e: any) {
                         dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                     }
                 }
@@ -105,7 +123,7 @@ const BoardUtilty = () => {
                 fileName.current = fn;
                 try {
                     window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
-                } catch (e : any) {
+                } catch (e: any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
                 }
             });
@@ -122,6 +140,7 @@ const BoardUtilty = () => {
             new ConditionBoardUtility(board.current, null),
             new DecoratorBoardUtility(board.current),
             new HiddenBoardUtility(board.current),
+            new ImportanceRectUtility(props.setImportanceRect)
         ];
         utilities.current.forEach(element => {
             element.forceUpdate = renderUI;
@@ -138,6 +157,8 @@ const BoardUtilty = () => {
                     ref={boardComponentRef}
                     board={board.current}
                     utility={utilities.current[currentUtility]}
+                    importanceRect={props.importanceRect}
+                    setImportanceRect={props.setImportanceRect}
                 />
                 <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-50'>
 
@@ -198,6 +219,14 @@ const BoardUtilty = () => {
                         >
                             <span className="mso text-xl">person</span>
                         </ToolButton>
+                        <ToolButton
+                            onClick={() => {
+                                setCurrentUtility(6);
+                            }}
+                            active={currentUtility === 6}
+                        >
+                            <span className="mso text-xl">crop_square</span>
+                        </ToolButton>
                     </div>
                 </div>
             </div>
@@ -206,4 +235,4 @@ const BoardUtilty = () => {
     )
 }
 
-export default BoardUtilty
+export const DMView = React.forwardRef(DMViewRenderer);

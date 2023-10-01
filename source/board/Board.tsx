@@ -30,7 +30,8 @@ export enum CreatureSize {
 
 export enum ItemType {
     Door,
-    Trap
+    Trap,
+    Note
 }
 
 export type DoorData = "locked" | "unlocked";
@@ -38,22 +39,11 @@ export type TrapData = {
     armed: boolean,
     effect: string
 }
-export type TreasureData = string[]
-export type ContainerData = string[]
-export type FurnitureData = {
-    type: string,
-    contents: string[]
-}
-export type LightSourceData = string
 export type NoteData = string
-export type TreeData = {
-    size: CreatureSize
-}
-
 
 export type BoardItem = {
     type: ItemType,
-    data: DoorData | TrapData
+    data: DoorData | TrapData | NoteData
 }
 
 export type BoardCreature = {
@@ -81,6 +71,7 @@ export enum SpellShape {
     Cone,
     OuterCone,
     Cube,
+    LargeCube,
     Cylinder,
     Sphere,
     Line
@@ -142,8 +133,6 @@ export const ConditionColors: { [key in BoardCondition] : string } = {
     [BoardCondition.Slow]: '#000000'
 }
 
-export const BaseSize = 3;
-
 export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
     [BoardCondition.None]: <></>,
     [BoardCondition.Fire]: <span className="msf text-red-500 rounded-full bg-white m-1">local_fire_department</span>,
@@ -180,7 +169,8 @@ export const ConditionCanvasIcons: { [key in BoardCondition] : string } = {
 
 export const ItemTypeIcons: { [key in ItemType] : React.ReactNode } = {
     [ItemType.Door]: <span className="msf">door_front</span>,
-    [ItemType.Trap]: <span className="msf">crisis_alert</span>
+    [ItemType.Trap]: <span className="msf">crisis_alert</span>,
+    [ItemType.Note]: <span className="msf">note</span>
 }
 
 export const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {

@@ -73,6 +73,15 @@ export class SpellBoardUtility implements IBoardUtility {
                         </ToolButton>
                         <ToolButton
                             onClick={() => {
+                                this.spellshape = SpellShape.LargeCube;
+                                this.forceUpdate?.call(this);
+                            }}
+                            active={this.spellshape == SpellShape.LargeCube}
+                        >
+                            <span className="msf">crop_square</span>
+                        </ToolButton>
+                        <ToolButton
+                            onClick={() => {
                                 this.spellshape = SpellShape.Cylinder;
                                 this.forceUpdate?.call(this);
                             }}
@@ -257,8 +266,14 @@ export class SpellBoardUtility implements IBoardUtility {
                 }
 
                 {
-                    this.spellshape == null || this.spellshape == SpellShape.Cube ? (
+                    this.spellshape == null || this.spellshape == SpellShape.LargeCube ? (
                         <div className='absolute top-0 left-0 right-0 bottom-0 border-4 border-dashed'></div>
+                    ) : null
+                }
+
+                {
+                    this.spellshape == null || this.spellshape == SpellShape.Cube ? (
+                        <div className='absolute top-1/4 left-1/2 right-0 bottom-1/4 border-4 border-dashed'></div>
                     ) : null
                 }
 

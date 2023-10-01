@@ -34,6 +34,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
         armed: false,
         effect: ""
     };
+    noteData: string = "";
 
     mouseDown: boolean = false;
 
@@ -76,7 +77,11 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         }
                     }
                 } else {
-                    const data = this.itemType == ItemType.Door ? this.doorData : this.trapData 
+                    const data = this.itemType == ItemType.Door ? this.doorData : (
+                        this.itemType == ItemType.Trap ? this.trapData : (
+                            this.itemType == ItemType.Note ? this.noteData : ""
+                        )
+                    )
                     this.board.decorators[idxTo] = {
                         type: this.decoratorType,
                         attachment: {
@@ -186,6 +191,16 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     >
                                         {ItemTypeIcons[ItemType.Trap]}
                                     </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.itemType = ItemType.Note;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.itemType == ItemType.Note}
+                                        className="text-xl"
+                                    >
+                                        {ItemTypeIcons[ItemType.Note]}
+                                    </ToolButton>
                                 </UIGroup>
                             </>
                         ) : null
@@ -236,6 +251,20 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     <TextInput onChange={(e) => {
                                         this.trapData.effect = e.target.value;
                                     }} />
+                                </UIGroup>
+                            </>
+                        ) : null
+                    }
+                    
+                    {
+                        this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Note ? (
+                            <>
+                                <UIGroup title="Note">
+                                    <TextInput
+                                        onChange={(e) => {
+                                            this.noteData = e.target.value;
+                                        }}
+                                    ></TextInput>
                                 </UIGroup>
                             </>
                         ) : null

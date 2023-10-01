@@ -1,13 +1,15 @@
 import React from "react"
 
+import "../index.css"
 import { Board, BoardCreature, BoardDecoratorType, BoardItem, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
 import { useForceUpdate } from "../utility"
+import { Rect } from "../Rect";
 
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-const drawTerrain = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }) => {
+const drawTerrain = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, _playerView: boolean) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -22,7 +24,7 @@ const drawTerrain = (canvas: HTMLCanvasElement, board: Board, position: { x: num
     );
 }
 
-const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }) => {
+const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, _playerView: boolean) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -52,7 +54,7 @@ const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: n
     }
 }
 
-const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }) => {
+const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -125,7 +127,7 @@ const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: n
                 ctx.font = `${CanvasBaseSize - LineWidth * 2}px Material Symbols`;
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#ffffff";
-                if (data == "locked") {
+                if (playerView || data == "locked") {
                     ctx.fillText(
                         "door_front",
                         position.x * CanvasBaseSize + LineWidth,
@@ -138,7 +140,7 @@ const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: n
                         position.y * CanvasBaseSize + CanvasBaseSize - LineWidth
                     )
                 }
-            } else if (attachment.type == ItemType.Trap) {
+            } else if (!playerView && attachment.type == ItemType.Trap) {
 
                 const data = attachment.data as TrapData;
                 const armed = data.armed;
@@ -170,28 +172,49 @@ const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: n
                         position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
                     )
                 }
+            } else if (!playerView && attachment.type == ItemType.Note) {
+                ctx.font = `${CanvasBaseSize - LineWidth * 4}px Material Symbols`;
+                ctx.fillStyle = "#ffffff";
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = LineWidth;
+
+                ctx.fillText(
+                    "note",
+                    position.x * CanvasBaseSize + LineWidth * 2,
+                    position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
+                )
+                ctx.strokeText(
+                    "note",
+                    position.x * CanvasBaseSize + LineWidth * 2,
+                    position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
+                )
+
             }
         }
     }
 }
 
-const drawHidden = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }) => {
+const drawHidden = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
     // render hidden
     if (board.hidden && board.hidden[idx]) {
         ctx.fillStyle = '#000000';
+        if (!playerView) {
+            ctx.globalAlpha = .5;
+        }
         ctx.fillRect(
             position.x * CanvasBaseSize + LineWidth / 2,
             position.y * CanvasBaseSize + LineWidth / 2,
             CanvasBaseSize - LineWidth,
             CanvasBaseSize - LineWidth
         );
+        ctx.globalAlpha = 1;
     }
 }
 
-const drawBoard = (canvas: HTMLCanvasElement, board: Board) => {
+const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean) => {
     const width = canvas.width;
     const height = canvas.height;
     const ctx = canvas.getContext('2d')!;
@@ -199,22 +222,22 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board) => {
 
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawTerrain(canvas, board, { x: j, y: i });
+            drawTerrain(canvas, board, { x: j, y: i }, playerView);
         }
     }
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawCondition(canvas, board, { x: j, y: i });
+            drawCondition(canvas, board, { x: j, y: i }, playerView);
         }
     }
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawDecorator(canvas, board, { x: j, y: i });
+            drawDecorator(canvas, board, { x: j, y: i }, playerView);
         }
     }
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawHidden(canvas, board, { x: j, y: i });
+            drawHidden(canvas, board, { x: j, y: i }, playerView);
         }
     }
 
@@ -234,7 +257,10 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board) => {
 
 export type BoardComponentProps = {
     board: Board,
-    utility?: IBoardUtility
+    playerView?: boolean,
+    utility?: IBoardUtility,
+    importanceRect: Rect | null
+    setImportanceRect?: (rect: Rect | null) => void
 }
 
 export type BoardComponentHandle = {
@@ -242,9 +268,9 @@ export type BoardComponentHandle = {
 }
 
 const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandle, BoardComponentProps> = (props, e) => {
-    const rootRef = React.useRef<HTMLDivElement>(null);
-    const renderUI = useForceUpdate();
 
+    const renderUI = useForceUpdate();
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
     React.useEffect(() => {
@@ -263,7 +289,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
         update: () => {
             canvasRef.current!.width = props.board.width * CanvasBaseSize;
             canvasRef.current!.height = props.board.height * CanvasBaseSize;
-            drawBoard(canvasRef.current!, props.board);
+            drawBoard(canvasRef.current!, props.board, props.playerView ?? false);
         }
     }));
 
@@ -336,6 +362,17 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                 ) : (
                                     <></>
                                 )
+                            }
+                            {
+                                <div
+                                    className="pointer-events-none absolute border-4 border-red-500"
+                                    style={{
+                                        left: props.importanceRect ? (props.importanceRect.x * CanvasBaseSize + 'px') : "0px",
+                                        top: props.importanceRect ? (props.importanceRect.y * CanvasBaseSize + 'px') : "0px",
+                                        width: props.importanceRect ? (props.importanceRect.width * CanvasBaseSize + 'px') : (props.board.width * CanvasBaseSize + 'px'),
+                                        height: props.importanceRect ? props.importanceRect.height * CanvasBaseSize + 'px' : (props.board.height * CanvasBaseSize + 'px'),
+                                    }}
+                                ></div>
                             }
                         </div>
                     </div>

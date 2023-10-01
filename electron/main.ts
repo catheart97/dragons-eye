@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } from 'electron'
+import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } from 'electron'
 import path from 'node:path'
 import NPMLicenses from '../license.json?raw';
 
@@ -60,12 +60,10 @@ process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.
 
 
 let win: BrowserWindow | null
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 function createWindow() {
     win = new BrowserWindow({
-        icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             sandbox: false
@@ -74,7 +72,6 @@ function createWindow() {
 
     win.maximize()
 
-    // Test active push message to Renderer-process.
     win.webContents.on('did-finish-load', () => {
         win?.webContents.send('main-process-message', (new Date).toLocaleString())
     })
@@ -82,7 +79,6 @@ function createWindow() {
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL)
     } else {
-        // win.loadFile('dist/index.html')
         win.loadFile(path.join(process.env.DIST, 'index.html'))
     }
 
@@ -181,6 +177,19 @@ function createWindow() {
         ]
     }));
 
+    menu.append(new MenuItem({
+        label: 'View',
+        submenu: [
+            {
+                label: "Show Player View",
+                accelerator: 'CmdOrCtrl+P',
+                click: () => {
+                    win!.webContents.send('r-show-hide-player-view');
+                }
+            }
+        ]
+    }))
+
     if (!isProd) {
         menu.append(new MenuItem({
             label: 'Development',
@@ -236,9 +245,28 @@ function createWindow() {
     });
 
     ipcMain.on("m-ready", (_event, _arg) => {
-        console.log("m-ready");
         if (fn != null) win!.webContents.send('r-open-file', fn);
     });
+
+    win.webContents.setWindowOpenHandler((_arg: HandlerDetails) => {
+        app.once('browser-window-created', (_event, newWindow) => {
+            newWindow.webContents.openDevTools();
+            newWindow.setPosition(0, 0);
+            newWindow.maximize();
+        });
+
+        return {
+            action: 'allow',
+            overrideBrowserWindowOptions: {
+                webPreferences: {
+                    sandbox: false,
+                    contextIsolation: false,
+                    nodeIntegration: true,
+                    enableRemoteModule: false
+                }
+            }
+        }
+    })
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -251,7 +279,7 @@ app.on('window-all-closed', () => {
     }
 })
 
-let fn : string | null = null;
+let fn: string | null = null;
 app.on("open-file", (_event, arg) => {
     fn = arg;
     win?.webContents?.send('r-open-file', arg);

@@ -1,9 +1,3 @@
-@import "../resources/fonts/fira-code.css";
-@import "../resources/fonts/fira-sans.css";
-@import "../resources/fonts/fira-sans-condensed.css";
-@import "../resources/fonts/fira-sans-extra-condensed.css";
-@import "../resources/fonts/material-symbols.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
