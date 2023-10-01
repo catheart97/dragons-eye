@@ -1,4 +1,4 @@
-import { Board, BoardPosition, IBoardUtility, BaseSize, BoardCondition, ConditionIcons } from "../Board"
+import { Board, BoardPosition, IBoardUtility, BoardCondition, ConditionIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
 

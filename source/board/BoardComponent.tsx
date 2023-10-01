@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Board, BoardCondition, BoardCreature, BoardDecoratorType, BoardItem, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, CreatureType, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
 import { useForceUpdate } from "../utility"
 
 const scale = 1;

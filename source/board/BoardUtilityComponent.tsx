@@ -121,7 +121,7 @@ const BoardUtilty = () => {
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new ConditionBoardUtility(board.current, null),
             new DecoratorBoardUtility(board.current),
-            new HiddenBoardUtility(board.current, false),
+            new HiddenBoardUtility(board.current),
         ];
         utilities.current.forEach(element => {
             element.forceUpdate = renderUI;

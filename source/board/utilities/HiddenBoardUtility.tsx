@@ -1,4 +1,4 @@
-import { Board, BoardPosition, IBoardUtility, BoardCondition, ConditionIcons } from "../Board"
+import { Board, BoardPosition, IBoardUtility } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
 
@@ -11,7 +11,7 @@ export class HiddenBoardUtility implements IBoardUtility {
 
     forceUpdate: (() => void) | null = null;
 
-    constructor(board: Board, targetCondition: boolean) {
+    constructor(board: Board) {
         this.board = board
         this.targetCondition = false
     }
