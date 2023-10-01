@@ -48,11 +48,6 @@ const PlayerViewRenderer : React.ForwardRefRenderFunction<PlayerViewHandle, Play
                     playerView
                     importanceRect={props.importanceRect}
                 />
-                <div className="absolute left-0 top-0">
-                    <span style={{
-                        fontFamily: "Material Symbols"
-                    }}>note</span>
-                </div>
             </div>
         </WindowComponent>
     )
