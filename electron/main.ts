@@ -250,7 +250,7 @@ function createWindow() {
 
     win.webContents.setWindowOpenHandler((_arg: HandlerDetails) => {
         app.once('browser-window-created', (_event, newWindow) => {
-            newWindow.webContents.openDevTools();
+            // newWindow.webContents.openDevTools();
             newWindow.setPosition(0, 0);
             newWindow.maximize();
         });
