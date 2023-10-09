@@ -152,7 +152,9 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
     React.useEffect(setupUtilities, [board.current]);
     return (
         <>
-            <div className='w-full h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center'>
+            <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center basis-1 border-l-4 border-orange-600 grow basis-2' style={{
+                minWidth: "50vw!important"
+            }}>
                 <BoardComponent
                     ref={boardComponentRef}
                     board={board.current}

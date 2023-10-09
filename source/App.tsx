@@ -17,28 +17,33 @@ const App = () => {
         playerView.current?.update();
     }
 
-
     React.useEffect(() => {
         window.ipcRenderer.on("r-show-hide-player-view", (_e, ..._args) => {
-            playerView.current?.open();
+            if (playerView.current?.isOpen()) {
+                playerView.current.close();
+            } else {
+                playerView.current?.open();
+            }
         });
     }, []);
 
     return (
-        <>
-            <DMView 
-                board={board} 
+        <div className={
+            "flex"
+        }>
+            <PlayerView
+                ref={playerView}
+                board={board}
+                update={update}
+                importanceRect={importanceRect}
+            />
+            <DMView
+                board={board}
                 update={update}
                 importanceRect={importanceRect}
                 setImportanceRect={setImportanceRect}
             />
-            <PlayerView 
-                ref={playerView} 
-                board={board} 
-                update={update}
-                importanceRect={importanceRect}
-            />
-        </>
+        </div>
     )
 }
 

@@ -14,34 +14,39 @@ export type PlayerViewHandle = {
     open: () => void;
     close: () => void;
     update: () => void;
+    isOpen: () => boolean;
 }
 
 const PlayerViewRenderer : React.ForwardRefRenderFunction<PlayerViewHandle, PlayerViewProps> = (props, ref) => {
 
     const boardComponentRef = React.useRef<BoardComponentHandle>(null);
+    const [open, setOpen] = React.useState(false);
 
     const handle : PlayerViewHandle = {
         update: () => {
             boardComponentRef.current?.update();
         },
         open() {
-            windowComponent.current?.open();
             boardComponentRef.current?.update();
+            setOpen(true);
         },
         close() {
-            windowComponent.current?.close();
+            setOpen(false);
+        },
+        isOpen() {
+            return open;
         }
     }
-    const windowComponent = React.useRef<WindowComponentHandle>(null);
 
     React.useImperativeHandle(ref, () => handle);
 
     return (
-        <WindowComponent
-            title="Player View - Dragon's Eye"
-            ref={windowComponent}
-        >
-            <div className="text-2xl bg-green-500 h-screen w-screen flex items-center justify-center font-sans relative">
+        open ? (
+            <div className="text-2xl bg-green-500 h-screen relative grow basis-2" style={{
+                minWidth: "50vw",
+                maxWidth: "50vw",
+                width: "50vw",
+            }}>
                 <BoardComponent 
                     ref={boardComponentRef}
                     board={props.board.current}
@@ -49,7 +54,9 @@ const PlayerViewRenderer : React.ForwardRefRenderFunction<PlayerViewHandle, Play
                     importanceRect={props.importanceRect}
                 />
             </div>
-        </WindowComponent>
+        ) : (
+            <></>
+        )
     )
 }
 

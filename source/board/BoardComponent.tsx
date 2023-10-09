@@ -298,7 +298,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
     return (
         <div
             ref={rootRef}
-            className='overflow-scroll select-none h-[inherit] w-[inherit] min-h-[inherit] min-w-[inherit] max-h-[inherit] max-w-[inherit] bg-neutral-400'
+            className='overflow-scroll select-none h-[inherit] w-[inherit] min-h-[inherit] min-w-[inherit] max-h-[inherit] max-w-[inherit] bg-black'
             style={{
                 zoom: zoom
             }}
@@ -311,69 +311,126 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
             <div className="min-h-full flex items-center" style={{
                 justifyContent: 'safe center'
             }}>
-                <div className="p-72">
-                    <div className="relative">
-                        <canvas
-                            style={{
-                                width: props.board.width * CanvasBaseSize,
-                                height: props.board.height * CanvasBaseSize,
-                            }}
-                            ref={canvasRef}
-                            onMouseDown={(e) => {
-
-                                renderUI();
-
-                                let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
-                                let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
-                                x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
-                                y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
-                                if (props.utility && props.utility.onShapeClick) {
-                                    props.utility.onShapeClick({ x: x - 1, y: y - 1 })
-                                    console.log({ x, y })
-                                    renderUI();
+                <div className="p-72 flex flex-col">
+                    <div className="sticky bg-black/80 text-white text-2xl w-full self-end" style={{
+                        zIndex: 1000,
+                        height: CanvasBaseSize + 'px',
+                        width: props.board.width * CanvasBaseSize + 'px',
+                        top: 0,
+                        bottom: 0
+                    }}>
+                        {
+                            new Array<number>(props.board.width).fill(0).map((_, i) => {
+                                let text = ""
+                                while (i >= 26) {
+                                    text += String.fromCharCode(97 + (i % 26));
+                                    i = Math.floor(i / 26) - 1;
                                 }
-                            }}
-                            onMouseUp={(e) => {
-                                let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
-                                let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
-                                x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
-                                y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
-                                if (props.utility && props.utility.onShapeRelease) {
-                                    props.utility.onShapeRelease({ x: x - 1, y: y - 1 })
-                                    renderUI();
-                                }
-                            }}
-                            onMouseMove={(e) => {
-                                let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
-                                let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
-                                x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
-                                y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
-                                if (props.utility && props.utility.onShapeHover) {
-                                    props.utility.onShapeHover({ x: x - 1, y: y - 1 })
-                                    renderUI();
-                                }
-                            }}
-                            className="bg-white"
-                        ></canvas>
-                        <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
-                            {
-                                props.utility && props.utility.customComponent ? (
-                                    props.utility.customComponent()
-                                ) : (
-                                    <></>
+                                text += String.fromCharCode(97 + i);
+                                return (
+                                    <div
+                                        style={{
+                                            width: CanvasBaseSize + 'px',
+                                            height: CanvasBaseSize + 'px',
+                                        }}
+                                        key="i"
+                                        className="inline-flex justify-center items-center"
+                                    >
+                                        {text}
+                                    </div>
                                 )
-                            }
+                            })
+                        }
+                    </div>
+                    <div className="flex">
+                        <div className="sticky bg-black/80 text-white text-2xl" style={{
+                            zIndex: 1000,
+                            height: props.board.height * CanvasBaseSize + 'px',
+                            width: CanvasBaseSize + 'px',
+                            left: 0,
+                            right: 0
+                        }}>
                             {
-                                <div
-                                    className="pointer-events-none absolute border-4 border-red-500"
-                                    style={{
-                                        left: props.importanceRect ? (props.importanceRect.x * CanvasBaseSize + 'px') : "0px",
-                                        top: props.importanceRect ? (props.importanceRect.y * CanvasBaseSize + 'px') : "0px",
-                                        width: props.importanceRect ? (props.importanceRect.width * CanvasBaseSize + 'px') : (props.board.width * CanvasBaseSize + 'px'),
-                                        height: props.importanceRect ? props.importanceRect.height * CanvasBaseSize + 'px' : (props.board.height * CanvasBaseSize + 'px'),
-                                    }}
-                                ></div>
+                                new Array<number>(props.board.height).fill(0).map((_, i) => {
+                                    return (
+                                        <div
+                                            style={{
+                                                width: CanvasBaseSize + 'px',
+                                                height: CanvasBaseSize + 'px',
+                                            }}
+                                            key="i"
+                                            className="inline-flex justify-center items-center"
+                                        >
+                                            {i}
+                                        </div>
+                                    )
+                                })
                             }
+                        </div>
+
+                        <div className="relative">
+                            <canvas
+                                style={{
+                                    width: props.board.width * CanvasBaseSize,
+                                    height: props.board.height * CanvasBaseSize,
+                                }}
+                                ref={canvasRef}
+                                onMouseDown={(e) => {
+
+                                    renderUI();
+
+                                    let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
+                                    let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
+                                    x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
+                                    y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
+                                    if (props.utility && props.utility.onShapeClick) {
+                                        props.utility.onShapeClick({ x: x - 1, y: y - 1 })
+                                        console.log({ x, y })
+                                        renderUI();
+                                    }
+                                }}
+                                onMouseUp={(e) => {
+                                    let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
+                                    let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
+                                    x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
+                                    y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
+                                    if (props.utility && props.utility.onShapeRelease) {
+                                        props.utility.onShapeRelease({ x: x - 1, y: y - 1 })
+                                        renderUI();
+                                    }
+                                }}
+                                onMouseMove={(e) => {
+                                    let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
+                                    let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
+                                    x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
+                                    y = Math.max(Math.min(Math.ceil(y / (CanvasBaseSize * zoom)), props.board.height), 0);
+                                    if (props.utility && props.utility.onShapeHover) {
+                                        props.utility.onShapeHover({ x: x - 1, y: y - 1 })
+                                        renderUI();
+                                    }
+                                }}
+                                className="bg-white"
+                            ></canvas>
+                            <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                                {
+                                    props.utility && props.utility.customComponent ? (
+                                        props.utility.customComponent()
+                                    ) : (
+                                        <></>
+                                    )
+                                }
+                                {
+                                    <div
+                                        className="pointer-events-none absolute border-4 border-orange-600"
+                                        style={{
+                                            left: props.importanceRect ? (props.importanceRect.x * CanvasBaseSize + 'px') : "0px",
+                                            top: props.importanceRect ? (props.importanceRect.y * CanvasBaseSize + 'px') : "0px",
+                                            width: props.importanceRect ? (props.importanceRect.width * CanvasBaseSize + 'px') : (props.board.width * CanvasBaseSize + 'px'),
+                                            height: props.importanceRect ? props.importanceRect.height * CanvasBaseSize + 'px' : (props.board.height * CanvasBaseSize + 'px'),
+                                        }}
+                                    ></div>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
