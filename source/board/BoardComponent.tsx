@@ -10,12 +10,9 @@ const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-const drawTerrain = (
-    canvas: HTMLCanvasElement,
-    board: Board,
-    position: { x: number, y: number },
-    _playerView: boolean
-) => {
+type BoardCallback = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => void;
+
+const drawTerrain: BoardCallback = (canvas, board, position, _playerView) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -44,7 +41,7 @@ const drawTerrain = (
     }
 }
 
-const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, _playerView: boolean) => {
+const drawCondition: BoardCallback = (canvas, board, position, _playerView) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -74,7 +71,7 @@ const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: n
     }
 }
 
-const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => {
+const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -214,7 +211,7 @@ const drawDecorator = (canvas: HTMLCanvasElement, board: Board, position: { x: n
     }
 }
 
-const drawHidden = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => {
+const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -240,27 +237,27 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, width, height);
 
-    for (let i = 0; i < board.height; i++) {
-        for (let j = 0; j < board.width; j++) {
-            drawTerrain(canvas, board, { x: j, y: i }, playerView);
-        }
-    }
-    for (let i = 0; i < board.height; i++) {
-        for (let j = 0; j < board.width; j++) {
-            drawDecorator(canvas, board, { x: j, y: i }, playerView);
-        }
-    }
-    for (let i = 0; i < board.height; i++) {
-        for (let j = 0; j < board.width; j++) {
-            drawCondition(canvas, board, { x: j, y: i }, playerView);
-        }
-    }
-    for (let i = 0; i < board.height; i++) {
-        for (let j = 0; j < board.width; j++) {
-            drawHidden(canvas, board, { x: j, y: i }, playerView);
+    // draw helper
+    const forEachTile = (callback: BoardCallback) => {
+        for (let i = 0; i < board.height; i++) {
+            for (let j = 0; j < board.width; j++) {
+                callback(canvas, board, { x: j, y: i }, playerView);
+            }
         }
     }
 
+    // draw scene
+    forEachTile(drawTerrain);
+    if (playerView) {
+        forEachTile(drawDecorator);
+        forEachTile(drawCondition);
+    } else {
+        forEachTile(drawCondition);
+        forEachTile(drawDecorator);
+    }
+    forEachTile(drawHidden);
+
+    // draw grid
     ctx.lineWidth = LineWidth;
     ctx.strokeStyle = '#000000';
     ctx.beginPath();
