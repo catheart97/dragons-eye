@@ -102,7 +102,11 @@ export enum BoardTerrain {
     Sand,
     Dirt,
     Wall,
-    Wood
+    Wood,
+    Tile,
+    Ice,
+    Lava,
+    Snow
 }
 
 export const TerrainColors: { [key in BoardTerrain] : string } = {
@@ -113,7 +117,11 @@ export const TerrainColors: { [key in BoardTerrain] : string } = {
     [BoardTerrain.Sand]: '#fef08a',
     [BoardTerrain.Dirt]: '#854d0e',
     [BoardTerrain.Wall]: '#000000',
-    [BoardTerrain.Wood]: '#a27035'
+    [BoardTerrain.Wood]: '#a27035',
+    [BoardTerrain.Tile]: '#ffffff',
+    [BoardTerrain.Ice]: '#ffffff',
+    [BoardTerrain.Lava]: '#ef4444',
+    [BoardTerrain.Snow]: '#ffffff'
 }
 
 export const ConditionColors: { [key in BoardCondition] : string } = {
@@ -404,7 +412,7 @@ export const constructDefaultBoard = (w: number, h: number): Board => {
         const x = i % w;
         const y = Math.floor(i / w);
         if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
-            board[i] = BoardTerrain.Stone;
+            board[i] = BoardTerrain.Tile;
         }
     }
     return {

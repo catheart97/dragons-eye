@@ -1,27 +1,47 @@
 import React from "react"
 
 import "../index.css"
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
 import { useForceUpdate } from "../utility"
 import { Rect } from "../Rect";
+import { TexturePool } from "./TexturePool";
 
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-const drawTerrain = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, _playerView: boolean) => {
+const drawTerrain = (
+    canvas: HTMLCanvasElement,
+    board: Board,
+    position: { x: number, y: number },
+    _playerView: boolean
+) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
     // render terrain
     const terrain = board.terrain[idx]
-    ctx.fillStyle = TerrainColors[terrain];
-    ctx.fillRect(
-        position.x * CanvasBaseSize + LineWidth / 2,
-        position.y * CanvasBaseSize + LineWidth / 2,
-        CanvasBaseSize - LineWidth,
-        CanvasBaseSize - LineWidth
-    );
+    if (terrain == BoardTerrain.Wall) {
+        ctx.fillStyle = TerrainColors[terrain];
+        ctx.fillRect(
+            position.x * CanvasBaseSize + LineWidth / 2,
+            position.y * CanvasBaseSize + LineWidth / 2,
+            CanvasBaseSize - LineWidth,
+            CanvasBaseSize - LineWidth
+        );
+    } else {
+        const texturePool = TexturePool.getInstance().get();
+        if (!texturePool) {
+            return;
+        }
+        ctx.drawImage(
+            texturePool!.TerrainTextures[terrain],
+            position.x * CanvasBaseSize + LineWidth / 2,
+            position.y * CanvasBaseSize + LineWidth / 2,
+            CanvasBaseSize - LineWidth,
+            CanvasBaseSize - LineWidth
+        );
+    }
 }
 
 const drawCondition = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, _playerView: boolean) => {
@@ -227,12 +247,12 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
     }
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawCondition(canvas, board, { x: j, y: i }, playerView);
+            drawDecorator(canvas, board, { x: j, y: i }, playerView);
         }
     }
     for (let i = 0; i < board.height; i++) {
         for (let j = 0; j < board.width; j++) {
-            drawDecorator(canvas, board, { x: j, y: i }, playerView);
+            drawCondition(canvas, board, { x: j, y: i }, playerView);
         }
     }
     for (let i = 0; i < board.height; i++) {
@@ -273,7 +293,18 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
     const rootRef = React.useRef<HTMLDivElement>(null);
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
+    const draw = () => {
+        if (canvasRef.current) {
+            canvasRef.current!.width = props.board.width * CanvasBaseSize;
+            canvasRef.current!.height = props.board.height * CanvasBaseSize;
+            drawBoard(canvasRef.current!, props.board, props.playerView ?? false);
+        }
+    }
+
     React.useEffect(() => {
+        TexturePool.getInstance().constructTexturePool().then(() => {
+            draw();
+        });
         if (rootRef.current) {
             // scroll to center
             const viewportRect = rootRef.current.getBoundingClientRect();
@@ -287,9 +318,9 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
 
     React.useImperativeHandle(e, () => ({
         update: () => {
-            canvasRef.current!.width = props.board.width * CanvasBaseSize;
-            canvasRef.current!.height = props.board.height * CanvasBaseSize;
-            drawBoard(canvasRef.current!, props.board, props.playerView ?? false);
+            if (TexturePool.getInstance().get()) {
+                draw();
+            }
         }
     }));
 
@@ -333,7 +364,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                             width: CanvasBaseSize + 'px',
                                             height: CanvasBaseSize + 'px',
                                         }}
-                                        key="i"
+                                        key={i}
                                         className="inline-flex justify-center items-center"
                                     >
                                         {text}
@@ -358,7 +389,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                                 width: CanvasBaseSize + 'px',
                                                 height: CanvasBaseSize + 'px',
                                             }}
-                                            key="i"
+                                            key={i}
                                             className="inline-flex justify-center items-center"
                                         >
                                             {i}

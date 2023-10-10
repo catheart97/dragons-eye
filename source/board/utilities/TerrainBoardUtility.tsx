@@ -83,10 +83,9 @@ export class TerrainBoardUtility implements IBoardUtility {
                                     this.forceUpdate?.call(this);
                                 }}
                                 active={this.targetTerrain == v}
-                            ><div className='w-4 h-4 border-2 border-dashed border-black' style={{
-                                backgroundColor: TerrainColors[v]
-                            }}>
-                                </div></ToolButton>
+                            >
+                                {BoardTerrain[v]}
+                            </ToolButton>
                         )
                     })
                 }
