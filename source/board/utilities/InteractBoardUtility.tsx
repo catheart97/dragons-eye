@@ -1,4 +1,4 @@
-import { Board, BoardCreature, BoardDecoratorType, BoardPosition, IBoardUtility, ItemType, TrapData } from "../Board";
+import { Board, BoardCreature, BoardDecoratorType, BoardPosition, CreatureAttitude, IBoardUtility, ItemType, TrapData } from "../Board";
 import { CanvasBaseSize } from "../BoardComponent";
 
 export class InteractBoardUtility implements IBoardUtility {
@@ -75,7 +75,8 @@ export class InteractBoardUtility implements IBoardUtility {
                     {
                         decorator.type == BoardDecoratorType.Creature ? (
                             <>
-                                {(decorator.attachment as BoardCreature).name}
+                                {(decorator.attachment as BoardCreature).name} <br/>
+                                {CreatureAttitude[(decorator.attachment as BoardCreature).attitude]}
                             </>
                         ) : <></>
                     }

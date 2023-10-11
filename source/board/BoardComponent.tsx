@@ -94,7 +94,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                 } else if (attachment.size == CreatureSize.Gargantuan) {
                     modifier = 7;
                 } else if (attachment.size == CreatureSize.Tiny) {
-                    modifier = .5;
+                    modifier = .8;
                 }
             }
             dim *= modifier;
@@ -112,20 +112,45 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
             ctx.fill();
             ctx.stroke();
 
-            let height = 22 * modifier * scale;
+            // ctx.beginPath();
+            // ctx.lineWidth = modifier * LineWidth * 2;
+            // ctx.strokeStyle = '#FF0000';
+            // const healthAngle = attachment.hitpoints != undefined && attachment.maxHitpoints != undefined ? 2 * Math.PI * (attachment.hitpoints / attachment.maxHitpoints) : 2 * Math.PI;
+            // console.log(healthAngle)
+            // ctx.arc(
+            //     x * CanvasBaseSize + CanvasBaseSize / 2,
+            //     y * CanvasBaseSize + CanvasBaseSize / 2,
+            //     (dim / 2 - LineWidth * 2),
+            //     0,
+            //     healthAngle
+            // )
+            // ctx.stroke();
+
+            ctx.lineWidth = LineWidth;
+            ctx.strokeStyle = '#000000';
+
+            let height = 60 * modifier * scale;
             ctx.font = `${height - 2}px Material Symbols`;
-            ctx.fillStyle = '#000000';
-            ctx.fillText(
+
+            const color = CreatureAttitudeColors[attachment.attitude];
+            const darkenedColor = color.replace(/([0-9a-f]{2})/g, (_match, p1) => {
+                return Math.floor((parseInt(p1, 16) * .5)).toString(16).padStart(2, '0');
+            });
+
+            ctx.fillStyle = darkenedColor;
+            ctx.textAlign = 'center';
+            ctx.fillText( 
                 CanvasCreatureTypeIcons[attachment.type],
-                x * CanvasBaseSize + CanvasBaseSize / 2 - dim / 4 - height / 2,
-                y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2
+                x * CanvasBaseSize + CanvasBaseSize / 2,
+                y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 16,
             )
 
-            height = 32 * modifier * scale;
+            ctx.fillStyle = '#DDDDDD';
+            height = 28 * modifier * scale;
             ctx.font = `${height - 2}px Fira Sans`;
             ctx.fillText(
-                attachment.name.charAt(0).toUpperCase(),
-                x * CanvasBaseSize + CanvasBaseSize / 2 + dim / 4 - height / 2,
+                attachment.name.charAt(0).toUpperCase() + attachment.name.charAt(1).toLowerCase(),
+                x * CanvasBaseSize + CanvasBaseSize / 2,
                 y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 8
             )
         } else {

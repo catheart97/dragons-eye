@@ -3,6 +3,7 @@ import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
 import { UIGroup } from "../../ui/UIGroup";
 import { CanvasBaseSize } from "../BoardComponent";
+import { NumberInput } from "../../ui/NumberInput";
 
 enum DecoratorBoardUtilityMode {
     Drag,

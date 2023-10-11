@@ -381,15 +381,15 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
     }
 
     // place notes
-    // for (const note of data.notes) {
-    //     decorators[Math.floor(note.pos.y) + Math.floor(note.pos.x) * maxY] = {
-    //         type: BoardDecoratorType.Item,
-    //         attachment: {
-    //             type: ItemType.Note,
-    //             data: note.text
-    //         }
-    //     }
-    // }
+    for (const note of data.notes) {
+        decorators[Math.floor(note.pos.y) + Math.floor(note.pos.x) * maxY] = {
+            type: BoardDecoratorType.Item,
+            attachment: {
+                type: ItemType.Note,
+                data: note.text
+            }
+        }
+    }
 
     return {
         width: maxY,
