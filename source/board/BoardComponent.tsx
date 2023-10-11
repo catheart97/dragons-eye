@@ -270,6 +270,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
             }
         }
     }
+    
 
     // draw scene
     forEachTile(drawTerrain);
@@ -366,7 +367,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
             }}>
                 <div className="p-72 flex flex-col">
                     <div className="sticky bg-black/80 text-white text-2xl w-full self-end" style={{
-                        zIndex: 1000,
+                        zIndex: 50,
                         height: CanvasBaseSize + 'px',
                         width: props.board.width * CanvasBaseSize + 'px',
                         top: 0,
@@ -397,7 +398,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                     </div>
                     <div className="flex">
                         <div className="sticky bg-black/80 text-white text-2xl" style={{
-                            zIndex: 1000,
+                            zIndex: 50,
                             height: props.board.height * CanvasBaseSize + 'px',
                             width: CanvasBaseSize + 'px',
                             left: 0,

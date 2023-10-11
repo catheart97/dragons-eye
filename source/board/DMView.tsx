@@ -162,7 +162,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                     importanceRect={props.importanceRect}
                     setImportanceRect={props.setImportanceRect}
                 />
-                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-50'>
+                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60]'>
 
                     {
                         utilities.current[currentUtility] != undefined ? (
