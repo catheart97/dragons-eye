@@ -101,6 +101,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
 
             ctx.fillStyle = CreatureAttitudeColors[attachment.attitude];
             ctx.beginPath();
+            ctx.strokeStyle = '#000000';
             ctx.lineWidth = LineWidth;
             ctx.arc(
                 x * CanvasBaseSize + CanvasBaseSize / 2,
@@ -154,6 +155,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                 y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 8
             )
         } else {
+            ctx.textAlign = 'left';
             const attachment = decorator.attachment as BoardItem;
             if (attachment.type == ItemType.Door) {
                 const data = attachment.data as DoorData;
