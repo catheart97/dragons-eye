@@ -9,6 +9,7 @@ export enum Stat {
 
 export type PlayerStatblock = {
     name: string;
+    size: CreatureSize
 }
 
 export enum DamageType {
@@ -94,8 +95,8 @@ export type Spell = {
 
 export type Statblock = PlayerStatblock & {
     
-    armorClass: number;
-    speed: {
+    armorClass?: number;
+    speed?: {
         walk: number;
         fly?: number;
         swim?: number;
@@ -109,7 +110,7 @@ export type Statblock = PlayerStatblock & {
         temporary?: number;
     }
     
-    stats: {
+    stats?: {
         [key in Stat]: number;
     }
 
@@ -147,7 +148,6 @@ export type Statblock = PlayerStatblock & {
 
     image?: string;
 
-    size?: CreatureSize;
     alignment?: string;
     type?: CreatureType;
 

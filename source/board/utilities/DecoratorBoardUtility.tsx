@@ -1,8 +1,10 @@
-import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, CreatureSize, ItemType, ItemTypeIcons } from "../Board"
+import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, CreatureAttitude, ItemType, ItemTypeIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton";
 import { TextInput } from "../../ui/TextInput";
 import { UIGroup } from "../../ui/UIGroup";
 import { CanvasBaseSize } from "../BoardComponent";
+import { CreatureSize, Stat, Statblock } from "../../statblock/Statblock";
+import { NumberInput } from "../../ui/NumberInput";
 // import { NumberInput } from "../../ui/NumberInput";
 
 enum DecoratorBoardUtilityMode {
@@ -21,9 +23,15 @@ export class DecoratorBoardUtility implements IBoardUtility {
     decoratorType: BoardDecoratorType = BoardDecoratorType.Creature;
 
     creatureType: CreatureType = CreatureType.Humanoid;
-    creatureAttitude: CreatureAttitude = CreatureAttitude.Hostile;
-    creatureSize: CreatureSize = CreatureSize.MediumSmall;
-    creatureName: string = "";
+    creatureAttitude: CreatureAttitude = CreatureAttitude.Enemy;
+    creatureSize: CreatureSize = CreatureSize.Medium;
+    creatureName: string = "Creature";
+    creatureStatblock: Partial<Statblock> = {
+        hitPoints: {
+            current: 10,
+            maximum: 10,
+        }
+    }
 
     itemType: ItemType = ItemType.Door;
 
@@ -32,9 +40,9 @@ export class DecoratorBoardUtility implements IBoardUtility {
         armed: boolean,
         effect: string
     } = {
-        armed: false,
-        effect: ""
-    };
+            armed: false,
+            effect: ""
+        };
     noteData: string = "";
 
     mouseDown: boolean = false;
@@ -42,7 +50,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
     forceUpdate: (() => void) | null = null;
 
     constructor(board: Board) {
-        this.board = board; 
+        this.board = board;
     }
 
     onShapeClick(position: BoardPosition) {
@@ -68,13 +76,32 @@ export class DecoratorBoardUtility implements IBoardUtility {
         if (this.mode == DecoratorBoardUtilityMode.Place) {
             if (this.board.decorators[idxTo] == undefined) {
                 if (this.decoratorType == BoardDecoratorType.Creature) {
-                    this.board.decorators[idxTo] = {
-                        type: this.decoratorType,
-                        attachment: {
-                            name: this.creatureName,
-                            type: this.creatureType,
-                            attitude: this.creatureAttitude,
-                            size: this.creatureSize
+                    if (this.creatureAttitude == CreatureAttitude.Player) {
+                        this.board.decorators[idxTo] = {
+                            type: this.decoratorType,
+                            attachment: {
+                                type: this.creatureType,
+                                attitude: this.creatureAttitude,
+                                statblock: {
+                                    size: this.creatureSize,
+                                    name: this.creatureName
+                                }
+                            },
+                            key: this.board.decoratorCounter++
+                        }
+                    } else {
+                        this.board.decorators[idxTo] = {
+                            type: this.decoratorType,
+                            attachment: {
+                                type: this.creatureType,
+                                attitude: this.creatureAttitude,
+                                statblock: {
+                                    size: this.creatureSize,
+                                    name: this.creatureName,
+                                    ...this.creatureStatblock
+                                },
+                            },
+                            key: this.board.decoratorCounter++
                         }
                     }
                 } else {
@@ -88,7 +115,8 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         attachment: {
                             type: structuredClone(this.itemType),
                             data: structuredClone(data)
-                        }
+                        },
+                        key: this.board.decoratorCounter++
                     }
                 }
             }
@@ -105,6 +133,23 @@ export class DecoratorBoardUtility implements IBoardUtility {
 
     onShapeHover(position: BoardPosition) {
         this.position = position;
+    }
+
+    onMount() {
+        this.creatureStatblock = {
+            hitPoints: {
+                current: 10,
+                maximum: 10
+            },
+            stats: {
+                Strength: 10,
+                Dexterity: 10,
+                Constitution: 10,
+                Charisma: 10,
+                Wisdom: 10,
+                Intelligence: 10
+            }
+        }
     }
 
     userInterface() {
@@ -207,7 +252,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                         ) : null
                     }
 
-                    { 
+                    {
                         this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Door ? (
                             <>
                                 <UIGroup title="Door State">
@@ -256,7 +301,7 @@ export class DecoratorBoardUtility implements IBoardUtility {
                             </>
                         ) : null
                     }
-                    
+
                     {
                         this.mode == DecoratorBoardUtilityMode.Place && this.decoratorType == BoardDecoratorType.Item && this.itemType == ItemType.Note ? (
                             <>
@@ -276,7 +321,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                             <>
                                 <UIGroup title="Creature Type">
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
                                             this.creatureType = CreatureType.Humanoid;
                                             this.forceUpdate?.call(this);
@@ -286,7 +330,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         <span className="mso text-xl">person</span>
                                     </ToolButton>
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
                                             this.creatureType = CreatureType.Animal;
                                             this.forceUpdate?.call(this);
@@ -296,7 +339,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         <span className="mso text-xl">pets</span>
                                     </ToolButton>
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
                                             this.creatureType = CreatureType.Monster;
                                             this.forceUpdate?.call(this);
@@ -308,7 +350,6 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                 </UIGroup>
                                 <UIGroup title="Attitude">
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
                                             this.creatureAttitude = CreatureAttitude.Player;
                                             this.forceUpdate?.call(this);
@@ -318,22 +359,20 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         <span className="mso text-xl">person</span>
                                     </ToolButton>
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
-                                            this.creatureAttitude = CreatureAttitude.NPC;
+                                            this.creatureAttitude = CreatureAttitude.Ally;
                                             this.forceUpdate?.call(this);
                                         }}
-                                        active={this.creatureAttitude == CreatureAttitude.NPC}
+                                        active={this.creatureAttitude == CreatureAttitude.Ally}
                                     >
                                         <span className="mso text-xl">robot</span>
                                     </ToolButton>
                                     <ToolButton
-                                        className="grow"
                                         onClick={() => {
-                                            this.creatureAttitude = CreatureAttitude.Hostile;
+                                            this.creatureAttitude = CreatureAttitude.Enemy;
                                             this.forceUpdate?.call(this);
                                         }}
-                                        active={this.creatureAttitude == CreatureAttitude.Hostile}
+                                        active={this.creatureAttitude == CreatureAttitude.Enemy}
                                     >
                                         <span className="mso text-xl">swords</span>
                                     </ToolButton>
@@ -346,14 +385,23 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                         }}
                                         active={this.creatureSize == CreatureSize.Tiny}
                                     >
+                                        <span className="mso text-xl">bug_report</span>
+                                    </ToolButton>
+                                    <ToolButton
+                                        onClick={() => {
+                                            this.creatureSize = CreatureSize.Small;
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        active={this.creatureSize == CreatureSize.Small}
+                                    >
                                         <span className="mso text-xl">crib</span>
                                     </ToolButton>
                                     <ToolButton
                                         onClick={() => {
-                                            this.creatureSize = CreatureSize.MediumSmall;
+                                            this.creatureSize = CreatureSize.Medium;
                                             this.forceUpdate?.call(this);
                                         }}
-                                        active={this.creatureSize == CreatureSize.MediumSmall}
+                                        active={this.creatureSize == CreatureSize.Medium}
                                     >
                                         <span className="mso text-xl">person</span>
                                     </ToolButton>
@@ -386,10 +434,85 @@ export class DecoratorBoardUtility implements IBoardUtility {
                                     </ToolButton>
                                 </UIGroup>
                                 <UIGroup title="Name">
-                                    <TextInput onChange={(e) => {
-                                        this.creatureName = e.target.value;
-                                    }} />
+                                    <TextInput 
+                                        defaultValue={this.creatureName}
+                                        onChange={(e) => {
+                                            this.creatureName = e.target.value;
+                                        }} 
+                                    />
                                 </UIGroup>
+                                {
+                                    this.creatureAttitude != CreatureAttitude.Player ? (
+                                        <>
+                                            <UIGroup title="HP/MAX/ TEMP">
+                                                <NumberInput
+                                                    min={0}
+                                                    className="w-[28%]"
+                                                    onChange={(e) => {
+                                                        this.creatureStatblock.hitPoints!.current = e.target.valueAsNumber;
+                                                    }}
+                                                    defaultValue={10}
+                                                />
+                                                <NumberInput
+                                                    min={1}
+                                                    className="w-[28%]"
+                                                    onChange={(e) => {
+                                                        this.creatureStatblock.hitPoints!.maximum = e.target.valueAsNumber;
+                                                    }}
+                                                    defaultValue={10}
+                                                />
+                                                <NumberInput
+                                                    min={0}
+                                                    className="w-[28%]"
+                                                    onChange={(e) => {
+                                                        if (e.target.valueAsNumber) {
+                                                            this.creatureStatblock.hitPoints!.temporary = e.target.valueAsNumber
+                                                        } else {
+                                                            delete this.creatureStatblock.hitPoints!.temporary;
+                                                        }
+                                                    }}
+                                                    defaultValue={0}
+                                                />
+                                            </UIGroup>
+                                            <UIGroup title="Stats">
+                                                    <div className="w-full flex gap-2 justify-end">
+                                                        {
+                                                            (Object.values(Stat).filter((stat) => typeof(stat) == "string") as string[]).map((v, i) => {
+                                                                return (
+                                                                    <div className="flex flex-col items-center w-fit text-sm" key={v}>
+                                                                        <NumberInput
+                                                                            defaultValue={10}
+                                                                            min={0}
+                                                                            max={50}
+                                                                            className="w-4 text-center pl-1 pr-1"
+                                                                            style={{
+                                                                                appearance: "textfield",
+                                                                                WebkitAppearance: "textfield"
+                                                                            }}
+                                                                            onChange={(e) => {
+                                                                                if (this.creatureStatblock.stats == undefined) {
+                                                                                    this.creatureStatblock.stats = {
+                                                                                        Strength: 0,
+                                                                                        Dexterity: 0,
+                                                                                        Charisma: 0,
+                                                                                        Constitution:0,
+                                                                                        Wisdom: 0,
+                                                                                        Intelligence: 0
+                                                                                    }
+                                                                                }
+                                                                                this.creatureStatblock.stats[Stat[v as keyof typeof Stat]] = e.target.valueAsNumber
+                                                                            }}
+                                                                        ></NumberInput>
+                                                                        <div>{v.substring(0, 3).toUpperCase()}</div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                            </UIGroup>
+                                        </>
+                                    ) : null
+                                }
                             </>
                         ) : null
                     }

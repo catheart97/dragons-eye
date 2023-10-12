@@ -1,3 +1,5 @@
+import { CreatureSize, PlayerStatblock, Statblock } from "../statblock/Statblock";
+
 export type BoardPosition = {
     x: number,
     y: number
@@ -16,16 +18,8 @@ export enum CreatureType {
 
 export enum CreatureAttitude {
     Player,
-    NPC,
-    Hostile
-}
-
-export enum CreatureSize {
-    Tiny,
-    MediumSmall,
-    Large,
-    Huge,
-    Gargantuan
+    Ally,
+    Enemy
 }
 
 export enum ItemType {
@@ -47,24 +41,25 @@ export type BoardItem = {
 }
 
 export type BoardCreature = {
-    name: string,
     type: CreatureType,
     attitude: CreatureAttitude,
-    size: CreatureSize,
+    statblock: PlayerStatblock | Statblock
 }
 
 export type BoardDecorator = {
     type: BoardDecoratorType,
-    attachment: BoardCreature | BoardItem 
+    attachment: BoardCreature | BoardItem
+    key: number
 }
 
 export type Board = {
     width: number,
     height: number,
     terrain: Array<BoardTerrain>
-    conditions: { [key: number] : BoardCondition }
-    decorators: { [key: number] : BoardDecorator }
-    hidden?: { [key: number] : boolean }
+    conditions: { [key: number]: BoardCondition }
+    decorators: { [key: number]: BoardDecorator }
+    decoratorCounter: number
+    hidden?: { [key: number]: boolean }
 }
 
 export enum SpellShape {
@@ -109,7 +104,7 @@ export enum BoardTerrain {
     Snow
 }
 
-export const TerrainColors: { [key in BoardTerrain] : string } = {
+export const TerrainColors: { [key in BoardTerrain]: string } = {
     [BoardTerrain.Grass]: '#a3e635',
     [BoardTerrain.Water]: '#7dd3fc',
     [BoardTerrain.Stone]: '#9ca3af',
@@ -124,7 +119,7 @@ export const TerrainColors: { [key in BoardTerrain] : string } = {
     [BoardTerrain.Snow]: '#ffffff'
 }
 
-export const ConditionColors: { [key in BoardCondition] : string } = {
+export const ConditionColors: { [key in BoardCondition]: string } = {
     [BoardCondition.None]: '#ffffff',
     [BoardCondition.Fire]: '#ef4444',
     [BoardCondition.Acid]: '#166534',
@@ -141,7 +136,7 @@ export const ConditionColors: { [key in BoardCondition] : string } = {
     [BoardCondition.Slow]: '#000000'
 }
 
-export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
+export const ConditionIcons: { [key in BoardCondition]: React.ReactNode } = {
     [BoardCondition.None]: <></>,
     [BoardCondition.Fire]: <span className="msf text-red-500 rounded-full bg-white m-1">local_fire_department</span>,
     [BoardCondition.Acid]: <span className="msf text-green-800 rounded-full bg-white m-1">science</span>,
@@ -158,7 +153,7 @@ export const ConditionIcons: { [key in BoardCondition] : React.ReactNode } = {
     [BoardCondition.Slow]: <span className="msf rounded-full bg-white m-1">speed</span>
 }
 
-export const ConditionCanvasIcons: { [key in BoardCondition] : string } = {
+export const ConditionCanvasIcons: { [key in BoardCondition]: string } = {
     [BoardCondition.None]: "",
     [BoardCondition.Fire]: "local_fire_department",
     [BoardCondition.Acid]: "science",
@@ -175,7 +170,7 @@ export const ConditionCanvasIcons: { [key in BoardCondition] : string } = {
     [BoardCondition.Slow]: "speed"
 }
 
-export const ItemTypeIcons: { [key in ItemType] : React.ReactNode } = {
+export const ItemTypeIcons: { [key in ItemType]: React.ReactNode } = {
     [ItemType.Door]: <span className="msf">door_front</span>,
     [ItemType.Trap]: <span className="msf">crisis_alert</span>,
     [ItemType.Note]: <span className="msf">note</span>
@@ -183,8 +178,8 @@ export const ItemTypeIcons: { [key in ItemType] : React.ReactNode } = {
 
 export const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
     [CreatureAttitude.Player]: '#22c55e',
-    [CreatureAttitude.NPC]: '#a78bfa',
-    [CreatureAttitude.Hostile]: '#f87171'
+    [CreatureAttitude.Ally]: '#a78bfa',
+    [CreatureAttitude.Enemy]: '#f87171'
 }
 
 export const CanvasCreatureTypeIcons: { [key in CreatureType]: string } = {
@@ -201,7 +196,8 @@ export const CreatureTypeIcons: { [key in CreatureType]: JSX.Element } = {
 
 export const CreatureSizeDimension: { [key in CreatureSize]: number } = {
     [CreatureSize.Tiny]: 1,
-    [CreatureSize.MediumSmall]: 2,
+    [CreatureSize.Small]: 2,
+    [CreatureSize.Medium]: 2,
     [CreatureSize.Large]: 4,
     [CreatureSize.Huge]: 8,
     [CreatureSize.Gargantuan]: 16,
@@ -212,6 +208,7 @@ export interface IBoardUtility {
     onShapeRelease?: (position: BoardPosition) => void
     onShapeHover?: (position: BoardPosition) => void
     customComponent?: () => JSX.Element
+    onMount?: () => void
 
     forceUpdate: (() => void) | null
     userInterface: () => JSX.Element
@@ -239,6 +236,7 @@ export const constructRandomBoard = (width: number, height: number): Board => {
     return {
         width,
         height,
+        decoratorCounter: 0,
         terrain: board,
         conditions: {},
         decorators: {}
@@ -333,6 +331,8 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
 
     console.log(minX, minY, maxX, maxY)
 
+    let decoratorCounter = 0;
+
     // construct board
     const board = new Array<BoardTerrain>(maxX * maxY);
     board.fill(BoardTerrain.Wall);
@@ -367,7 +367,7 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
     }
 
     // place doors
-    const decorators : {[key: number]: BoardDecorator} = {};
+    const decorators: { [key: number]: BoardDecorator } = {};
     for (const door of data.doors) {
         if (board[door.y + door.x * maxY] === BoardTerrain.Stone) {
             decorators[door.y + door.x * maxY] = {
@@ -375,7 +375,8 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
                 attachment: {
                     type: ItemType.Door,
                     data: "unlocked"
-                }
+                },
+                key: decoratorCounter++
             }
         }
     }
@@ -387,7 +388,8 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
             attachment: {
                 type: ItemType.Note,
                 data: note.text
-            }
+            },
+            key: decoratorCounter++
         }
     }
 
@@ -395,6 +397,7 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
         width: maxY,
         height: maxX,
         terrain: board,
+        decoratorCounter,
         conditions: {},
         decorators
     };
@@ -418,6 +421,7 @@ export const constructDefaultBoard = (w: number, h: number): Board => {
     return {
         width: w,
         height: h,
+        decoratorCounter: 0,
         terrain: board,
         conditions: {},
         decorators: {}

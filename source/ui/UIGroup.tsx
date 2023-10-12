@@ -6,7 +6,7 @@ export const UIGroup = (props: {
 }) => {
     return (
         <>
-            <div className='w-full flex p-2'>
+            <div className='w-full flex p-2 gap-3'>
                 <div className='flex justify-left items-center pl-2 min-w-20 w-20'>
                     {props.title}
                 </div>

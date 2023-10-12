@@ -1,10 +1,11 @@
 import React from "react"
 
 import "../index.css"
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, CreatureSize, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
 import { useForceUpdate } from "../utility"
 import { Rect } from "../Rect";
 import { TexturePool } from "./TexturePool";
+import { CreatureSize } from "../statblock/Statblock";
 
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
@@ -86,14 +87,14 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
             let modifier = 1;
             let dim = CanvasBaseSize;
 
-            if (attachment.size != CreatureSize.MediumSmall) {
-                if (attachment.size == CreatureSize.Large) {
+            if (attachment.statblock.size != CreatureSize.Medium && attachment.statblock.size != CreatureSize.Small) {
+                if (attachment.statblock.size == CreatureSize.Large) {
                     modifier = 3;
-                } else if (attachment.size == CreatureSize.Huge) {
+                } else if (attachment.statblock.size == CreatureSize.Huge) {
                     modifier = 5;
-                } else if (attachment.size == CreatureSize.Gargantuan) {
+                } else if (attachment.statblock.size == CreatureSize.Gargantuan) {
                     modifier = 7;
-                } else if (attachment.size == CreatureSize.Tiny) {
+                } else if (attachment.statblock.size == CreatureSize.Tiny) {
                     modifier = .8;
                 }
             }
@@ -113,19 +114,6 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
             ctx.fill();
             ctx.stroke();
 
-            // ctx.beginPath();
-            // ctx.lineWidth = modifier * LineWidth * 2;
-            // ctx.strokeStyle = '#FF0000';
-            // const healthAngle = attachment.hitpoints != undefined && attachment.maxHitpoints != undefined ? 2 * Math.PI * (attachment.hitpoints / attachment.maxHitpoints) : 2 * Math.PI;
-            // console.log(healthAngle)
-            // ctx.arc(
-            //     x * CanvasBaseSize + CanvasBaseSize / 2,
-            //     y * CanvasBaseSize + CanvasBaseSize / 2,
-            //     (dim / 2 - LineWidth * 2),
-            //     0,
-            //     healthAngle
-            // )
-            // ctx.stroke();
 
             ctx.lineWidth = LineWidth;
             ctx.strokeStyle = '#000000';
@@ -150,7 +138,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
             height = 28 * modifier * scale;
             ctx.font = `${height - 2}px Fira Sans`;
             ctx.fillText(
-                attachment.name.charAt(0).toUpperCase() + attachment.name.charAt(1).toLowerCase(),
+                attachment.statblock.name.charAt(0).toUpperCase() + attachment.statblock.name.charAt(1).toLowerCase(),
                 x * CanvasBaseSize + CanvasBaseSize / 2,
                 y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 8
             )

@@ -166,7 +166,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
 
                     {
                         utilities.current[currentUtility] != undefined ? (
-                            <div className='rounded-xl bg-neutral-200 w-fit flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black'>
+                            <div className='rounded-xl bg-neutral-200 w-96 min-w-96 max-w-full flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black'>
                                 {utilities.current[currentUtility]!.userInterface()}
                             </div>
                         ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
@@ -176,6 +176,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(0);
+                                utilities.current[0].onMount?.call(utilities.current[0]);
                             }}
                             active={currentUtility === 0}
                         >
@@ -184,6 +185,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(1);
+                                utilities.current[1].onMount?.call(utilities.current[1]);
                             }}
                             active={currentUtility === 1}
                         >
@@ -192,6 +194,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(2);
+                                utilities.current[2].onMount?.call(utilities.current[2]);
                             }}
                             active={currentUtility === 2}
                         >
@@ -200,6 +203,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(3);
+                                utilities.current[3].onMount?.call(utilities.current[3]);
                             }}
                             active={currentUtility === 3}
                         >
@@ -208,6 +212,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(5);
+                                utilities.current[5].onMount?.call(utilities.current[5]);
                             }}
                             active={currentUtility === 5}
                         >
@@ -216,6 +221,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(4);
+                                utilities.current[4].onMount?.call(utilities.current[4]);
                             }}
                             active={currentUtility === 4}
                         >
@@ -224,6 +230,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                         <ToolButton
                             onClick={() => {
                                 setCurrentUtility(6);
+                                utilities.current[6].onMount?.call(utilities.current[6]);
                             }}
                             active={currentUtility === 6}
                         >
