@@ -1,8 +1,8 @@
 import React from "react";
 // import { WindowComponent, WindowComponentHandle } from "../ui/WindowComponent";
-import { Board } from "./Board";
-import { BoardComponent, BoardComponentHandle } from "./BoardComponent";
-import { Rect } from "../Rect";
+import { Board } from "./board/Board";
+import { BoardComponent, BoardComponentHandle } from "./board/BoardComponent";
+import { Rect } from "./Rect";
 
 export type PlayerViewProps = {
     board: React.MutableRefObject<Board>;

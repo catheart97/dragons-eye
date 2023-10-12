@@ -1,6 +1,6 @@
-import { DMView } from './board/DMView';
+import { DMView } from './DMView';
 import React from 'react';
-import { PlayerView, PlayerViewHandle } from './board/PlayerView';
+import { PlayerView, PlayerViewHandle } from './PlayerView';
 import { Board, constructDefaultBoard } from './board/Board';
 import { useForceUpdate } from './utility';
 import { Rect } from './Rect';

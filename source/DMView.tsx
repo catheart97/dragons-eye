@@ -1,20 +1,20 @@
 import * as React from 'react'
 
-import { ToolButton } from '../ui/ToolButton';
-import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon } from './Board';
-import { TerrainBoardUtility } from './utilities/TerrainBoardUtility';
-import { SpellBoardUtility } from './utilities/SpellBoardUtility';
-import { BoardComponent, BoardComponentHandle } from './BoardComponent';
-import { ConditionBoardUtility } from './utilities/ConditionBoardUtility';
-import { DecoratorBoardUtility } from './utilities/DecoratorBoardUtility';
+import { ToolButton } from './ui/ToolButton';
+import { Board, BoardTerrain, IBoardUtility, OnePageDungeon, constructDefaultBoard, constructFromOnePageDungeon } from './board/Board';
+import { TerrainBoardUtility } from './board/utilities/TerrainBoardUtility';
+import { SpellBoardUtility } from './board/utilities/SpellBoardUtility';
+import { BoardComponent, BoardComponentHandle } from './board/BoardComponent';
+import { ConditionBoardUtility } from './board/utilities/ConditionBoardUtility';
+import { DecoratorBoardUtility } from './board/utilities/DecoratorBoardUtility';
 
-import { InteractBoardUtility } from './utilities/InteractBoardUtility';
-import { Dialog, DialogHandle } from '../ui/Dialog';
-import { NumberInput } from '../ui/NumberInput';
-import { UIGroup } from '../ui/UIGroup';
-import { HiddenBoardUtility } from './utilities/HiddenBoardUtility';
-import { Rect } from '../Rect';
-import { ImportanceRectUtility } from './utilities/ImportanceRectBoardUtility';
+import { InteractBoardUtility } from './board/utilities/InteractBoardUtility';
+import { Dialog, DialogHandle } from './ui/Dialog';
+import { NumberInput } from './ui/NumberInput';
+import { UIGroup } from './ui/UIGroup';
+import { HiddenBoardUtility } from './board/utilities/HiddenBoardUtility';
+import { Rect } from './Rect';
+import { ImportanceRectUtility } from './board/utilities/ImportanceRectBoardUtility';
 
 export type DMViewProps = {
     board: React.MutableRefObject<Board>;
