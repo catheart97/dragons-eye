@@ -21,6 +21,10 @@ export class HiddenBoardUtility implements IBoardUtility {
 
     }
 
+    icon() {
+        return <span className="mso text-xl">visibility_off</span>;
+    }
+
     private setBoardCondition(position: BoardPosition, condition: boolean) {
         if (condition) {
             if (!this.board.hidden) {
@@ -105,6 +109,12 @@ export class HiddenBoardUtility implements IBoardUtility {
                     </div>
                 </ToolButton>
             </>
+        )
+    }
+
+    description() {
+        return (
+            <>Hide fields in player's view.</>
         )
     }
 }

@@ -6,7 +6,9 @@ import { TerrainBoardUtility } from './board/utilities/TerrainBoardUtility';
 import { SpellBoardUtility } from './board/utilities/SpellBoardUtility';
 import { BoardComponent, BoardComponentHandle } from './board/BoardComponent';
 import { ConditionBoardUtility } from './board/utilities/ConditionBoardUtility';
-import { DecoratorBoardUtility } from './board/utilities/DecoratorBoardUtility';
+import { CreateDecoratorBoardUtility } from './board/utilities/CreateDecoratorBoardUtility';
+import { TrashDecoratorBoardUtility } from './board/utilities/TrashDecoratorBoardUtility';
+import { MoveDecoratorBoardUtility } from './board/utilities/MoveDecoratorBoardUtility';
 
 import { InteractBoardUtility } from './board/utilities/InteractBoardUtility';
 import { Dialog, DialogHandle } from './ui/Dialog';
@@ -15,6 +17,8 @@ import { UIGroup } from './ui/UIGroup';
 import { HiddenBoardUtility } from './board/utilities/HiddenBoardUtility';
 import { Rect } from './Rect';
 import { ImportanceRectUtility } from './board/utilities/ImportanceRectBoardUtility';
+import { Tooltip, TooltipContent, TooltipTarget } from './ui/Tooltip';
+import { InitiaitveBoardUtility } from './board/utilities/InitiativeBoardUtility';
 
 export type DMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -136,9 +140,12 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
         utilities.current = [
             new InteractBoardUtility(board.current),
             new SpellBoardUtility(),
+            new InitiaitveBoardUtility(board.current),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new ConditionBoardUtility(board.current, null),
-            new DecoratorBoardUtility(board.current),
+            new CreateDecoratorBoardUtility(board.current),
+            new MoveDecoratorBoardUtility(board.current),
+            new TrashDecoratorBoardUtility(board.current),
             new HiddenBoardUtility(board.current),
             new ImportanceRectUtility(props.setImportanceRect)
         ];
@@ -162,80 +169,41 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                     importanceRect={props.importanceRect}
                     setImportanceRect={props.setImportanceRect}
                 />
-                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60]'>
-
+                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
                     {
                         utilities.current[currentUtility] != undefined ? (
-                            <div className='rounded-xl bg-neutral-200 w-96 min-w-96 max-w-full flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black'>
+                            <div className='rounded-xl bg-neutral-200 w-96 min-w-96 max-w-full flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black max-h-full overflow-y-scroll'>
                                 {utilities.current[currentUtility]!.userInterface()}
                             </div>
                         ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
                     }
 
                     <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black'>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(0);
-                                utilities.current[0].onMount?.call(utilities.current[0]);
-                            }}
-                            active={currentUtility === 0}
-                        >
-                            <span className="mso text-xl">arrow_selector_tool</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(1);
-                                utilities.current[1].onMount?.call(utilities.current[1]);
-                            }}
-                            active={currentUtility === 1}
-                        >
-                            <span className="mso text-xl">bolt</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(2);
-                                utilities.current[2].onMount?.call(utilities.current[2]);
-                            }}
-                            active={currentUtility === 2}
-                        >
-                            <span className="mso text-xl">edit</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(3);
-                                utilities.current[3].onMount?.call(utilities.current[3]);
-                            }}
-                            active={currentUtility === 3}
-                        >
-                            <span className="mso text-xl">question_mark</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(5);
-                                utilities.current[5].onMount?.call(utilities.current[5]);
-                            }}
-                            active={currentUtility === 5}
-                        >
-                            <span className="mso text-xl">visibility_off</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(4);
-                                utilities.current[4].onMount?.call(utilities.current[4]);
-                            }}
-                            active={currentUtility === 4}
-                        >
-                            <span className="mso text-xl">person</span>
-                        </ToolButton>
-                        <ToolButton
-                            onClick={() => {
-                                setCurrentUtility(6);
-                                utilities.current[6].onMount?.call(utilities.current[6]);
-                            }}
-                            active={currentUtility === 6}
-                        >
-                            <span className="mso text-xl">crop_square</span>
-                        </ToolButton>
+                        {
+                            utilities.current.map((v, i) => {
+                                return (
+                                    <Tooltip
+                                        key={i}
+                                        strategy='fixed'
+                                    >
+                                        <TooltipTarget>
+                                            <ToolButton
+                                                onClick={() => {
+                                                    setCurrentUtility(i);
+                                                    utilities.current[i].onMount?.call(utilities.current[i]);
+                                                }}
+                                                active={currentUtility === i}
+                                            >
+                                                {v.icon()}
+                                            </ToolButton>
+                                        </TooltipTarget>
+                                        <TooltipContent>
+                                            {v.description()}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )
+                            })
+                        }
                     </div>
                 </div>
             </div>

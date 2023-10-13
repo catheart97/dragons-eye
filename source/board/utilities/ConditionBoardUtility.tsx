@@ -21,6 +21,10 @@ export class ConditionBoardUtility implements IBoardUtility {
 
     }
 
+    icon() {
+        return <span className="mso text-xl">question_mark</span>
+    }
+
     private setBoardCondition(position: BoardPosition, condition: BoardCondition | null) {
         if (condition) {
             this.board.conditions[position.x + position.y * this.board.width] = condition;
@@ -95,6 +99,12 @@ export class ConditionBoardUtility implements IBoardUtility {
                     })
                 }
             </>
+        )
+    }
+
+    description() {
+        return (
+            <>Add a condition to a field.</>
         )
     }
 }

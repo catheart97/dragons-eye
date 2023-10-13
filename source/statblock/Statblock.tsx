@@ -95,13 +95,13 @@ export type Spell = {
 
 export type Statblock = PlayerStatblock & {
     
-    armorClass?: number;
-    speed?: {
+    armorClass: number;
+    speed: {
         walk: number;
-        fly?: number;
-        swim?: number;
-        burrow?: number;
-        climb?: number;
+        fly: number;
+        swim: number;
+        burrow: number;
+        climb: number;
     }
 
     hitPoints: {
@@ -110,45 +110,104 @@ export type Statblock = PlayerStatblock & {
         temporary?: number;
     }
     
-    stats?: {
+    stats: {
         [key in Stat]: number;
     }
 
-    savingThrows?: {
+    savingThrows: {
         [key in Stat]: number;
     }
 
-    skills?: {
+    skills: {
         [key: string]: number;
     }
 
-    damageVulnerabilities?: DamageType[];
-    damageResistances?: DamageType[];
-    damageImmunities?: DamageType[];
+    damageVulnerabilities: DamageType[];
+    damageResistances: DamageType[];
+    damageImmunities: DamageType[];
 
-    conditionImmunities?: CreatureCondition[];
+    conditionImmunities: CreatureCondition[];
 
-    senses?: {
-        darkvision?: number;
-        blindsight?: number;
-        tremorsense?: number;
-        truesight?: number;
+    senses: {
+        darkvision: number;
+        blindsight: number;
+        tremorsense: number;
+        truesight: number;
     }
-    passivePerception?: number;
-    languages?: string[];
-    challengeRating?: number;
+    passivePerception: number;
+    languages: string[];
+    challengeRating: number;
 
-    actions?: StatblockAction[];
-    spells?: Spell[];
-    spellSlots?: [number, number, number, number, number, number, number, number, number, number]
-    legendaryActions?: StatblockAction[];
-    reactions?: StatblockAction[];  
+    actions: StatblockAction[];
+    spells: Spell[];
+    spellSlots: [number, number, number, number, number, number, number, number, number, number]
+    legendaryActions: StatblockAction[];
+    reactions: StatblockAction[];  
 
-    description?: string;
+    description: string;
 
-    image?: string;
+    image: string;
 
-    alignment?: string;
-    type?: CreatureType;
+    alignment: string;
+    type: CreatureType;
 
+}
+
+export const constructDefaultStatblock = (): Statblock => {
+    return {
+        name: "New Creature",
+        size: CreatureSize.Medium,
+        hitPoints: {
+            current: 10,
+            maximum: 10,
+            temporary: 0
+        },
+        armorClass: 10,
+        speed: {
+            walk: 30,
+            fly: -1,
+            swim: -1,
+            burrow: -1,
+            climb: -1
+        },
+        stats: {
+            Strength: 10,
+            Dexterity: 10,
+            Constitution: 10,
+            Intelligence: 10,
+            Wisdom: 10,
+            Charisma: 10
+        },
+        savingThrows: {
+            Strength: 0,
+            Dexterity: 0,
+            Constitution: 0,
+            Intelligence: 0,
+            Wisdom: 0,
+            Charisma: 0
+        },
+        skills: {},
+        damageVulnerabilities: [],
+        damageResistances: [],
+        damageImmunities: [],
+        conditionImmunities: [],
+        senses: {
+            darkvision: 0,
+            blindsight: 0,
+            tremorsense: 0,
+            truesight: 0
+        },
+        passivePerception: 10,
+        languages: [],
+        challengeRating: 0,
+        actions: [],
+        spells: [],
+        spellSlots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        legendaryActions: [],
+        reactions: [],
+        description: "",
+        image: "",
+        alignment: "",
+        type: CreatureType.Humanoid
+    }
 }

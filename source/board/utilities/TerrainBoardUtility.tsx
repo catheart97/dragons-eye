@@ -22,6 +22,10 @@ export class TerrainBoardUtility implements IBoardUtility {
         console.log("down");
     }
 
+    icon() {
+        return <span className="mso text-xl">edit</span>
+    }
+
     onShapeHover(position: BoardPosition) {
         this.hoverTile = position;
     }
@@ -90,6 +94,12 @@ export class TerrainBoardUtility implements IBoardUtility {
                     })
                 }
             </>
+        )
+    }
+
+    description() {
+        return (
+            <>Edit the board terrain.</>
         )
     }
 }

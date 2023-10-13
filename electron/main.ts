@@ -33,6 +33,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+SRD 5th Edition
+
+The App contains some content from the SRD licensed by Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc..
+
 Open Source License Notices
 
 `

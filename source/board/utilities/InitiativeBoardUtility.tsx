@@ -1,0 +1,283 @@
+import { Stat, Statblock } from "../../statblock/Statblock";
+import { StatblockComponent } from "../../statblock/StatblockComponent";
+import { NumberInput } from "../../ui/NumberInput";
+import { ToolButton } from "../../ui/ToolButton";
+import { UIGroup } from "../../ui/UIGroup";
+import { Board, BoardPosition, IBoardUtility, BoardDecorator, BoardDecoratorType, BoardCreature, CreatureAttitude, InitiaitveData } from "../Board";
+
+export class InitiaitveBoardUtility implements IBoardUtility {
+
+    board: Board;
+    forceUpdate: (() => void) | null = null;
+
+    constructor(board: Board) {
+        this.board = board;
+    }
+
+    onShapeClick?: ((position: BoardPosition) => void) | undefined;
+    onShapeRelease?: ((position: BoardPosition) => void) | undefined;
+    onShapeHover?: ((position: BoardPosition) => void) | undefined;
+    customComponent?: (() => JSX.Element) | undefined;
+
+    icon() {
+        return <span className="mso text-xl">swords</span>;
+    }
+
+    description() {
+        return (
+            <>Track initiative for your players and monsters.</>
+        )
+    }
+
+    initiatives: InitiaitveData[] = [];
+    onMount() {
+        this.initiatives = [];
+    }
+
+    userInterface() {
+        if (this.board.initiative != undefined) {
+            // todo: verify that the initiative list is still valid by 
+            // checking if the decorators are still on the board
+            // or if new decorators have been added or removed and auto roll for them
+
+            for (const key in this.board.decorators) {
+                if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
+                    const attachment = this.board.decorators[key].attachment as BoardCreature;
+                    if (attachment.attitude != CreatureAttitude.Player) {
+                        let found = false;
+                        for (const i of this.board.initiative) {
+                            if (i.id == this.board.decorators[key].key) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            const statblock = attachment.statblock as Statblock
+                            this.board.initiative.push({
+                                id: this.board.decorators[key].key,
+                                initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
+                                conditions: []
+                            });
+                        }
+                    }
+                }
+            }
+
+            // delete initiatives that are no longer on the board
+            this.initiatives = this.initiatives.filter((v) => {
+                for (const i of this.board.initiative!) {
+                    if (i.id == v.id) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            // sort initiatives
+            this.board.initiative.sort((a, b) => {
+                return b.initiative - a.initiative;
+            });
+
+            return (
+                <div className="flex w-full flex-col gap-2">
+                    {
+                        this.board.initiative.map((v, i) => {
+                            // find decorator which has the key id 
+                            let decorator: BoardDecorator | null = null;
+                            for (const key in this.board.decorators) {
+                                if (this.board.decorators[key].key == v.id) {
+                                    decorator = this.board.decorators[key];
+                                    break;
+                                }
+                            }
+                            if (decorator == null) {
+                                return <></>;
+                            }
+
+                            const attachment = decorator.attachment as BoardCreature;
+                            const statblock = attachment.statblock as Statblock;
+
+                            if (this.board.initiativeIndex == i) {
+                                return (
+                                    <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-white" key={"p" + i}>
+                                        <StatblockComponent
+                                            uniqueKey={decorator.key}
+                                            updateStatblock={(s) => {
+                                                attachment.statblock = s;
+                                                this.forceUpdate?.call(this);
+                                            }}
+                                            statblock={statblock}
+                                            player={attachment.attitude == CreatureAttitude.Player}
+                                        />
+                                    </div>
+                                )
+                            } else {
+                                return (
+                                    <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-neutral-50" key={i}>
+                                        <div className="flex justify-between items-end">
+                                            <div className="">{statblock.name}</div>
+                                            <div className="text-xs">Attitude: {attachment.attitude}</div>
+                                            <div className="text-xs">
+                                                {
+                                                    [
+                                                        "HP: " + (
+                                                            statblock.hitPoints ? (
+                                                                statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
+                                                            ) : "-"),
+                                                        "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
+                                                        "ID: " + decorator.key
+                                                    ].join(", ")
+                                                }
+                                            </div>
+                                        </div>
+
+                                        {
+                                            attachment.attitude == CreatureAttitude.Player ? (
+                                                null
+                                            ) : (
+                                                <div className="w-full flex h-4 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="bg-green-500"
+                                                        style={{
+                                                            width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                            height: "100%"
+                                                        }}
+                                                    ></div>
+                                                    <div
+                                                        className="bg-green-700"
+                                                        style={{
+                                                            width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                            height: "100%"
+                                                        }}
+                                                    ></div>
+                                                    <div
+                                                        className="bg-red-500"
+                                                        style={{
+                                                            width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
+                                                            height: "100%"
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                )
+                            }
+                        })
+
+                    }
+                    <div className="flex justify-end">
+                        <ToolButton
+                            onClick={() => {
+                                this.board.initiativeIndex = (this.board.initiativeIndex! -  1 + this.board.initiative!.length) % this.board.initiative!.length;
+                                this.forceUpdate?.call(this);
+                            }}
+                            active={false}
+                        >
+                            <span className="mso text-xl">arrow_back</span>
+                        </ToolButton>
+                        <ToolButton
+                            onClick={() => {
+                                this.board.initiativeIndex = (this.board.initiativeIndex! +  1 + this.board.initiative!.length) % this.board.initiative!.length;
+                                this.forceUpdate?.call(this);
+                            }}
+                            active={false}
+                        >
+                            <span className="mso text-xl">arrow_forward</span>
+                        </ToolButton>
+                        <ToolButton
+                            onClick={() => {
+                                this.board.initiative = undefined;
+                                this.forceUpdate?.call(this);
+                            }}
+                            active={false}
+                        >
+                            <span className="mso text-xl">swords</span> Clear
+                        </ToolButton>
+                    </div>
+                </div>
+            )
+        } else {
+            // get players from board
+            const players: BoardDecorator[] = [];
+            for (const key in this.board.decorators) {
+                if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
+                    const attachment = this.board.decorators[key].attachment as BoardCreature;
+                    if (attachment.attitude == CreatureAttitude.Player) {
+                        players.push(this.board.decorators[key]);
+                    }
+                }
+            }
+
+            return (
+                <>
+                    {
+                        players.length != 0 ? (
+                            <>
+                                {
+                                    players.map((v, i) => {
+                                        const attachment = v.attachment as BoardCreature;
+                                        return (
+                                            <UIGroup title={attachment.statblock.name} key={i}>
+                                                <NumberInput
+                                                    onChange={(e) => {
+                                                        for (const i of this.initiatives) {
+                                                            if (i.id == v.key) {
+                                                                i.initiative = e.target.valueAsNumber;
+                                                                return;
+                                                            }
+                                                        }
+                                                        this.initiatives.push({
+                                                            id: v.key,
+                                                            initiative: e.target.valueAsNumber,
+                                                            conditions: []
+                                                        });
+                                                    }}
+                                                ></NumberInput>
+                                            </UIGroup>
+                                        )
+                                    })
+                                }
+                                <ToolButton
+                                    onClick={() => {
+                                        // roll initiative for npcs and monsters
+                                        for (const key in this.board.decorators) {
+                                            if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
+                                                const attachment = this.board.decorators[key].attachment as BoardCreature;
+                                                if (attachment.attitude != CreatureAttitude.Player) {
+                                                    const statblock = attachment.statblock as Statblock
+                                                    this.initiatives.push({
+                                                        id: this.board.decorators[key].key,
+                                                        initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
+                                                        conditions: []
+                                                    });
+                                                }
+                                            }
+                                        }
+
+                                        // sort initiatives
+                                        this.initiatives.sort((a, b) => {
+                                            return b.initiative - a.initiative;
+                                        });
+
+                                        this.board.initiative = this.initiatives;
+                                        this.board.initiativeIndex = 0;
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    active={false}
+                                >
+                                    <span className="mso text-xl">swords</span> Fight
+                                </ToolButton>
+                            </>
+                        ) : (
+                            <div className="p-2">
+                                No players found on the board.
+                            </div>
+                        )
+                    }
+                </>
+            )
+
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { CreatureSize, PlayerStatblock, Statblock } from "../statblock/Statblock";
+import { CreatureCondition, CreatureSize, PlayerStatblock, Statblock } from "../statblock/Statblock";
 
 export type BoardPosition = {
     x: number,
@@ -52,6 +52,12 @@ export type BoardDecorator = {
     key: number
 }
 
+export type InitiaitveData = {
+    id: number
+    initiative: number
+    conditions: CreatureCondition[]
+}
+
 export type Board = {
     width: number,
     height: number,
@@ -60,6 +66,8 @@ export type Board = {
     decorators: { [key: number]: BoardDecorator }
     decoratorCounter: number
     hidden?: { [key: number]: boolean }
+    initiative?: InitiaitveData[]
+    initiativeIndex?: number
 }
 
 export enum SpellShape {
@@ -209,6 +217,9 @@ export interface IBoardUtility {
     onShapeHover?: (position: BoardPosition) => void
     customComponent?: () => JSX.Element
     onMount?: () => void
+
+    icon: () => JSX.Element
+    description: () => JSX.Element
 
     forceUpdate: (() => void) | null
     userInterface: () => JSX.Element

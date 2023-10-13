@@ -19,6 +19,10 @@ export class SpellBoardUtility implements IBoardUtility {
         }
     }
 
+    icon() {
+        return <span className="mso text-xl">bolt</span>;
+    }
+
     onShapeClick(position: BoardPosition) {
         this.p0 = position;
     }
@@ -350,6 +354,12 @@ export class SpellBoardUtility implements IBoardUtility {
 
                 </div>
             </div>
+        )
+    }
+
+    description() {
+        return (
+            <>Show spell casting overlay (WIP).</>
         )
     }
 

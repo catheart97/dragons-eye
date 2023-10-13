@@ -17,6 +17,10 @@ export class ImportanceRectUtility implements IBoardUtility {
         this.setImportanceRect = setImportanceRect;
     }
 
+    icon() {
+        return <span className="mso text-xl">crop_square</span>;
+    }
+
     onShapeClick(position: BoardPosition) {
         this.downTile = position;
     }
@@ -66,6 +70,12 @@ export class ImportanceRectUtility implements IBoardUtility {
         return (
             <>
             </>
+        )
+    }
+
+    description() {
+        return (
+            <>Mark an important area (WIP).</>
         )
     }
 }

@@ -12,6 +12,10 @@ export class InteractBoardUtility implements IBoardUtility {
         this.board = board
     }
 
+    icon() {
+        return <span className="mso text-xl">arrow_selector_tool</span>;
+    }
+
     onShapeClick(position: BoardPosition) {
         const decorator = this.board.decorators[position.x + this.board.width * position.y];
         if (decorator) {
@@ -136,5 +140,11 @@ export class InteractBoardUtility implements IBoardUtility {
     forceUpdate: (() => void) | null = null;
     userInterface() {
         return <></>
+    }
+
+    description() {
+        return (
+            <>Interact and inspect the board.</>
+        )
     }
 }
