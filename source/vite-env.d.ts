@@ -7,6 +7,7 @@ declare global {
   interface Window {
     ipcRenderer: typeof ipcRenderer;
     fsExtra: typeof fsExtra;
+    userData: () => Promise<string>
   }
 }
 

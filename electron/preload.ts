@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import fsExtra from 'fs-extra'
+import { TexturePool } from '../source/board/TexturePool'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('fsExtra', fsExtra)
@@ -83,7 +84,7 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #282c34;
+  background: #AAAAAA;
   z-index: 9;
 }
     `
@@ -116,4 +117,6 @@ window.onmessage = ev => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
-setTimeout(removeLoading, 4999)
+TexturePool.getInstance().constructTexturePool().then(() => {
+  removeLoading();
+})

@@ -355,7 +355,12 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
             <div className="min-h-full flex items-center" style={{
                 justifyContent: 'safe center'
             }}>
-                <div className="p-72 flex flex-col">
+                <div 
+                    className="flex flex-col"
+                    style={{
+                        padding: "40rem"
+                    }}
+                >
                     <div className="sticky bg-black/80 text-white text-2xl w-full self-end" style={{
                         zIndex: 50,
                         height: CanvasBaseSize + 'px',
