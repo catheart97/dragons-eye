@@ -35,6 +35,7 @@ export const TabView = (props: {
                     props.children.map((v, i) => {
                         return (
                             <button
+                                key={i}
                                 onClick={() => setActiveIndex(i)}
                                 className={"overflow-hidden absolute " + (i == activeIndex ? "text-neutral-800" : "text-neutral-50")}
                                 style={{

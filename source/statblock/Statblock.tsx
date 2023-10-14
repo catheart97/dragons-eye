@@ -87,10 +87,13 @@ export type StatblockAction = {
 export type Spell = {
     name: string;
     level: number;
-    description: string;
     school: string;
+    components: string;
+    range: string;
+    time: string; // such as 1 action or 1 bonus action
+    duration: string; // how long the spell lasts (+ concentration)
+    description: string;
     ritual: boolean;
-    concentration: boolean;
 }
 
 export type Statblock = PlayerStatblock & {
@@ -118,9 +121,7 @@ export type Statblock = PlayerStatblock & {
         [key in Stat]: number;
     }
 
-    skills: {
-        [key: string]: number;
-    }
+    skills: string;
 
     damageVulnerabilities: DamageType[];
     damageResistances: DamageType[];
@@ -135,7 +136,7 @@ export type Statblock = PlayerStatblock & {
         truesight: number;
     }
     passivePerception: number;
-    languages: string[];
+    languages: string;
     challengeRating: number;
 
     actions: StatblockAction[];
@@ -186,7 +187,7 @@ export const constructDefaultStatblock = (): Statblock => {
             Wisdom: 0,
             Charisma: 0
         },
-        skills: {},
+        skills: "",
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -198,7 +199,7 @@ export const constructDefaultStatblock = (): Statblock => {
             truesight: 0
         },
         passivePerception: 10,
-        languages: [],
+        languages: "",
         challengeRating: 0,
         actions: [],
         spells: [],

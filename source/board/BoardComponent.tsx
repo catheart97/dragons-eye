@@ -294,6 +294,7 @@ export type BoardComponentProps = {
     utility?: IBoardUtility,
     importanceRect: Rect | null
     setImportanceRect?: (rect: Rect | null) => void
+    children?: React.ReactNode
 }
 
 export type BoardComponentHandle = {
@@ -352,6 +353,8 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                 }
             }}
         >
+            {props.children}
+
             <div className="min-h-full flex items-center" style={{
                 justifyContent: 'safe center'
             }}>

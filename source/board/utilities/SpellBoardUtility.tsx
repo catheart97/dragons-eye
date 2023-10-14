@@ -251,7 +251,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         />
 
                         {/** Search bar */}
-                        <div className="flex w-full rounded-xl shadow items-center">
+                        <div className="flex rounded-xl shadow items-center m-2">
                             <span className="mso p-2">search</span>
                             <input
                                 className="grow h-full"
@@ -263,23 +263,25 @@ export class SpellBoardUtility implements IBoardUtility {
                             />
                         </div>
                         {/** Spell list */}
-                        {
-                            Database.getInstance().getSpells().map((spell, i) => {
-                                if (!spell.name.toLowerCase().includes(this.filter.toLowerCase()))
-                                    return null;
+                        <div className="flex flex-col gap-2 p-2">
+                            {
+                                Database.getInstance().getSpells().map((spell, i) => {
+                                    if (!spell.name.toLowerCase().includes(this.filter.toLowerCase()))
+                                        return null;
 
-                                return <SpellComponent
-                                    key={spell.name}
-                                    spell={spell}
-                                    onDeleteRequest={() => {
-                                        const spells = Database.getInstance().getSpells();
-                                        spells.splice(i, 1);
-                                        Database.getInstance().updateSpells(spells);
-                                        this.forceUpdate?.call(this);
-                                    }}
-                                />
-                            })
-                        }
+                                    return <SpellComponent
+                                        key={spell.name}
+                                        spell={spell}
+                                        onDeleteRequest={() => {
+                                            const spells = Database.getInstance().getSpells();
+                                            spells.splice(i, 1);
+                                            Database.getInstance().updateSpells(spells);
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                    />
+                                })
+                            }
+                        </div>
                     </Tab>
                 </TabView>
             </>

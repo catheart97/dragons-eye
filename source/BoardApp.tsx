@@ -5,7 +5,7 @@ import { Board, constructDefaultBoard } from './board/Board';
 import { useForceUpdate } from './utility';
 import { Rect } from './Rect';
 
-const App = () => {
+const BoardApp = () => {
     const board = React.useRef<Board>(constructDefaultBoard(15, 15))
     const playerView = React.useRef<PlayerViewHandle>(null);
 
@@ -47,4 +47,4 @@ const App = () => {
     )
 }
 
-export default App
+export default BoardApp

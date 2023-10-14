@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipTarget } from "../ui/Tooltip";
 import { UIGroup } from "../ui/UIGroup";
 import { ToolButton } from "../ui/ToolButton";
 import { Database } from "../database/Database";
+import { SpellComponent } from "./SpellComponent";
 
 export const StatblockComponent = (props: {
     createMode?: boolean,
@@ -108,7 +109,7 @@ export const StatblockComponent = (props: {
                     </UIGroup>
                 ) : null
             }
-            
+
             <UIGroup title="Size">
                 <ToolButton
                     onClick={() => {
@@ -614,8 +615,9 @@ export const StatblockComponent = (props: {
 
                         {
                             editMode || statblock.actions.length > 0 ? (
-                                <UIGroup title="Actions">
-                                    <div className="flex flex-col gap-1 w-60">
+                                <>
+                                    <UIGroup title="Actions" />
+                                    <div className="flex flex-col gap-1 w-full">
                                         {
                                             editMode ? (
                                                 <div className="flex">
@@ -659,15 +661,16 @@ export const StatblockComponent = (props: {
                                             })
                                         }
                                     </div>
-                                </UIGroup>
+                                </>
                             ) : null
                         }
 
                         {/* Legendary Actions */}
                         {
                             editMode || statblock.legendaryActions.length > 0 ? (
-                                <UIGroup title="Legendary Actions">
-                                    <div className="flex flex-col gap-1 w-60">
+                                <>
+                                    <UIGroup title="Legendary Actions" />
+                                    <div className="flex flex-col gap-1 w-full">
                                         {
                                             editMode ? (
                                                 <div className="flex">
@@ -711,15 +714,17 @@ export const StatblockComponent = (props: {
                                             })
                                         }
                                     </div>
-                                </UIGroup>
+                                </>
                             ) : null
                         }
 
                         {/* Reactions */}
                         {
                             editMode || statblock.reactions.length > 0 ? (
-                                <UIGroup title="Reactions">
-                                    <div className="flex flex-col gap-1 w-60">
+                                <>
+                                    <UIGroup title="Reactions" />
+
+                                    <div className="flex flex-col gap-1 w-full">
                                         {
                                             editMode ? (
                                                 <div className="flex">
@@ -763,7 +768,7 @@ export const StatblockComponent = (props: {
                                             })
                                         }
                                     </div>
-                                </UIGroup>
+                                </>
                             ) : null
                         }
 
@@ -790,7 +795,7 @@ export const StatblockComponent = (props: {
                                                         </div>
                                                         <div className="grow flex items-center pl-1 justify-center" style={{
                                                             fontSize: "0.6rem"
-                                                        }}>                                    
+                                                        }}>
                                                             {i + 1} Lvl
                                                         </div>
                                                     </div>
@@ -806,48 +811,47 @@ export const StatblockComponent = (props: {
                         {/** todo: UX and UI redesign */}
                         {
                             editMode || statblock.spells.length > 0 ? (
-                                <UIGroup title="Spells">
-                                    <div className="flex flex-col gap-1 w-60">
+                                <>
+                                    <UIGroup title="Spells"></UIGroup>
+
+                                    <div className="flex flex-col gap-1 w-full">
                                         {
                                             editMode ? (
-                                                <div className="flex">
-                                                    <div className="grow flex-col items-start justify-center">
-                                                        <select ref={spellSelectRef} className="bg-transparent focus:outline-none w-full">
-                                                            {
-                                                                Database.getInstance().getSpells().map((v, i) => {
-                                                                    return <option key={i} value={i}>{v.name}</option>
-                                                                })
-                                                            }
-                                                        </select>
-                                                        <button
-                                                            onClick={() => {
-                                                                statblock.spells.push(
-                                                                    structuredClone(
-                                                                        Database.getInstance().getSpells()[spellSelectRef.current!.value as unknown as number]
-                                                                    )
-                                                                );
-                                                                update();
-                                                            }}
-                                                            className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                        >
-                                                            <span className="mso">add</span>
-                                                        </button>
-                                                    </div>
+                                                <div className="grow flex items-start justify-center rounded-xl shadow overflow-hidden">
+                                                    <select ref={spellSelectRef} className="bg-transparent focus:outline-none w-full h-full flex items-center justify-center p-1">
+                                                        {
+                                                            Database.getInstance().getSpells().map((v, i) => {
+                                                                return <option key={i} value={i}>{v.name}</option>
+                                                            })
+                                                        }
+                                                    </select>
+                                                    <button
+                                                        onClick={() => {
+                                                            statblock.spells.push(
+                                                                structuredClone(
+                                                                    Database.getInstance().getSpells()[spellSelectRef.current!.value as unknown as number]
+                                                                )
+                                                            );
+                                                            update();
+                                                        }}
+                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
+                                                    >
+                                                        <span className="mso">add</span>
+                                                    </button>
                                                 </div>
                                             ) : null
                                         }
                                         {
                                             statblock.spells.map((v) => {
                                                 return (
-                                                    <p>
-                                                        <b className="font-bold">{v.name} </b>
-                                                        {v.description}
-                                                    </p>
+                                                    <SpellComponent
+                                                        spell={v}
+                                                    />
                                                 )
                                             })
                                         }
                                     </div>
-                                </UIGroup>
+                                </>
                             ) : null
                         }
 
@@ -895,6 +899,53 @@ export const StatblockComponent = (props: {
                                 }
                             </div>
                         </UIGroup>
+
+                        {/* Languages */}
+                        <UIGroup title="Languages">
+                        </UIGroup>
+                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                            <input
+                                type="text"
+                                className="text-xs w-full text-start bg-transparent focus:outline-none w-full"
+                                defaultValue={statblock.languages}
+                                placeholder="Orkish, Elvish, ..."
+                                onChange={(e) => {
+                                    statblock.languages = e.target.value;
+                                    update()
+                                }}
+                            />
+                        </div>
+
+                        {/* Skills */}
+                        <UIGroup title="Skills">
+                        </UIGroup>
+                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                            <input
+                                type="text"
+                                className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
+                                defaultValue={statblock.skills}
+                                placeholder="Athletics +5, ..."
+                                onChange={(e) => {
+                                    statblock.skills = e.target.value;
+                                    update()
+                                }}
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <UIGroup title="Description">
+                        </UIGroup>
+                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                            <textarea
+                                className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
+                                defaultValue={statblock.description}
+                                placeholder="Description..."
+                                onChange={(e) => {
+                                    statblock.description = e.target.value;
+                                    update()
+                                }}
+                            />
+                        </div>
                     </>
                 ) : (
                     <></>

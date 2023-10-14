@@ -97,16 +97,15 @@ function createWindow() {
         submenu: [
             {
                 label: 'About',
-                click: () => {
-                    app.showAboutPanel();
-                }
+                // click: () => {
+                //     app.showAboutPanel();
+                // },
+                role: 'about'
             },
             {
                 label: 'Quit',
                 accelerator: 'CmdOrCtrl+Q',
-                click: () => {
-                    app.quit()
-                }
+                role: 'quit'
             },
         ]
     }));
@@ -187,6 +186,37 @@ function createWindow() {
     }));
 
     menu.append(new MenuItem({
+        label: 'Edit',
+        submenu: [
+            {
+                label: 'Cut',
+                accelerator: 'CmdOrCtrl+X',
+                role: 'cut'
+            },
+            {
+                label: 'Copy',
+                accelerator: 'CmdOrCtrl+C',
+                role: 'copy'
+            },
+            {
+                label: 'Paste',
+                accelerator: 'CmdOrCtrl+V',
+                role: 'paste'
+            },
+            {
+                label: 'Delete',
+                accelerator: 'Delete',
+                role: 'delete'
+            },
+            {
+                label: 'Select All',
+                accelerator: 'CmdOrCtrl+Shift+A',
+                role: 'selectAll'
+            }
+        ]
+    }));
+
+    menu.append(new MenuItem({
         label: 'View',
         submenu: [
             {
@@ -206,16 +236,12 @@ function createWindow() {
                 {
                     label: 'Reload',
                     accelerator: 'CmdOrCtrl+R',
-                    click: () => {
-                        win?.webContents.reload();
-                    }
+                    role: 'reload'
                 },
                 {
                     label: 'Toggle Development Tools',
                     accelerator: 'CmdOrCtrl+Alt+C',
-                    click: () => {
-                        win?.webContents.toggleDevTools();
-                    }
+                    role: 'toggleDevTools'
                 }
             ]
         }));

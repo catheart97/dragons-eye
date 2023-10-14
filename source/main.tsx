@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import BoardApp from './BoardApp'
 
 import './index.css'
 import "../resources/fonts/fira-code.css";
@@ -21,7 +21,7 @@ const init = async () => {
 init().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <App />
+      <BoardApp />
     </React.StrictMode>,
   )
 

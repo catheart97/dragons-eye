@@ -79,97 +79,98 @@ export class InitiaitveBoardUtility implements IBoardUtility {
             });
 
             return (
-                <div className="flex w-full flex-col gap-2">
-                    {
-                        this.board.initiative.map((v, i) => {
-                            // find decorator which has the key id 
-                            let decorator: BoardDecorator | null = null;
-                            for (const key in this.board.decorators) {
-                                if (this.board.decorators[key].key == v.id) {
-                                    decorator = this.board.decorators[key];
-                                    break;
+                <div className="flex w-full h-full flex-col gap-2">
+                    <div className="flex flex-col gap-2 grow overflow-y-scroll">
+                        {
+                            this.board.initiative.map((v, i) => {
+                                // find decorator which has the key id 
+                                let decorator: BoardDecorator | null = null;
+                                for (const key in this.board.decorators) {
+                                    if (this.board.decorators[key].key == v.id) {
+                                        decorator = this.board.decorators[key];
+                                        break;
+                                    }
                                 }
-                            }
-                            if (decorator == null) {
-                                return <></>;
-                            }
+                                if (decorator == null) {
+                                    return <></>;
+                                }
 
-                            const attachment = decorator.attachment as BoardCreature;
-                            const statblock = attachment.statblock as Statblock;
+                                const attachment = decorator.attachment as BoardCreature;
+                                const statblock = attachment.statblock as Statblock;
 
-                            if (this.board.initiativeIndex == i) {
-                                return (
-                                    <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-white" key={"p" + i}>
-                                        <StatblockComponent
-                                            uniqueKey={decorator.key}
-                                            updateStatblock={(s) => {
-                                                attachment.statblock = s;
-                                                this.forceUpdate?.call(this);
-                                            }}
-                                            statblock={statblock}
-                                            player={attachment.attitude == CreatureAttitude.Player}
-                                        />
-                                    </div>
-                                )
-                            } else {
-                                return (
-                                    <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-neutral-50" key={i}>
-                                        <div className="flex justify-between items-end">
-                                            <div className="">{statblock.name}</div>
-                                            <div className="text-xs">Attitude: {attachment.attitude}</div>
-                                            <div className="text-xs">
-                                                {
-                                                    [
-                                                        "HP: " + (
-                                                            statblock.hitPoints ? (
-                                                                statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
-                                                            ) : "-"),
-                                                        "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
-                                                        "ID: " + decorator.key
-                                                    ].join(", ")
-                                                }
-                                            </div>
+                                if (this.board.initiativeIndex == i) {
+                                    return (
+                                        <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-white" key={"p" + i}>
+                                            <StatblockComponent
+                                                uniqueKey={decorator.key}
+                                                updateStatblock={(s) => {
+                                                    attachment.statblock = s;
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                statblock={statblock}
+                                                player={attachment.attitude == CreatureAttitude.Player}
+                                            />
                                         </div>
-
-                                        {
-                                            attachment.attitude == CreatureAttitude.Player ? (
-                                                null
-                                            ) : (
-                                                <div className="w-full flex h-4 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="bg-green-500"
-                                                        style={{
-                                                            width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                            height: "100%"
-                                                        }}
-                                                    ></div>
-                                                    <div
-                                                        className="bg-green-700"
-                                                        style={{
-                                                            width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                            height: "100%"
-                                                        }}
-                                                    ></div>
-                                                    <div
-                                                        className="bg-red-500"
-                                                        style={{
-                                                            width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
-                                                            height: "100%"
-                                                        }}
-                                                    ></div>
+                                    )
+                                } else {
+                                    return (
+                                        <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-neutral-50" key={i}>
+                                            <div className="flex justify-between items-end">
+                                                <div className="">{statblock.name}</div>
+                                                <div className="text-xs">Attitude: {attachment.attitude}</div>
+                                                <div className="text-xs">
+                                                    {
+                                                        [
+                                                            "HP: " + (
+                                                                statblock.hitPoints ? (
+                                                                    statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
+                                                                ) : "-"),
+                                                            "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
+                                                            "ID: " + decorator.key
+                                                        ].join(", ")
+                                                    }
                                                 </div>
-                                            )
-                                        }
-                                    </div>
-                                )
-                            }
-                        })
+                                            </div>
 
-                    }
+                                            {
+                                                attachment.attitude == CreatureAttitude.Player ? (
+                                                    null
+                                                ) : (
+                                                    <div className="w-full flex h-4 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="bg-green-500"
+                                                            style={{
+                                                                width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                        <div
+                                                            className="bg-green-700"
+                                                            style={{
+                                                                width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                        <div
+                                                            className="bg-red-500"
+                                                            style={{
+                                                                width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
+                            })
+                        }
+                    </div>
                     <div className="flex justify-end">
                         <ToolButton
                             onClick={() => {
-                                this.board.initiativeIndex = (this.board.initiativeIndex! -  1 + this.board.initiative!.length) % this.board.initiative!.length;
+                                this.board.initiativeIndex = (this.board.initiativeIndex! - 1 + this.board.initiative!.length) % this.board.initiative!.length;
                                 this.forceUpdate?.call(this);
                             }}
                             active={false}
@@ -178,7 +179,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                         </ToolButton>
                         <ToolButton
                             onClick={() => {
-                                this.board.initiativeIndex = (this.board.initiativeIndex! +  1 + this.board.initiative!.length) % this.board.initiative!.length;
+                                this.board.initiativeIndex = (this.board.initiativeIndex! + 1 + this.board.initiative!.length) % this.board.initiative!.length;
                                 this.forceUpdate?.call(this);
                             }}
                             active={false}
