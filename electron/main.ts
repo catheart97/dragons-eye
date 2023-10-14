@@ -1,6 +1,8 @@
 import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } from 'electron'
 import path from 'node:path'
 import NPMLicenses from '../license.json?raw';
+import fsExtra from 'fs-extra';
+import { Database, GM5CompendiumJSON } from '../source/database/Database';
 
 type License = {
     name: string;
@@ -155,6 +157,57 @@ function createWindow() {
                             win!.webContents.send('r-import-onepagedungeon', fn[0]);
                             console.log("Importing " + fn[0]);
                         }
+                    },
+                    {
+                        label: "GM5 JSON Compendium",
+                        click: () => {
+                            const fn = dialog.showOpenDialogSync({
+                                filters: [
+                                    { name: "GM5 JSON Compendium", extensions: ['json'] },
+                                    { name: 'All Files', extensions: ['*'] }
+                                ],
+                                properties: ['openFile']
+                            });
+
+                            if (!fn) return;
+
+                            win!.webContents.send('r-import-compendium', fn[0]);
+                        }
+                    },
+                    {
+                        label: "Dragon's Eye Database",
+                        click: () => {
+                            const fn = dialog.showOpenDialogSync({
+                                filters: [
+                                    { name: "Dragon's Eye Database", extensions: ['json'] },
+                                    { name: 'All Files', extensions: ['*'] }
+                                ],
+                                properties: ['openFile']
+                            });
+
+                            if (!fn) return;
+
+                            win!.webContents.send('r-import-database', fn[0]);
+                        }
+                    }
+                ]
+            },
+            {
+                label: 'Export',
+                submenu: [
+                    {
+                        label: "Dragon's Eye Database",
+                        click: () => {
+                            const fn = dialog.showSaveDialogSync({
+                                filters: [
+                                    { name: "Dragon's Eye Database", extensions: ['json'] },
+                                    { name: 'All Files', extensions: ['*'] }
+                                ],
+                                properties: ['createDirectory']
+                            });
+                            if (!fn) return;
+                            win!.webContents.send('r-export-database', fn);
+                        }
                     }
                 ]
             },
@@ -277,6 +330,10 @@ function createWindow() {
         });
         if (!fn) return;
         win!.webContents.send('r-save-file-as', fn);
+    });
+
+    ipcMain.on("m-reload", (_event, _arg) => {
+        win?.webContents.reload();
     });
 
     ipcMain.on("m-ready", (_event, _arg) => {

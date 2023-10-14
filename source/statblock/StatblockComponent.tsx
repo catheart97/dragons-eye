@@ -473,7 +473,7 @@ export const StatblockComponent = (props: {
                                         {
                                             statblock.damageResistances.map((v, i) => {
                                                 return (
-                                                    <div className="flex rounded-xl overflow-hidden">
+                                                    <div className="flex rounded-xl overflow-hidden" key={i}>
                                                         <div className="grow flex items-center pl-1">
                                                             {v}
                                                         </div>
@@ -531,7 +531,7 @@ export const StatblockComponent = (props: {
                                         {
                                             statblock.damageImmunities.map((v, i) => {
                                                 return (
-                                                    <div className="flex rounded-xl overflow-hidden">
+                                                    <div className="flex rounded-xl overflow-hidden" key={i}>
                                                         <div className="grow flex items-center pl-1">
                                                             {v}
                                                         </div>
@@ -651,10 +651,10 @@ export const StatblockComponent = (props: {
                                             ) : null
                                         }
                                         {
-                                            statblock.actions.map((v) => {
+                                            statblock.actions.map((v, i) => {
                                                 return (
-                                                    <p>
-                                                        <b className="font-bold">{v.name} </b>
+                                                    <p key={i}>
+                                                        <b className="font-black">{v.name} </b>
                                                         {v.description}
                                                     </p>
                                                 )
@@ -704,10 +704,10 @@ export const StatblockComponent = (props: {
                                             ) : null
                                         }
                                         {
-                                            statblock.legendaryActions.map((v) => {
+                                            statblock.legendaryActions.map((v, i) => {
                                                 return (
-                                                    <p>
-                                                        <b className="font-bold">{v.name} </b>
+                                                    <p key={i}>
+                                                        <b className="font-black">{v.name} </b>
                                                         {v.description}
                                                     </p>
                                                 )
@@ -758,10 +758,10 @@ export const StatblockComponent = (props: {
                                             ) : null
                                         }
                                         {
-                                            statblock.reactions.map((v) => {
+                                            statblock.reactions.map((v, i) => {
                                                 return (
-                                                    <p>
-                                                        <b className="font-bold">{v.name} </b>
+                                                    <p key={i}>
+                                                        <b className="font-black">{v.name} </b>
                                                         {v.description}
                                                     </p>
                                                 )
@@ -845,6 +845,7 @@ export const StatblockComponent = (props: {
                                             statblock.spells.map((v) => {
                                                 return (
                                                     <SpellComponent
+                                                        key={v.name}
                                                         spell={v}
                                                     />
                                                 )
