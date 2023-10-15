@@ -1,3 +1,4 @@
+import { Board } from "../board/Board";
 import { Campaign } from "../campaign/Campaign";
 import { useForceUpdate } from "../utility";
 import { CampaignDMView } from "./CampaignDMView";
@@ -6,6 +7,7 @@ import { IAppView } from "./IAppView";
 
 export const CampaignApp = (props: IAppView & {
     campaign: React.MutableRefObject<Campaign>
+    loadCampaignBoard: (board: Board) => void
 }) => {
 
     const forceUpdate = useForceUpdate();
@@ -18,6 +20,7 @@ export const CampaignApp = (props: IAppView & {
             "flex"
         }>
             <CampaignDMView 
+                loadCampaignBoard={props.loadCampaignBoard}
                 campaign={props.campaign}
                 dialogHandle={props.dialogHandle}
                 update={update}

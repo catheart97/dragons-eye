@@ -1,6 +1,6 @@
 import React from "react"
 import { Board } from "../board/Board"
-import { Statblock } from "../statblock/Statblock"
+import { PlayerStatblock, Statblock } from "../statblock/Statblock"
 
 export type Adventure = {
     image?: string,
@@ -15,13 +15,21 @@ export type Adventure = {
 export type Campaign = {
     image?: string,
     title: string,
+    players: PlayerStatblock[],
     npcs: Statblock[],
     adventures: Adventure[]
 }
 
 export const EmptyCampaign: Campaign = {
     title: "Campaign",
-    adventures: [],
+    adventures: [
+        {
+            title: "Adventure",
+            npcs: [],
+            boards: []
+        }
+    ],
+    players: [],
     npcs: []
 }
 

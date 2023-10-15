@@ -28,6 +28,12 @@ export const App = () => {
     const fileName = React.useRef<string>("");
     const playerViewOpen = React.useRef<boolean>(false);
 
+    const campaignBoard = React.useRef<Board | null>(null);
+    const loadCampaignBoard = (board: Board | null) => {
+        campaignBoard.current = board;
+        forceUpdate();
+    }
+
     React.useEffect(() => {
         if (registered.current) {
             return;
@@ -152,11 +158,32 @@ export const App = () => {
             <CampaignContext.Provider
                 value={campaign}
             >
-                <CampaignApp
-                    campaign={campaign}
-                    playerViewOpen={playerViewOpen.current}
-                    dialogHandle={dialogHandle}
-                />
+                {
+                    campaignBoard.current ? (
+                        <div className="h-full w-full relative">
+                            <BoardApp
+                                board={campaignBoard as React.MutableRefObject<Board>}
+                                playerViewOpen={playerViewOpen.current}
+                                dialogHandle={dialogHandle}
+                            />
+                            <button 
+                                className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:scale-110 active:scale-100 transition-all duration-200 ease-in-out"
+                                onClick={() => {
+                                    loadCampaignBoard(null);
+                                }}
+                            >
+                                <span className="mso">arrow_back</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <CampaignApp
+                            campaign={campaign}
+                            loadCampaignBoard={loadCampaignBoard}
+                            dialogHandle={dialogHandle}
+                            playerViewOpen={playerViewOpen.current}
+                        />
+                    )
+                }
             </CampaignContext.Provider>
         )
     )

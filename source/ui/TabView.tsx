@@ -10,14 +10,25 @@ export const Tab = (props: ITab) => {
     return <></>
 }
 
-export const TabView = (props: {
+export type TabViewProps = {
     defaultIndex?: number
     children: React.ReactElement<ITab>[]
     className?: string
     tabClassName?: string
     tabStyle?: React.CSSProperties
-}) => {
+}
+
+export type TabViewHandle = {
+    setActiveIndex: (index: number) => void
+}
+
+export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, TabViewProps> = (props, ref) => {
     const [activeIndex, setActiveIndex] = React.useState(props.defaultIndex ?? 0);
+
+    React.useImperativeHandle(ref, () => ({
+        setActiveIndex: setActiveIndex
+    }));
+
     return (
         <div className={"w-full flex flex-col rounded-xl bg-white overflow-hidden " + props.className}>
             {/* Header */}
@@ -64,3 +75,5 @@ export const TabView = (props: {
         </div>
     )
 }
+
+export const TabView = React.forwardRef(TabViewRenderer);

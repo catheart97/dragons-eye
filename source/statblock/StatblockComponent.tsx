@@ -16,7 +16,6 @@ const ActionViewComponent = (props: {
     return (
         <div
             className={"transition-all duration-200 ease-in-out w-full flex flex-col rounded-xl overflow-hidden pl-3 " + (expanded ? "bg-neutral-100" : "")}
-
         >
             <div
                 className="w-full font-black flex items-center justify-between text-sm"
