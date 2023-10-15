@@ -1,6 +1,7 @@
 import { Board, BoardPosition, IBoardUtility, BoardCondition, ConditionIcons } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
+import { UIContainer } from "../../ui/UIContainer"
 
 export class ConditionBoardUtility implements IBoardUtility {
     private board: Board
@@ -79,7 +80,7 @@ export class ConditionBoardUtility implements IBoardUtility {
 
     userInterface() {
         return (
-            <>
+            <UIContainer>
                 {
                     (Object.values(BoardCondition).filter((v) => typeof v !== 'string') as BoardCondition[]).map((v, i) => {
                         return (
@@ -98,7 +99,7 @@ export class ConditionBoardUtility implements IBoardUtility {
                         )
                     })
                 }
-            </>
+            </UIContainer>
         )
     }
 

@@ -127,28 +127,26 @@ export const NewSpellComponent = (props: {
     )
 }
 
-// todo: improve ux and ui design
 export const SpellComponent = (props: {
     spell: Spell,
     onDeleteRequest?: () => void,
 }) => {
-    const [height, setHeight] = React.useState(0);
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [expanded, setExpanded] = React.useState(false);
 
     return (
         <div className="rounded-xl overflow-hidden bg-neutral-100">
             <div className='w-full flex'>
-                <div className='flex justify-left items-center grow uppercase p-1 pl-2'>
+                <div className='flex justify-left items-center grow p-1 pl-2'>
                     {props.spell.name}
                 </div>
                 <button
                     className='text-xs hover:bg-gray-200 w-8 p-1 flex justify-center items-center'
                     onClick={() => {
-                        setHeight(height === 0 ? containerRef.current?.scrollHeight! : 0);
+                        setExpanded(!expanded);
                     }}
                 >
                     {
-                        height === 0 ? <span className="mso">arrow_downward</span> : <span className="mso">arrow_upward</span>
+                        !expanded ? <span className="mso">arrow_downward</span> : <span className="mso">arrow_upward</span>
                     }
                 </button>
                 {
@@ -163,46 +161,45 @@ export const SpellComponent = (props: {
                 }
 
             </div>
-            <div
-                className="overflow-hidden"
-                ref={containerRef}
-                style={{
-                    height: height,
-                    transition: 'height 0.2s ease-in-out'
-                }}
-            >
-                <div className='flex flex-col justify-left items-center w-full p-2'>
-                    <div className="flex rounded-xl bg-white w-full overflow-hidden text-center">
-                        <div className="flex flex-col items-center justify-center grow">
-                            <div className="text-xl grow bg-neutral-50 h-2/3 w-full">{props.spell.level}</div>
-                            <div className="text-sm grow">Lvl</div>
-                        </div>
-                        <div className="flex flex-col items-center justify-center grow">
-                            <div className="text-xl grow bg-neutral-50 h-2/3 w-full">{props.spell.school}</div>
-                            <div className="text-sm grow">School</div>
-                        </div>
-                        <div className="flex flex-col items-center justify-center grow">
-                            <div className="text-xl grow bg-neutral-50 w-full h-2/3 flex justify-center items-center">{props.spell.ritual ? <span className="mso">check</span> : <span className="mso">close</span>}</div>
-                            <div className="text-sm grow">Ritual</div>
+            {
+                expanded ? (
+                    <div
+                        className="overflow-hidden"
+                    >
+                        <div className='flex flex-col justify-left items-center w-full p-2'>
+                            <div className="flex rounded-xl bg-white w-full overflow-hidden text-center">
+                                <div className="flex flex-col items-center justify-center grow">
+                                    <div className="text-xl grow bg-neutral-50 h-2/3 w-full">{props.spell.level}</div>
+                                    <div className="text-sm grow">Lvl</div>
+                                </div>
+                                <div className="flex flex-col items-center justify-center grow">
+                                    <div className="text-xl grow bg-neutral-50 h-2/3 w-full">{props.spell.school}</div>
+                                    <div className="text-sm grow">School</div>
+                                </div>
+                                <div className="flex flex-col items-center justify-center grow">
+                                    <div className="text-xl grow bg-neutral-50 w-full h-2/3 flex justify-center items-center">{props.spell.ritual ? <span className="mso">check</span> : <span className="mso">close</span>}</div>
+                                    <div className="text-sm grow">Ritual</div>
+                                </div>
+                            </div>
+                            <UIGroup title="Range" className="pt-1 pb-1" noPadding>
+                                <div className="text-end w-full">{props.spell.range}</div>
+                            </UIGroup>
+                            <UIGroup title="Components" className="pt-1 pb-1" noPadding>
+                                <div className="text-end w-full">{props.spell.components}</div>
+                            </UIGroup>
+                            <UIGroup title="Time" className="pt-1 pb-1" noPadding>
+                                <div className="text-end w-full">{props.spell.time}</div>
+                            </UIGroup>
+                            <UIGroup title="Duration" className="pt-1 pb-1" noPadding>
+                                <div className="text-end w-full">{props.spell.duration}</div>
+                            </UIGroup>
+                            <div className="text-xs">
+                                {props.spell.description}
+                            </div>
                         </div>
                     </div>
-                    <UIGroup title="Range" className="pt-1 pb-1" noPadding>
-                        <div className="text-end w-full">{props.spell.range}</div>
-                    </UIGroup>
-                    <UIGroup title="Components" className="pt-1 pb-1" noPadding>
-                        <div className="text-end w-full">{props.spell.components}</div>
-                    </UIGroup>
-                    <UIGroup title="Time" className="pt-1 pb-1" noPadding>
-                        <div className="text-end w-full">{props.spell.time}</div>
-                    </UIGroup>
-                    <UIGroup title="Duration" className="pt-1 pb-1" noPadding>
-                        <div className="text-end w-full">{props.spell.duration}</div>
-                    </UIGroup>
-                    <div className="text-xs">
-                        {props.spell.description}
-                    </div>
-                </div>
-            </div>
+                ) : null
+            }
         </div>
     )
 }

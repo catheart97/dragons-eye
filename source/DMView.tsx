@@ -6,7 +6,7 @@ import { TerrainBoardUtility } from './board/utilities/TerrainBoardUtility';
 import { SpellBoardUtility } from './board/utilities/SpellBoardUtility';
 import { BoardComponent, BoardComponentHandle } from './board/BoardComponent';
 import { ConditionBoardUtility } from './board/utilities/ConditionBoardUtility';
-import { CreateDecoratorBoardUtility } from './board/utilities/CreateDecoratorBoardUtility';
+import { CreateCreatureDecoratorBoardUtility } from './board/utilities/CreateCreatureDecoratorBoardUtility';
 import { TrashDecoratorBoardUtility } from './board/utilities/TrashDecoratorBoardUtility';
 import { MoveDecoratorBoardUtility } from './board/utilities/MoveDecoratorBoardUtility';
 
@@ -19,6 +19,7 @@ import { Rect } from './Rect';
 import { ImportanceRectUtility } from './board/utilities/ImportanceRectBoardUtility';
 import { Tooltip, TooltipContent, TooltipTarget } from './ui/Tooltip';
 import { InitiaitveBoardUtility } from './board/utilities/InitiativeBoardUtility';
+import { CreateItemDecoratorBoardUtility } from './board/utilities/CreateItemDecoratorBoardUtility';
 
 export type DMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -143,7 +144,8 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
             new InitiaitveBoardUtility(board.current),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new ConditionBoardUtility(board.current, null),
-            new CreateDecoratorBoardUtility(board.current),
+            new CreateCreatureDecoratorBoardUtility(board.current),
+            new CreateItemDecoratorBoardUtility(board.current),
             new MoveDecoratorBoardUtility(board.current),
             new TrashDecoratorBoardUtility(board.current),
             new HiddenBoardUtility(board.current),
@@ -159,7 +161,7 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
     React.useEffect(setupUtilities, [board.current]);
     return (
         <>
-            <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center basis-1 border-l-4 border-orange-600 grow basis-2' style={{
+            <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
                 minWidth: "50vw!important"
             }}>
                 <BoardComponent
@@ -169,16 +171,14 @@ const DMViewRenderer: React.ForwardRefRenderFunction<DMViewHandle, DMViewProps> 
                     importanceRect={props.importanceRect}
                     setImportanceRect={props.setImportanceRect}
                 />
-                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
+                <div className='absolute left-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-start gap-1 z-[60] justify-end top-0'>
                     {
                         utilities.current[currentUtility] != undefined ? (
-                            <div className='rounded-xl bg-neutral-200 w-96 min-w-96 max-w-full flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black max-h-full overflow-y-scroll'>
-                                {utilities.current[currentUtility]!.userInterface()}
-                            </div>
+                            utilities.current[currentUtility]!.userInterface()
                         ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
                     }
 
-                    <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-end pointer-events-auto shadow-2xl shadow-black'>
+                    <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-start pointer-events-auto shadow-2xl shadow-black'>
                         {
                             utilities.current.map((v, i) => {
                                 return (

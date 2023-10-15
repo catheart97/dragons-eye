@@ -21,7 +21,7 @@ const init = async () => {
 window.ipcRenderer.on('r-import-compendium', (_e, fn) => {
   const data = window.fsExtra.readJSONSync(fn);
   Database.getInstance().import(data as GM5CompendiumJSON);
-  window.ipcRenderer.send("m-reload");
+  // window.ipcRenderer.send("m-reload");
 })
 window.ipcRenderer.on('r-import-database', (_e, fn) => {
   const data = window.fsExtra.readJSONSync(fn);

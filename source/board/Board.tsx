@@ -1,3 +1,4 @@
+import { Item } from "../database/Item";
 import { CreatureCondition, CreatureSize, PlayerStatblock, Statblock } from "../statblock/Statblock";
 
 export type BoardPosition = {
@@ -22,10 +23,11 @@ export enum CreatureAttitude {
     Enemy
 }
 
-export enum ItemType {
+export enum BoardItemType {
     Door,
     Trap,
-    Note
+    Note,
+    Item
 }
 
 export type DoorData = "locked" | "unlocked";
@@ -36,9 +38,10 @@ export type TrapData = {
 export type NoteData = string
 
 export type BoardItem = {
-    type: ItemType,
-    data: DoorData | TrapData | NoteData
+    type: BoardItemType,
+    data: DoorData | TrapData | NoteData | ItemData
 }
+export type ItemData = Item[]
 
 export type BoardCreature = {
     type: CreatureType,
@@ -178,10 +181,11 @@ export const ConditionCanvasIcons: { [key in BoardCondition]: string } = {
     [BoardCondition.Slow]: "speed"
 }
 
-export const ItemTypeIcons: { [key in ItemType]: React.ReactNode } = {
-    [ItemType.Door]: <span className="msf">door_front</span>,
-    [ItemType.Trap]: <span className="msf">crisis_alert</span>,
-    [ItemType.Note]: <span className="msf">note</span>
+export const ItemTypeIcons: { [key in BoardItemType]: React.ReactNode } = {
+    [BoardItemType.Door]: <span className="msf">door_front</span>,
+    [BoardItemType.Trap]: <span className="msf">crisis_alert</span>,
+    [BoardItemType.Note]: <span className="msf">note</span>,
+    [BoardItemType.Item]: <span className="msf">backpack</span>
 }
 
 export const CreatureAttitudeColors: { [key in CreatureAttitude]: string } = {
@@ -384,7 +388,7 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
             decorators[door.y + door.x * maxY] = {
                 type: BoardDecoratorType.Item,
                 attachment: {
-                    type: ItemType.Door,
+                    type: BoardItemType.Door,
                     data: "unlocked"
                 },
                 key: decoratorCounter++
@@ -397,7 +401,7 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
         decorators[Math.floor(note.pos.y) + Math.floor(note.pos.x) * maxY] = {
             type: BoardDecoratorType.Item,
             attachment: {
-                type: ItemType.Note,
+                type: BoardItemType.Note,
                 data: note.text
             },
             key: decoratorCounter++

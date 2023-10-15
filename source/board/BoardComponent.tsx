@@ -1,7 +1,7 @@
 import React from "react"
 
 import "../index.css"
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, ItemType, TerrainColors, TrapData } from "./Board"
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, BoardItemType, TerrainColors, TrapData } from "./Board"
 import { useForceUpdate } from "../utility"
 import { Rect } from "../Rect";
 import { TexturePool } from "./TexturePool";
@@ -145,7 +145,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
         } else {
             ctx.textAlign = 'left';
             const attachment = decorator.attachment as BoardItem;
-            if (attachment.type == ItemType.Door) {
+            if (attachment.type == BoardItemType.Door) {
                 const data = attachment.data as DoorData;
                 ctx.lineWidth = LineWidth;
                 ctx.fillStyle = "#000000";
@@ -172,7 +172,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                         position.y * CanvasBaseSize + CanvasBaseSize - LineWidth
                     )
                 }
-            } else if (!playerView && attachment.type == ItemType.Trap) {
+            } else if (!playerView && attachment.type == BoardItemType.Trap) {
 
                 const data = attachment.data as TrapData;
                 const armed = data.armed;
@@ -204,7 +204,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                         position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
                     )
                 }
-            } else if (!playerView && attachment.type == ItemType.Note) {
+            } else if (!playerView && attachment.type == BoardItemType.Note) {
                 ctx.font = `${CanvasBaseSize - LineWidth * 4}px Material Symbols`;
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#000000";
@@ -220,7 +220,22 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                     position.x * CanvasBaseSize + LineWidth * 2,
                     position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
                 )
+            } else {
+                ctx.font = `${CanvasBaseSize - LineWidth * 4}px Material Symbols`;
+                ctx.fillStyle = "#ffffff";
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = LineWidth;
 
+                ctx.fillText(
+                    "backpack",
+                    position.x * CanvasBaseSize + LineWidth * 2,
+                    position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
+                )
+                ctx.strokeText(
+                    "backpack",
+                    position.x * CanvasBaseSize + LineWidth * 2,
+                    position.y * CanvasBaseSize + CanvasBaseSize - LineWidth * 2
+                )
             }
         }
     }

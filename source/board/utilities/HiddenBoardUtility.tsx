@@ -1,6 +1,7 @@
 import { Board, BoardPosition, IBoardUtility } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
+import { UIContainer } from "../../ui/UIContainer"
 
 export class HiddenBoardUtility implements IBoardUtility {
     private board: Board
@@ -86,7 +87,7 @@ export class HiddenBoardUtility implements IBoardUtility {
 
     userInterface() {
         return (
-            <>
+            <UIContainer>
                 <ToolButton
                     onClick={() => {
                         this.targetCondition = false;
@@ -108,7 +109,7 @@ export class HiddenBoardUtility implements IBoardUtility {
                         <span className="msf">visibility_off</span>
                     </div>
                 </ToolButton>
-            </>
+            </UIContainer>
         )
     }
 

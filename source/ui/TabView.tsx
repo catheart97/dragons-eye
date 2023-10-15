@@ -14,12 +14,14 @@ export const TabView = (props: {
     defaultIndex?: number
     children: React.ReactElement<ITab>[]
     className?: string
+    tabClassName?: string
+    tabStyle?: React.CSSProperties
 }) => {
     const [activeIndex, setActiveIndex] = React.useState(props.defaultIndex ?? 0);
     return (
         <div className={"w-full flex flex-col rounded-xl bg-white overflow-hidden " + props.className}>
             {/* Header */}
-            <div className="relative w-full h-8 bg-orange-600">
+            <div className="relative w-full h-8 min-h-8 max-h-8 shrink-0 bg-orange-600">
                 <div
                     className=" absolute bg-white transition-all duration-200"
                     style={{
@@ -53,7 +55,9 @@ export const TabView = (props: {
             </div>
 
             {/* Body */}
-            <div className="w-full h-fit grow overflow-y-scroll">
+            <div 
+                className={"w-full grow flex flex-col gap-1 " + props.tabClassName}
+            >
                 {props.children[activeIndex].props.children ?? <></>}
             </div>
 

@@ -1,9 +1,11 @@
-import { CreatureCondition, CreatureSize, CreatureType, DamageType, Spell, Statblock } from "../statblock/Statblock";
+import { CreatureCondition, CreatureSize, CreatureType, DamageType, Spell, Statblock, StatblockAction } from "../statblock/Statblock";
 import { userData } from "./Environment";
+import { Item, ItemType } from "./Item";
 
 type Schema = {
     spells: Spell[],
     monsters: Statblock[]
+    items: Item[]
 }
 export type DatabaseSchema = Schema;
 
@@ -21,33 +23,45 @@ type GM5Monster = {
     int: number,
     wis: number,
     cha: number,
-    skill?: string[],
-    senses: string,
+    skill?: string[] | string,
+    senses?: string,
     passive: number,
     languages: string,
     cr: number,
-    trait: {
+    trait?: {
         name: string,
         text: string
-    }[],
-    action: {
+    }[] | {
+        name: string,
+        text: string
+    },
+    action?: {
         name: string,
         text: string,
-    }[],
+    }[] | {
+        name: string,
+        text: string,
+    },
     reaction?: {
         name: string,
         text: string
-    }[],
-    legendary?: {
+    }[] | {
         name: string,
         text: string
-    }[],
+    },
+    legendary?: {
+        name?: string,
+        text: string
+    }[] | {
+        name?: string,
+        text: string
+    },
     vulnerable?: string,
     resist?: string,
     immune?: string,
     conditionImmune?: string,
     environment?: string,
-    save?: string[],
+    save?: string[] | string,
     slots?: string,
 }
 
@@ -65,10 +79,30 @@ type GM5Spell = {
     roll?: string
 }
 
+type GM5Item = {
+    name: string,
+    type: string,
+    text: string,
+    weight?: number,
+    magic?: string,
+    value?: string,
+    range?: string,
+    property?: string,
+    dmg1?: string,
+    dmg2?: string,
+    dmgType?: string,
+    ac?: string,
+    roll? : string | string[],
+    stealth?: string,
+    strength?: string,
+
+}
+
 export type GM5CompendiumJSON = {
     compendium: {
         spell: GM5Spell[],
-        monster: GM5Monster[]
+        monster: GM5Monster[],
+        item: GM5Item[]
     }[]
 }
 
@@ -86,11 +120,17 @@ export class Database {
     private constructor() {
         const DB_PATH = userData() + "/" + "db.json";
         if (window.fsExtra.existsSync(DB_PATH)) {
-            this.data = window.fsExtra.readJSONSync(DB_PATH);
+            this.data = {
+                spells: [],
+                monsters: [],
+                items: [],
+                ...window.fsExtra.readJSONSync(DB_PATH)
+            };
         } else {
             this.data = {
                 spells: [],
-                monsters: []
+                monsters: [],
+                items: []
             }
         }
     }
@@ -154,6 +194,38 @@ export class Database {
         this.commit();
     }
 
+    private processItems() {
+        // sort by name
+        this.data.items.sort((a, b) => {
+            if (a.name < b.name) {
+                return -1
+            } else if (a.name > b.name) {
+                return 1
+            }
+            return 0
+        })
+
+        // remove duplicates
+        let i = 0;
+        while (i < this.data.items.length - 1) {
+            if (this.data.items[i].name === this.data.items[i + 1].name) {
+                this.data.items.splice(i, 1);
+            } else {
+                i++;
+            }
+        }
+        this.commit();
+    }
+
+    public getItems(): Item[] {
+        return this.data.items;
+    }
+
+    public updateItems(items: Item[]) {
+        this.data.items = items;
+        this.processItems();
+    }
+
     public updateMonsters(monsters: Statblock[]) {
         this.data.monsters = monsters;
         this.processMonsters();
@@ -177,6 +249,7 @@ export class Database {
     public import = (json: GM5CompendiumJSON) => {
         this.data.spells = [];
         this.data.monsters = [];
+        let failCount = 0;
         json.compendium.forEach(compendium => {
             compendium.spell.forEach(spell => {
                 const spellName = spell.name;
@@ -203,6 +276,52 @@ export class Database {
                 this.data.spells.push(s);
             })
 
+
+            compendium.item.forEach(item => {
+
+                let type : ItemType;
+                switch (item.type) {
+                    case "W": type = ItemType.WondrousItem; break;
+                    case "M": type = ItemType.MeleeWeapon; break;
+                    case "R": type = ItemType.RangedWeapon; break;
+                    case "LA": type = ItemType.LightArmor; break;
+                    case "MA": type = ItemType.MediumArmor; break;
+                    case "HA": type = ItemType.HeavyArmor; break;
+                    case "P": type = ItemType.Potion; break;
+                    case "RD": type = ItemType.Rod; break;
+                    case "ST": type = ItemType.Staff; break;
+                    case "WD": type = ItemType.Wand; break;
+                    case "RG": type = ItemType.Ring; break;
+                    case "SC": type = ItemType.Scroll; break;
+                    default: failCount++; return;
+                }
+
+                const i: Item = {
+                    name: decodeHtmlEntity(item.name),
+                    type: type,
+                    description: [
+                        decodeHtmlEntity(item.text) + "\n",
+                        item.range ? "Range: " + item.range + "\n" : "",
+                        item.property ? "Property: " + item.property + "\n" : "",
+                        item.dmg1 ? "Damage: " + item.dmg1 + "\n" : "",
+                        item.dmg2 ? "Damage: " + item.dmg2 + "\n" : "",
+                        item.dmgType ? "Damage Type: " + item.dmgType + "\n" : "",
+                        item.ac ? "Armor Class: " + item.ac + "\n" : "",
+                        item.stealth ? "Stealth: " + item.stealth + "\n" : "",
+                        item.strength ? "Strength: " + item.strength + "\n" : "",
+                    ].join(""),
+                    weight: item.weight ?? 0,
+                    magic: item.magic ? true : undefined,
+                    value: item.value ? parseInt(item.value) : 0,
+                }
+                this.data.items.push(i);
+            })
+        })
+
+        this.processSpells();
+        this.processItems();
+
+        json.compendium.forEach(compendium => {
             compendium.monster.forEach(monster => {
                 try {
                     let size: CreatureSize;
@@ -256,6 +375,27 @@ export class Database {
                         return arr;
                     }
 
+                    let spells = []
+                    let spellTrait : {
+                        name: string,
+                        text: string
+                    } | null = null;
+                    if (monster.trait) {
+                        if (monster.trait instanceof Array) {
+                            spellTrait = monster.trait.filter(v => v.name === "Spellcasting")[0] || null;
+                        } else {
+                            spellTrait = monster.trait.name === "Spellcasting" ? monster.trait : null;
+                        }
+                    }
+                    if (spellTrait) {
+                        const txt = spellTrait.text.toLowerCase();
+                        for (const spell of this.data.spells) {
+                            if (txt.includes(spell.name.toLowerCase())) {
+                                spells.push(spell);
+                            }
+                        }
+                    }
+
                     const statblock: Statblock = {
                         name: decodeHtmlEntity(monster.name),
                         size,
@@ -281,12 +421,18 @@ export class Database {
                             burrow: monster.speed.match(/\sburrow d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
                             climb: monster.speed.match(/\sclimb d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
                         },
-                        skills: monster.skill ? monster.skill.join(", ") : "",
+                        skills: monster.skill ? (
+                            typeof monster.skill === "string" ? (
+                                monster.skill 
+                            ) : (
+                                monster.skill.join(", ")
+                            )
+                        ) : "",
                         senses: {
-                            darkvision: monster.senses.match(/darkvision \d+/g) ? parseInt(monster.senses.match(/darkvision \d+/g)![0].split(" ")[1]) : 0,
-                            blindsight: monster.senses.match(/blindsight \d+/g) ? parseInt(monster.senses.match(/blindsight \d+/g)![0].split(" ")[1]) : 0,
-                            tremorsense: monster.senses.match(/tremorsense \d+/g) ? parseInt(monster.senses.match(/tremorsense \d+/g)![0].split(" ")[1]) : 0,
-                            truesight: monster.senses.match(/truesight \d+/g) ? parseInt(monster.senses.match(/truesight \d+/g)![0].split(" ")[1]) : 0,
+                            darkvision: monster.senses?.match(/darkvision \d+/g) ? parseInt(monster.senses.match(/darkvision \d+/g)![0].split(" ")[1]) : 0,
+                            blindsight: monster.senses?.match(/blindsight \d+/g) ? parseInt(monster.senses.match(/blindsight \d+/g)![0].split(" ")[1]) : 0,
+                            tremorsense: monster.senses?.match(/tremorsense \d+/g) ? parseInt(monster.senses.match(/tremorsense \d+/g)![0].split(" ")[1]) : 0,
+                            truesight: monster.senses?.match(/truesight \d+/g) ? parseInt(monster.senses.match(/truesight \d+/g)![0].split(" ")[1]) : 0,
                         },
                         passivePerception: monster.passive,
                         languages: monster.languages,
@@ -294,35 +440,94 @@ export class Database {
                         damageImmunities: (monster.immune?.split(", ") || []).map(v => DamageType[(v.charAt(0).toUpperCase() + v.substring(1)) as keyof typeof DamageType]),
                         damageVulnerabilities: (monster.vulnerable?.split(", ") || []).map(v => DamageType[(v.charAt(0).toUpperCase() + v.substring(1)) as keyof typeof DamageType]),
                         conditionImmunities: (monster.conditionImmune?.split(", ") || []).map(v => CreatureCondition[(v.charAt(0).toUpperCase() + v.substring(1)) as keyof typeof CreatureCondition]),
-                        actions: monster.action.map(action => {
-                            return {
-                                name: decodeHtmlEntity(action.name),
-                                description: decodeHtmlEntity(action.text)
+                        actions: monster.action ? (
+                            monster.action instanceof Array ? (monster.action.map(action => {
+                                return {
+                                    name: decodeHtmlEntity(action.name),
+                                    description: decodeHtmlEntity(action.text)
+                                }
+                            })) : ([{
+                                name: decodeHtmlEntity(monster.action.name),
+                                description: decodeHtmlEntity(monster.action.text)
+                            } as StatblockAction])
+                        ) : (
+                            []
+                        ),
+                        reactions: monster.reaction ? (
+                            monster.reaction instanceof Array ? (monster.reaction.map(reaction => {
+                                return {
+                                    name: decodeHtmlEntity(reaction.name),
+                                    description: decodeHtmlEntity(reaction.text)
+                                }
+                            })) : ([{
+                                name: decodeHtmlEntity(monster.reaction.name),
+                                description: decodeHtmlEntity(monster.reaction.text)
+                            } as StatblockAction])
+                        ) : (
+                            []
+                        ),
+                        legendaryActions: monster.legendary ? (
+                            monster.legendary instanceof Array ? (monster.legendary.map(legendary => {
+                                return {
+                                    name: legendary.name ? decodeHtmlEntity(legendary.name) : "Legendary Action",
+                                    description: decodeHtmlEntity(legendary.text)
+                                }
                             }
-                        }),
-                        reactions: monster.reaction?.map(reaction => {
-                            return {
-                                name: decodeHtmlEntity(reaction.name),
-                                description: decodeHtmlEntity(reaction.text)
-                            }
-                        }) || [],
-                        legendaryActions: monster.legendary?.map(legendary => {
-                            return {
-                                name: decodeHtmlEntity(legendary.name),
-                                description: decodeHtmlEntity(legendary.text)
-                            }
-                        }) || [],
+                            )) : ([{
+                                name: monster.legendary.name ? decodeHtmlEntity(monster.legendary.name) : "Legendary Action",
+                                description: decodeHtmlEntity(monster.legendary.text)
+                            } as StatblockAction])
+                        ) : (
+                            []
+                        ),
                         savingThrows: {
-                            Strength: monster.save?.filter(v => v.includes("Strength"))[0] ? parseInt(monster.save?.filter(v => v.includes("Strength"))[0].split(" ")[1]) : 0,
-                            Dexterity: monster.save?.filter(v => v.includes("Dexterity"))[0] ? parseInt(monster.save?.filter(v => v.includes("Dexterity"))[0].split(" ")[1]) : 0,
-                            Constitution: monster.save?.filter(v => v.includes("Constitution"))[0] ? parseInt(monster.save?.filter(v => v.includes("Constitution"))[0].split(" ")[1]) : 0,
-                            Intelligence: monster.save?.filter(v => v.includes("Intelligence"))[0] ? parseInt(monster.save?.filter(v => v.includes("Intelligence"))[0].split(" ")[1]) : 0,
-                            Wisdom: monster.save?.filter(v => v.includes("Wisdom"))[0] ? parseInt(monster.save?.filter(v => v.includes("Wisdom"))[0].split(" ")[1]) : 0,
-                            Charisma: monster.save?.filter(v => v.includes("Charisma"))[0] ? parseInt(monster.save?.filter(v => v.includes("Charisma"))[0].split(" ")[1]) : 0,
+                            Strength: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Strength"))[0] ? parseInt(monster.save.filter(v => v.includes("Strength"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Strength") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0,
+                            Dexterity: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Dexterity"))[0] ? parseInt(monster.save.filter(v => v.includes("Dexterity"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Dexterity") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0,
+                            Constitution: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Constitution"))[0] ? parseInt(monster.save.filter(v => v.includes("Constitution"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Constitution") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0,
+
+                            Intelligence: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Intelligence"))[0] ? parseInt(monster.save.filter(v => v.includes("Intelligence"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Intelligence") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0,
+                            Wisdom: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Wisdom"))[0] ? parseInt(monster.save.filter(v => v.includes("Wisdom"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Wisdom") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0
+                            ,
+                            Charisma: monster.save ? (
+                                monster.save instanceof Array ? (monster.save.filter(v => v.includes("Charisma"))[0] ? parseInt(monster.save.filter(v => v.includes("Charisma"))[0].split(" ")[1]) : 0) : (
+                                    monster.save.includes("Charisma") ? parseInt(monster.save.split(" ")[1]) : 0
+                                )
+                            ) : 0,
                         },
                         spellSlots: padRightWithZeros((monster.slots ? monster.slots.split(", ").map(v => parseInt(v)) : []), 10) as [number, number, number, number, number, number, number, number, number, number],
-                        description: typeof monster.trait === "string" ? decodeHtmlEntity(monster.trait) : decodeHtmlEntity(monster.trait.map(trait => trait.text).join("\n")),
-                        spells: [],
+                        description: "",
+                        traits: monster.trait ? (
+                            monster.trait instanceof Array ? (monster.trait.map(trait => {
+                                return {
+                                    name: decodeHtmlEntity(trait.name),
+                                    description: decodeHtmlEntity(trait.text)
+                                }
+                            })) : ([{
+                                name: decodeHtmlEntity(monster.trait.name),
+                                description: decodeHtmlEntity(monster.trait.text)
+                            } as StatblockAction])
+                        ) : [],
+                        spells,
                         challengeRating: monster.cr,
                         alignment: monster.alignment,
                         type: type,
@@ -330,12 +535,13 @@ export class Database {
                     }
                     this.data.monsters.push(statblock);
                 } catch (e) {
-                    console.log(e)
+                    failCount++;
+                    console.log(e, monster)
                 }
             })
         })
 
-        this.processSpells();
+        console.log("Imported " + this.data.spells.length + " spells and " + this.data.monsters.length + " monsters. Failed " + failCount + " monsters.");
         this.processMonsters();
     }
 

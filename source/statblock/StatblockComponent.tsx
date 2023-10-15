@@ -1,11 +1,191 @@
 import React from "react";
-import { CreatureSize, DamageType, PlayerStatblock, Stat, Statblock, constructDefaultStatblock, CreatureCondition } from "./Statblock";
+import { CreatureSize, DamageType, PlayerStatblock, Stat, Statblock, constructDefaultStatblock, CreatureCondition, StatblockAction } from "./Statblock";
 import { useForceUpdate } from "../utility";
 import { Tooltip, TooltipContent, TooltipTarget } from "../ui/Tooltip";
 import { UIGroup } from "../ui/UIGroup";
 import { ToolButton } from "../ui/ToolButton";
 import { Database } from "../database/Database";
 import { SpellComponent } from "./SpellComponent";
+
+// todo: add delete option
+const ActionViewComponent = (props: {
+    attack: StatblockAction,
+    onDeleteRequest?: () => void
+}) => {
+    const [expanded, setExpanded] = React.useState(false);
+    return (
+        <div
+            className={"transition-all duration-200 ease-in-out w-full flex flex-col rounded-xl overflow-hidden pl-3 " + (expanded ? "bg-neutral-100" : "")}
+
+        >
+            <div
+                className="w-full font-black flex items-center justify-between text-sm"
+            >
+                <div className="flex items-center grow pr-2 p-1">{props.attack.name}</div>
+                <button
+                    className="flex items-center justify-center hover:bg-neutral-200 w-8 h-full"
+                    onClick={() => setExpanded(!expanded)}
+                >
+                    {
+                        expanded ? (
+                            <span className="mso">arrow_upward</span>
+                        ) : (
+                            <span className="mso">arrow_downward</span>
+                        )
+                    }
+                </button>
+                <button
+                    className="flex items-center justify-center hover:bg-neutral-200 w-8 h-full "
+                    onClick={props.onDeleteRequest}
+                >
+                    <span className="mso">delete</span>
+                </button>
+            </div>
+            {
+                expanded ? (
+                    <div className="w-full text-left pr-2 p-1">
+                        {props.attack.description}
+                    </div>
+                ) : null
+            }
+        </div>
+    )
+}
+
+const ActionEditorComponent = (props: {
+    title: string,
+    editMode: boolean,
+    onProcess: (text: string, description: string) => void,
+    actions: StatblockAction[]
+    update: () => void
+}) => {
+
+    const inputTextRef = React.useRef<HTMLInputElement>(null);
+    const inputDescriptionRef = React.useRef<HTMLInputElement>(null);
+
+    return (
+        <>
+            <UIGroup title={props.title} className="text-orange-600" />
+            <div className="flex flex-col gap-1 w-full">
+                {
+                    props.editMode ? (
+                        <div className="flex p-2 pl-3 bg-neutral-100 rounded-xl overflow-hidden">
+                            <div className="grow flex-col items-start justify-center">
+                                <input
+                                    ref={inputTextRef}
+                                    type="text"
+                                    placeholder="Trait Name"
+                                    className="bg-transparent focus:outline-none w-full"
+                                />
+                                <input
+                                    ref={inputDescriptionRef}
+                                    type="text"
+                                    placeholder="Trait Description"
+                                    className="bg-transparent focus:outline-none w-full"
+                                />
+                            </div>
+                            <button
+                                onClick={() => {
+                                    props.onProcess(inputTextRef.current!.value, inputDescriptionRef.current!.value);
+                                }}
+                                className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
+                            >
+                                <span className="mso">add</span>
+                            </button>
+                        </div>
+                    ) : null
+                }
+                <div className="flex flex-col gap-1">
+                    {
+                        props.actions.map((v, i) => {
+                            return (
+                                <ActionViewComponent
+                                    attack={v}
+                                    key={i}
+                                    onDeleteRequest={() => {
+                                        props.actions.splice(i, 1);
+                                        props.update();
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                </div>
+            </div>
+        </>
+    )
+}
+
+interface EnumEditorProps<T> {
+    enumObj: object
+    title: string,
+    process: (v: T) => void,
+    editMode: boolean,
+    data: T[],
+    update: () => void
+}
+
+
+const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
+    const damageSelectRef = React.useRef<HTMLSelectElement>(null);
+    return (
+        <>
+            <UIGroup title={props.title} className="text-orange-600" />
+
+            <div className="flex flex-col gap-1 w-full">
+                {
+                    props.editMode ? (
+                        <div className="flex rounded-xl overflow-hidden bg-neutral-100 pl-2">
+                            <select
+                                className="grow focus:outline-none bg-transparent"
+                                ref={damageSelectRef}
+                            >
+                                {
+                                    Object.keys(
+                                        props.enumObj
+                                    ).filter(v => typeof v == "string").map((v, i) => {
+                                        return <option key={i} value={v}>{v}</option>
+                                    })
+                                }
+                            </select>
+                            <button
+                                onClick={() => {
+                                    props.process(
+                                        damageSelectRef.current!.value as unknown as T
+                                    )
+                                }}
+                                className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
+                            >
+                                <span className="mso">add</span>
+                            </button>
+                        </div>
+                    ) : <></>
+                }
+
+                {
+                    props.data.map((v, i) => {
+                        return (
+                            <div className="flex rounded-xl overflow-hidden" key={i}>
+                                <div className="grow flex items-center pl-3">
+                                    {v as unknown as string}
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        props.data.splice(i, 1);
+                                        props.update();
+                                    }}
+                                    className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
+                                >
+                                    <span className="mso">delete</span>
+                                </button>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        </>
+    )
+}
 
 export const StatblockComponent = (props: {
     createMode?: boolean,
@@ -25,21 +205,7 @@ export const StatblockComponent = (props: {
     }
 
     const hpInputRef = React.useRef<HTMLInputElement>(null);
-    const damageVulnerabilitiesSelectRef = React.useRef<HTMLSelectElement>(null);
-    const damageResistancesSelectRef = React.useRef<HTMLSelectElement>(null);
-    const damageImmunitiesSelectRef = React.useRef<HTMLSelectElement>(null);
-
-    const conditionImmunitiesSelectRef = React.useRef<HTMLSelectElement>(null);
     const spellSelectRef = React.useRef<HTMLSelectElement>(null);
-
-    const actionNameInputRef = React.useRef<HTMLInputElement>(null);
-    const actionDescriptionInputRef = React.useRef<HTMLInputElement>(null);
-
-    const legendaryActionInputRef = React.useRef<HTMLInputElement>(null);
-    const legendaryActionDescriptionInputRef = React.useRef<HTMLInputElement>(null);
-
-    const reactionNameInputRef = React.useRef<HTMLInputElement>(null);
-    const reactionDescriptionInputRef = React.useRef<HTMLInputElement>(null);
 
     if (!statblock && !props.player) {
         statblock = {
@@ -383,231 +549,67 @@ export const StatblockComponent = (props: {
 
                         {
                             editMode || statblock.damageVulnerabilities.length > 0 ? (
-                                <UIGroup title="Vulnerabilities">
-                                    <div className="flex flex-col gap-1 w-44">
-                                        {
-                                            editMode ? (
-                                                <div className="flex rounded-xl overflow-hidden">
-                                                    <select
-                                                        className="grow focus:outline-none"
-                                                        ref={damageVulnerabilitiesSelectRef}
-                                                    >
-                                                        {
-                                                            Object.keys(DamageType).filter(v => typeof v == "string").map((v, i) => {
-                                                                return <option key={i} value={v}>{v}</option>
-                                                            })
-                                                        }
-                                                    </select>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.damageVulnerabilities.push(
-                                                                damageVulnerabilitiesSelectRef.current!.value as DamageType
-                                                            );
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : <></>
-                                        }
-
-                                        {
-                                            statblock.damageVulnerabilities.map((v, i) => {
-                                                return (
-                                                    <div className="flex rounded-xl overflow-hidden" key={i}>
-                                                        <div className="grow flex items-center pl-1">
-                                                            {v}
-                                                        </div>
-                                                        <button
-                                                            onClick={() => {
-                                                                statblock.damageVulnerabilities.splice(i, 1);
-                                                                update();
-                                                            }}
-                                                            className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                        >
-                                                            <span className="mso">delete</span>
-                                                        </button>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </UIGroup>
+                                <EnumEditorComponent
+                                    enumObj={DamageType}
+                                    title="Vulnerabilities"
+                                    process={(damage) => {
+                                        statblock.damageVulnerabilities.push(damage);
+                                        update();
+                                    }}
+                                    editMode={editMode}
+                                    data={statblock.damageVulnerabilities}
+                                    update={update}
+                                />
                             ) : null
                         }
 
                         {
                             editMode || statblock.damageResistances.length > 0 ? (
-                                <UIGroup title="Resistances">
-                                    <div className="flex flex-col gap-1 w-44">
-                                        {
-                                            editMode ? (
-                                                <div className="flex rounded-xl overflow-hidden">
-                                                    <select
-                                                        className="grow focus:outline-none"
-                                                        ref={damageResistancesSelectRef}
-                                                    >
-                                                        {
-                                                            Object.keys(DamageType).filter(v => typeof v == "string").map((v, i) => {
-                                                                return <option key={i} value={v}>{v}</option>
-                                                            })
-                                                        }
-                                                    </select>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.damageResistances.push(
-                                                                damageResistancesSelectRef.current!.value as DamageType
-                                                            );
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : <></>
-                                        }
-
-                                        {
-                                            statblock.damageResistances.map((v, i) => {
-                                                return (
-                                                    <div className="flex rounded-xl overflow-hidden" key={i}>
-                                                        <div className="grow flex items-center pl-1">
-                                                            {v}
-                                                        </div>
-                                                        <button
-                                                            onClick={() => {
-                                                                statblock.damageResistances.splice(i, 1);
-                                                                update();
-                                                            }}
-                                                            className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                        >
-                                                            <span className="mso">delete</span>
-                                                        </button>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </UIGroup>
+                                <EnumEditorComponent
+                                    enumObj={DamageType}
+                                    title="Resistances"
+                                    process={(damage) => {
+                                        statblock.damageResistances.push(damage);
+                                        update();
+                                    }}
+                                    editMode={editMode}
+                                    data={statblock.damageResistances}
+                                    update={update}
+                                />
                             ) : null
                         }
 
                         {/* Damage Immunities */}
                         {
                             editMode || statblock.damageImmunities.length > 0 ? (
-                                <UIGroup title="Immunities">
-                                    <div className="flex flex-col gap-1 w-44">
-                                        {
-                                            editMode ? (
-                                                <div className="flex rounded-xl overflow-hidden">
-                                                    <select
-                                                        className="grow focus:outline-none"
-                                                        ref={damageImmunitiesSelectRef}
-                                                    >
-                                                        {
-                                                            Object.keys(DamageType).filter(v => typeof v == "string").map((v, i) => {
-                                                                return <option key={i} value={v}>{v}</option>
-                                                            })
-                                                        }
-                                                    </select>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.damageImmunities.push(
-                                                                damageImmunitiesSelectRef.current!.value as DamageType
-                                                            );
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : <></>
-                                        }
-
-                                        {
-                                            statblock.damageImmunities.map((v, i) => {
-                                                return (
-                                                    <div className="flex rounded-xl overflow-hidden" key={i}>
-                                                        <div className="grow flex items-center pl-1">
-                                                            {v}
-                                                        </div>
-                                                        <button
-                                                            onClick={() => {
-                                                                statblock.damageImmunities.splice(i, 1);
-                                                                update();
-                                                            }}
-                                                            className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                        >
-                                                            <span className="mso">delete</span>
-                                                        </button>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </UIGroup>
+                                <EnumEditorComponent
+                                    enumObj={DamageType}
+                                    title="Immunities"
+                                    process={(damage) => {
+                                        statblock.damageImmunities.push(damage);
+                                        update();
+                                    }}
+                                    editMode={editMode}
+                                    data={statblock.damageImmunities}
+                                    update={update}
+                                />
                             ) : null
                         }
 
                         {/* Condition Immunities */}
                         {
                             editMode || statblock.conditionImmunities.length > 0 ? (
-                                <UIGroup title="Condition Immunities">
-                                    <div className="flex flex-col gap-1 w-44">
-                                        {
-                                            editMode ? (
-                                                <div className="flex rounded-xl overflow-hidden">
-                                                    <select
-                                                        className="grow focus:outline-none"
-                                                        ref={conditionImmunitiesSelectRef}
-                                                    >
-                                                        {
-                                                            Object.keys(CreatureCondition).filter(v => typeof v == "string").map((v, i) => {
-                                                                return <option key={i} value={v}>{v}</option>
-                                                            })
-                                                        }
-                                                    </select>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.conditionImmunities.push(
-                                                                conditionImmunitiesSelectRef.current!.value as CreatureCondition
-                                                            );
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : null
-                                        }
-
-                                        {
-                                            statblock.conditionImmunities.map((v, i) => {
-                                                return (
-                                                    <div className="flex rounded-xl overflow-hidden">
-                                                        <div className="grow flex items-center pl-1">
-                                                            {v}
-                                                        </div>
-                                                        <button
-                                                            onClick={() => {
-                                                                statblock.conditionImmunities.splice(i, 1);
-                                                                update();
-                                                            }}
-                                                            className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                        >
-                                                            <span className="mso">delete</span>
-                                                        </button>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </UIGroup>
+                                <EnumEditorComponent
+                                    enumObj={CreatureCondition}
+                                    title="Condition Immunities"
+                                    process={(condition) => {
+                                        statblock.conditionImmunities.push(condition);
+                                        update();
+                                    }}
+                                    editMode={editMode}
+                                    data={statblock.conditionImmunities}
+                                    update={update}
+                                />
                             ) : null
                         }
 
@@ -615,160 +617,76 @@ export const StatblockComponent = (props: {
 
                         {
                             editMode || statblock.actions.length > 0 ? (
-                                <>
-                                    <UIGroup title="Actions" />
-                                    <div className="flex flex-col gap-1 w-full">
-                                        {
-                                            editMode ? (
-                                                <div className="flex">
-                                                    <div className="grow flex-col items-start justify-center">
-                                                        <input
-                                                            ref={actionNameInputRef}
-                                                            type="text"
-                                                            placeholder="Action Name"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                        <input
-                                                            ref={actionDescriptionInputRef}
-                                                            type="text"
-                                                            placeholder="Action Description"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                    </div>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.actions.push({
-                                                                name: actionNameInputRef.current!.value,
-                                                                description: actionDescriptionInputRef.current!.value
-                                                            })
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : null
-                                        }
-                                        {
-                                            statblock.actions.map((v, i) => {
-                                                return (
-                                                    <p key={i}>
-                                                        <b className="font-black">{v.name} </b>
-                                                        {v.description}
-                                                    </p>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </>
+                                <ActionEditorComponent
+                                    title="Actions"
+                                    editMode={editMode}
+                                    onProcess={(name, description) => {
+                                        statblock.actions.push({
+                                            name,
+                                            description
+                                        })
+                                        update();
+                                    }}
+                                    actions={statblock.actions}
+                                    update={update}
+                                />
                             ) : null
                         }
 
                         {/* Legendary Actions */}
                         {
                             editMode || statblock.legendaryActions.length > 0 ? (
-                                <>
-                                    <UIGroup title="Legendary Actions" />
-                                    <div className="flex flex-col gap-1 w-full">
-                                        {
-                                            editMode ? (
-                                                <div className="flex">
-                                                    <div className="grow flex-col items-start justify-center">
-                                                        <input
-                                                            ref={legendaryActionInputRef}
-                                                            type="text"
-                                                            placeholder="Action Name"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                        <input
-                                                            ref={legendaryActionDescriptionInputRef}
-                                                            type="text"
-                                                            placeholder="Action Description"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                    </div>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.legendaryActions.push({
-                                                                name: legendaryActionInputRef.current!.value,
-                                                                description: legendaryActionDescriptionInputRef.current!.value
-                                                            })
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : null
-                                        }
-                                        {
-                                            statblock.legendaryActions.map((v, i) => {
-                                                return (
-                                                    <p key={i}>
-                                                        <b className="font-black">{v.name} </b>
-                                                        {v.description}
-                                                    </p>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </>
+                                <ActionEditorComponent
+                                    title="Legendary Actions"
+                                    editMode={editMode}
+                                    onProcess={(name, description) => {
+                                        statblock.legendaryActions.push({
+                                            name,
+                                            description
+                                        })
+                                        update();
+                                    }}
+                                    actions={statblock.legendaryActions}
+                                    update={update}
+                                />
                             ) : null
                         }
 
                         {/* Reactions */}
                         {
                             editMode || statblock.reactions.length > 0 ? (
-                                <>
-                                    <UIGroup title="Reactions" />
+                                <ActionEditorComponent
+                                    title="Reactions"
+                                    editMode={editMode}
+                                    onProcess={(name, description) => {
+                                        statblock.reactions.push({
+                                            name,
+                                            description
+                                        })
+                                        update();
+                                    }}
+                                    actions={statblock.reactions}
+                                    update={update}
+                                />
+                            ) : null
+                        }
 
-                                    <div className="flex flex-col gap-1 w-full">
-                                        {
-                                            editMode ? (
-                                                <div className="flex">
-                                                    <div className="grow flex-col items-start justify-center">
-                                                        <input
-                                                            ref={reactionNameInputRef}
-                                                            type="text"
-                                                            placeholder="Action Name"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                        <input
-                                                            ref={reactionDescriptionInputRef}
-                                                            type="text"
-                                                            placeholder="Action Description"
-                                                            className="bg-transparent focus:outline-none w-full"
-                                                        />
-                                                    </div>
-                                                    <button
-                                                        onClick={() => {
-                                                            statblock.reactions.push({
-                                                                name: reactionNameInputRef.current!.value,
-                                                                description: reactionDescriptionInputRef.current!.value
-                                                            })
-                                                            update();
-                                                        }}
-                                                        className="p-2 items-center flex hover:bg-neutral-100 transition-all duration-200 ease-in-out"
-                                                    >
-                                                        <span className="mso">add</span>
-                                                    </button>
-                                                </div>
-                                            ) : null
-                                        }
-                                        {
-                                            statblock.reactions.map((v, i) => {
-                                                return (
-                                                    <p key={i}>
-                                                        <b className="font-black">{v.name} </b>
-                                                        {v.description}
-                                                    </p>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </>
+                        {/* Traits */}
+                        {
+                            editMode || statblock.reactions.length > 0 ? (
+                                <ActionEditorComponent
+                                    title="Traits"
+                                    editMode={editMode}
+                                    onProcess={(name, description) => {
+                                        statblock.traits.push({
+                                            name,
+                                            description
+                                        })
+                                        update();
+                                    }}
+                                    actions={statblock.traits}
+                                    update={update}
+                                />
                             ) : null
                         }
 
@@ -776,7 +694,7 @@ export const StatblockComponent = (props: {
                         {
                             editMode || statblock.spellSlots.reduce((a, b) => a + b, 0) > 0 ? (
                                 <>
-                                    <UIGroup title="Spell Slots"></UIGroup>
+                                    <UIGroup title="Spell Slots" className="text-orange-600"></UIGroup>
                                     <div className="flex gap-1 w-full justify-center rounded-full shadow bg-white pt-2 pb-2">
                                         {
                                             statblock.spellSlots.map((v, i) => {
@@ -812,12 +730,12 @@ export const StatblockComponent = (props: {
                         {
                             editMode || statblock.spells.length > 0 ? (
                                 <>
-                                    <UIGroup title="Spells"></UIGroup>
+                                    <UIGroup title="Spells" className="text-orange-600"></UIGroup>
 
                                     <div className="flex flex-col gap-1 w-full">
                                         {
                                             editMode ? (
-                                                <div className="grow flex items-start justify-center rounded-xl shadow overflow-hidden">
+                                                <div className="grow flex items-center justify-center rounded-xl bg-neutral-100 pl-2 overflow-hidden">
                                                     <select ref={spellSelectRef} className="bg-transparent focus:outline-none w-full h-full flex items-center justify-center p-1">
                                                         {
                                                             Database.getInstance().getSpells().map((v, i) => {
@@ -857,96 +775,115 @@ export const StatblockComponent = (props: {
                         }
 
                         {/* Senses + Passive Perception */}
-                        <UIGroup title="Senses">
-                            <div className="flex flex-col gap-1 w-full">
-                                <div className="flex rounded-xl overflow-hidden">
-                                    <div className="grow flex items-center pl-1">
-                                        Passive Perception
-                                    </div>
-                                    <div className="flex items-center">
+                        <UIGroup title="Senses" className="text-orange-600"></UIGroup>
+                        <div className="flex flex-col gap-1 w-full pl-2">
+                            <div className="flex rounded-xl overflow-hidden">
+                                <div className="grow flex items-center pl-1">
+                                    Passive Perception
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        type="number"
+                                        className="text-xs w-8 text-center bg-transparent"
+                                        defaultValue={statblock.passivePerception}
+                                        onChange={(e) => {
+                                            statblock.passivePerception = e.target.valueAsNumber;
+                                            update()
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {
+                                Object.keys(statblock.senses).map((v, i) => {
+                                    return (
+                                        <div className="flex rounded-xl overflow-hidden" key={i}>
+                                            <div className="grow flex items-center pl-1">
+                                                {v.charAt(0).toUpperCase() + v.slice(1)}
+                                            </div>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="number"
+                                                    className="text-xs w-8 text-center bg-transparent"
+                                                    defaultValue={statblock.senses[v as keyof typeof statblock.senses]}
+                                                    onChange={(e) => {
+                                                        statblock.senses[v as keyof typeof statblock.senses] = e.target.valueAsNumber;
+                                                        update()
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+
+                        {/* Languages */}
+                        {
+                            editMode || statblock.languages.length > 0 ? (
+                                <>
+                                    <UIGroup title="Languages" className="text-orange-600">
+                                    </UIGroup>
+                                    <div className="flex flex-col gap-1 w-full p-1 pl-3">
                                         <input
-                                            type="number"
-                                            className="text-xs w-8 text-center bg-transparent"
-                                            defaultValue={statblock.passivePerception}
+                                            type="text"
+                                            className="text-xs w-full text-start bg-transparent focus:outline-none w-full"
+                                            defaultValue={statblock.languages}
+                                            placeholder="Orkish, Elvish, ..."
                                             onChange={(e) => {
-                                                statblock.passivePerception = e.target.valueAsNumber;
+                                                statblock.languages = e.target.value;
                                                 update()
                                             }}
                                         />
                                     </div>
-                                </div>
-
-                                {
-                                    Object.keys(statblock.senses).map((v, i) => {
-                                        return (
-                                            <div className="flex rounded-xl overflow-hidden" key={i}>
-                                                <div className="grow flex items-center pl-1">
-                                                    {v.charAt(0).toUpperCase() + v.slice(1)}
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <input
-                                                        type="number"
-                                                        className="text-xs w-8 text-center bg-transparent"
-                                                        defaultValue={statblock.senses[v as keyof typeof statblock.senses]}
-                                                        onChange={(e) => {
-                                                            statblock.senses[v as keyof typeof statblock.senses] = e.target.valueAsNumber;
-                                                            update()
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </UIGroup>
-
-                        {/* Languages */}
-                        <UIGroup title="Languages">
-                        </UIGroup>
-                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
-                            <input
-                                type="text"
-                                className="text-xs w-full text-start bg-transparent focus:outline-none w-full"
-                                defaultValue={statblock.languages}
-                                placeholder="Orkish, Elvish, ..."
-                                onChange={(e) => {
-                                    statblock.languages = e.target.value;
-                                    update()
-                                }}
-                            />
-                        </div>
+                                </>
+                            ) : null
+                        }
 
                         {/* Skills */}
-                        <UIGroup title="Skills">
-                        </UIGroup>
-                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
-                            <input
-                                type="text"
-                                className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
-                                defaultValue={statblock.skills}
-                                placeholder="Athletics +5, ..."
-                                onChange={(e) => {
-                                    statblock.skills = e.target.value;
-                                    update()
-                                }}
-                            />
-                        </div>
+                        {
+                            editMode || statblock.skills.length > 0 ? (
+                                <>
+
+                                    <UIGroup title="Skills" className="text-orange-600">
+                                    </UIGroup>
+                                    <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                                        <input
+                                            type="text"
+                                            className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
+                                            defaultValue={statblock.skills}
+                                            placeholder="Athletics +5, ..."
+                                            onChange={(e) => {
+                                                statblock.skills = e.target.value;
+                                                update()
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            ) : null
+
+                        }
 
                         {/* Description */}
-                        <UIGroup title="Description">
-                        </UIGroup>
-                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
-                            <textarea
-                                className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
-                                defaultValue={statblock.description}
-                                placeholder="Description..."
-                                onChange={(e) => {
-                                    statblock.description = e.target.value;
-                                    update()
-                                }}
-                            />
-                        </div>
+                        {
+                            editMode || statblock.description.length > 0 ? (
+                                <>
+                                    <UIGroup title="Description" className="text-orange-600">
+                                    </UIGroup>
+                                    <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                                        <textarea
+                                            className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
+                                            defaultValue={statblock.description}
+                                            placeholder="Description..."
+                                            onChange={(e) => {
+                                                statblock.description = e.target.value;
+                                                update()
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            ) : null
+                        }
                     </>
                 ) : (
                     <></>

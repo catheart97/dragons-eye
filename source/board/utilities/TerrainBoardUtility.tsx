@@ -1,6 +1,7 @@
 import { Board, BoardPosition, BoardTerrain, IBoardUtility, TerrainColors } from "../Board"
 import { ToolButton } from "../../ui/ToolButton"
 import { CanvasBaseSize } from "../BoardComponent"
+import { UIContainer } from "../../ui/UIContainer"
 
 export class TerrainBoardUtility implements IBoardUtility {
     private board: Board
@@ -76,7 +77,7 @@ export class TerrainBoardUtility implements IBoardUtility {
 
     userInterface() {
         return (
-            <>
+            <UIContainer>
                 {
                     (Object.values(BoardTerrain).filter((v) => typeof v !== 'string') as BoardTerrain[]).map((v, i) => {
                         return (
@@ -93,7 +94,7 @@ export class TerrainBoardUtility implements IBoardUtility {
                         )
                     })
                 }
-            </>
+            </UIContainer>
         )
     }
 

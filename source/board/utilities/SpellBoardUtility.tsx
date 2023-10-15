@@ -2,6 +2,7 @@ import { Database } from "../../database/Database";
 import { NewSpellComponent, SpellComponent } from "../../statblock/SpellComponent";
 import { Tab, TabView } from "../../ui/TabView";
 import { ToolButton } from "../../ui/ToolButton";
+import { UIContainer } from "../../ui/UIContainer";
 import { BoardPosition, BoardCondition, IBoardUtility, SpellShape } from "../Board"
 import { CanvasBaseSize } from "../BoardComponent";
 
@@ -38,7 +39,7 @@ export class SpellBoardUtility implements IBoardUtility {
 
     userInterface() {
         return (
-            <>
+            <UIContainer>
                 <TabView>
                     <Tab title="Shape Cast">
                         <div className='w-full flex p-2'>
@@ -284,7 +285,7 @@ export class SpellBoardUtility implements IBoardUtility {
                         </div>
                     </Tab>
                 </TabView>
-            </>
+            </UIContainer>
         )
     }
 

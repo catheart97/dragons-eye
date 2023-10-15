@@ -31,17 +31,17 @@ const BoardApp = () => {
         <div className={
             "flex"
         }>
-            <PlayerView
-                ref={playerView}
-                board={board}
-                update={update}
-                importanceRect={importanceRect}
-            />
             <DMView
                 board={board}
                 update={update}
                 importanceRect={importanceRect}
                 setImportanceRect={setImportanceRect}
+            />
+            <PlayerView
+                ref={playerView}
+                board={board}
+                update={update}
+                importanceRect={importanceRect}
             />
         </div>
     )

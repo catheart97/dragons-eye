@@ -144,6 +144,7 @@ export type Statblock = PlayerStatblock & {
     spellSlots: [number, number, number, number, number, number, number, number, number, number]
     legendaryActions: StatblockAction[];
     reactions: StatblockAction[];  
+    traits: StatblockAction[];
 
     description: string;
 
@@ -206,6 +207,7 @@ export const constructDefaultStatblock = (): Statblock => {
         spellSlots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         legendaryActions: [],
         reactions: [],
+        traits: [],
         description: "",
         image: "",
         alignment: "",
