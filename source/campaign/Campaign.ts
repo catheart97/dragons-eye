@@ -2,14 +2,17 @@ import React from "react"
 import { Board } from "../board/Board"
 import { PlayerStatblock, Statblock } from "../statblock/Statblock"
 
+export type Encounter = {
+    title: string,
+    description: string,
+    board: Board
+}
+
 export type Adventure = {
     image?: string,
     title: string,
     npcs: Statblock[],
-    boards: {
-        name: string,
-        board: Board
-    }[]
+    encounters: Encounter[]
 }
 
 export type Campaign = {
@@ -18,6 +21,7 @@ export type Campaign = {
     players: PlayerStatblock[],
     npcs: Statblock[],
     adventures: Adventure[]
+    encounters: Encounter[]
 }
 
 export const EmptyCampaign: Campaign = {
@@ -26,9 +30,10 @@ export const EmptyCampaign: Campaign = {
         {
             title: "Adventure",
             npcs: [],
-            boards: []
+            encounters: []
         }
     ],
+    encounters: [],
     players: [],
     npcs: []
 }

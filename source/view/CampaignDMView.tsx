@@ -626,7 +626,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                         props.campaign.current.adventures.push({
                                             title: name,
                                             npcs: [],
-                                            boards: []
+                                            encounters: []
                                         });
                                         props.update();
                                     },
