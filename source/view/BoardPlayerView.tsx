@@ -1,47 +1,41 @@
 import React from "react";
 // import { WindowComponent, WindowComponentHandle } from "../ui/WindowComponent";
-import { Board, BoardCreature, BoardDecorator } from "./board/Board";
-import { BoardComponent, BoardComponentHandle } from "./board/BoardComponent";
-import { Rect } from "./Rect";
+import { Board, BoardCreature, BoardDecorator } from "../board/Board";
+import { BoardComponent, BoardComponentHandle } from "../board/BoardComponent";
+import { Rect } from "../Rect";
+import { IPlayerAppView } from "./IAppView";
 
-export type PlayerViewProps = {
+export type BoardPlayerViewProps = {
     board: React.MutableRefObject<Board>;
-    update: () => void;
     importanceRect: Rect | null;
-}
+} & IPlayerAppView
 
-export type PlayerViewHandle = {
-    open: () => void;
-    close: () => void;
+export type BoardPlayerViewHandle = {
     update: () => void;
     isOpen: () => boolean;
 }
 
-const PlayerViewRenderer: React.ForwardRefRenderFunction<PlayerViewHandle, PlayerViewProps> = (props, ref) => {
+const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHandle, BoardPlayerViewProps> = (props, ref) => {
 
     const boardComponentRef = React.useRef<BoardComponentHandle>(null);
-    const [open, setOpen] = React.useState(false);
-
-    const handle: PlayerViewHandle = {
+    const handle: BoardPlayerViewHandle = {
         update: () => {
             boardComponentRef.current?.update();
         },
-        open() {
-            boardComponentRef.current?.update();
-            setOpen(true);
-        },
-        close() {
-            setOpen(false);
-        },
         isOpen() {
-            return open;
+            return props.open
         }
     }
+
+    React.useEffect(() => {
+        boardComponentRef.current?.update();
+        console.log(props.open)
+    }, [props.open])
 
     React.useImperativeHandle(ref, () => handle);
 
     return (
-        open ? (
+        props.open ? (
             <div className="text-2xl bg-green-500 h-screen relative grow basis-2" style={{
                 minWidth: "50vw",
                 maxWidth: "50vw",
@@ -98,4 +92,4 @@ const PlayerViewRenderer: React.ForwardRefRenderFunction<PlayerViewHandle, Playe
     )
 }
 
-export const PlayerView = React.forwardRef(PlayerViewRenderer);
+export const BoardPlayerView = React.forwardRef(BoardPlayerViewRenderer);

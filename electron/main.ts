@@ -117,10 +117,20 @@ function createWindow() {
         submenu: [
             {
                 label: 'New',
-                accelerator: 'CmdOrCtrl+N',
-                click: () => {
-                    win!.webContents.send('r-new-file', 10, 10);
-                }
+                submenu: [
+                    {
+                        label: 'Board',
+                        click: () => {
+                            win!.webContents.send('r-new-board');
+                        }
+                    },
+                    {
+                        label: 'Campaign',
+                        click: () => {
+                            win!.webContents.send('r-new-campaign');
+                        }
+                    }
+                ]
             },
             {
                 label: 'Open',
@@ -128,6 +138,7 @@ function createWindow() {
                 click: () => {
                     const fn = dialog.showOpenDialogSync({
                         filters: [
+                            { name: "Dragon's Eye Campaign", extensions: ['json', 'dec'] },
                             { name: "Dragon's Eye Board", extensions: ['json', 'deb'] },
                             { name: 'All Files', extensions: ['*'] }
                         ],
@@ -323,6 +334,7 @@ function createWindow() {
     ipcMain.on("m-save-file-as", (_event, _arg) => {
         const fn = dialog.showSaveDialogSync({
             filters: [
+                { name: "Dragon's Eye Campaign", extensions: ['dec', 'json'] },
                 { name: "Dragon's Eye Board", extensions: ['deb', 'json'] },
                 { name: 'All Files', extensions: ['*'] }
             ],

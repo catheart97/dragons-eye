@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import BoardApp from './BoardApp'
 
 import './index.css'
 import "../resources/fonts/fira-code.css";
@@ -11,6 +10,7 @@ import "../resources/fonts/material-symbols.css";
 import { Database, DatabaseSchema, GM5CompendiumJSON } from './database/Database';
 import { TexturePool } from './board/TexturePool';
 import { setupEnvironment } from './database/Environment';
+import { App } from './view/App';
 
 const init = async () => {
   await TexturePool.getInstance().constructTexturePool();
@@ -39,7 +39,7 @@ window.ipcRenderer.on('r-export-database', (_e, fn) => {
 init().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <BoardApp />
+      <App />
     </React.StrictMode>,
   )
 
