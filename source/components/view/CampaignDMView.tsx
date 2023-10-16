@@ -243,9 +243,11 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.campaign.current.adventures[selectedAdventure].notes = data;
                                                         props.update();
                                                     }}
+                                                    setImage={props.setImage}
                                                 />
                                                 <div className="text-xl font-bold">Notes</div>
                                                 <NoteList
+                                                    setImage={props.setImage}
                                                     data={props.campaign.current.notes}
                                                     update={props.update}
                                                     allowAdd
@@ -381,6 +383,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                             </CompendiumDashboardElement>
                                             <DashboardElement title="Notes">
                                                 <NoteList
+                                                    setImage={props.setImage}
                                                     data={props.campaign.current.notes}
                                                     update={props.update}
                                                     allowAdd

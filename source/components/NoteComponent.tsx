@@ -43,11 +43,18 @@ export const NoteComponent = (props: IViewComponent<Note>) => {
                                 }}
                             >
                                 <div className="flex bg-neutral-800/80 text-neutral-50">
-                                    <button
-                                        className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
-                                    >
-                                        <span className="mso">visibility</span>
-                                    </button>
+                                    {
+                                        props.setImage && (
+                                            <button
+                                                className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
+                                                onClick={() => {
+                                                    props.setImage!(image);
+                                                }}
+                                            >
+                                                <span className="mso">visibility</span>
+                                            </button>
+                                        )
+                                    }
                                     <button
                                         className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
                                         onClick={() => {

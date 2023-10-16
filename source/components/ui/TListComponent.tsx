@@ -7,6 +7,7 @@ export interface IAddComponent<T> {
 export interface IViewComponent<T> {
     data: T
     updateData: (data: T) => void
+    setImage?: (image: string) => void
 }
 
 export interface ITListElementProps<T> {
@@ -70,6 +71,7 @@ export const TListElementComponent = <T extends {
                     <props.viewComponent
                         data={props.data}
                         updateData={props.onUpdateRequest}
+                        setImage={props.setImage}
                     ></props.viewComponent>
                 ) : null
             }
