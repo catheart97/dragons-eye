@@ -7,10 +7,10 @@ import "../resources/fonts/fira-sans.css";
 import "../resources/fonts/fira-sans-condensed.css";
 import "../resources/fonts/fira-sans-extra-condensed.css";
 import "../resources/fonts/material-symbols.css";
-import { Database, DatabaseSchema, GM5CompendiumJSON } from './database/Database';
-import { TexturePool } from './board/TexturePool';
-import { setupEnvironment } from './database/Environment';
-import { App } from './view/App';
+import { Database, DatabaseSchema, GM5CompendiumJSON } from './data/Database';
+import { TexturePool } from './data/TexturePool';
+import { setupEnvironment } from './data/Environment';
+import { App } from './App';
 
 const init = async () => {
   await TexturePool.getInstance().constructTexturePool();

@@ -1,6 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import fsExtra from 'fs-extra'
-import { TexturePool } from '../source/board/TexturePool'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('fsExtra', fsExtra)
@@ -18,7 +17,7 @@ function withPrototype(obj: Record<string, any>) {
       obj[key] = function (...args: any) {
         return value.call(obj, ...args)
       }
-    } else {
+    } else { 
       obj[key] = value
     }
   }
@@ -117,6 +116,4 @@ window.onmessage = ev => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
-TexturePool.getInstance().constructTexturePool().then(() => {
-  removeLoading();
-})
+removeLoading();
