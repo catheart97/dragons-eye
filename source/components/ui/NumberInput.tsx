@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const NumberInput = (props: {
-  ref?: React.RefObject<HTMLInputElement>
+  elemRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   min?: number
@@ -17,7 +17,7 @@ export const NumberInput = (props: {
       max={props.max}
       defaultValue={props.defaultValue}
       type="number"
-      ref={props.ref}
+      ref={props.elemRef}
       disabled={props.disabled}
       onChange={props.onChange}
       className={[

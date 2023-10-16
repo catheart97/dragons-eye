@@ -14,6 +14,7 @@ export interface ITListElementProps<T> {
     onSelect?: (item: T) => void
     onDeleteRequest?: () => void
     onUpdateRequest: (data: T) => void
+    setImage?: (image: string) => void
     data: T
 }
 
@@ -83,6 +84,7 @@ export interface ITListComponentProps<T> {
     onSelect?: (item: T) => void
     searchBar?: boolean
     data: Array<T>
+    setImage?: (image: string) => void
     update: () => void
 }
 
@@ -132,7 +134,7 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
                 {
                     expanded && props.newComponent && (
                         <div
-                            className="h-fit transition-all duration-200 ease-in-out p-2 rounded-xl shadow"
+                            className="h-fit transition-all duration-200 ease-in-out overflow-hidden rounded-xl shadow"
                         >
                             <props.newComponent
                                 onSubmit={(data: T) => {
@@ -164,6 +166,7 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
                                 props.update();
                             }}
                             onSelect={props.onSelect}
+                            setImage={props.setImage}
                         ></TListElementComponent>
                     )
                 })

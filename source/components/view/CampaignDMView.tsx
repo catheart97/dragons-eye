@@ -5,6 +5,7 @@ import { IDMAppView } from "./IAppView";
 
 import AdventureIcon from "../../../resources/placeholders/adventure.png";
 import CampaignIcon from "../../../resources/placeholders/campaign.png";
+import CharacterIcon from "../../../resources/placeholders/character.png";
 
 import React, { useEffect } from "react";
 import { Board } from "../../data/Board";
@@ -17,10 +18,12 @@ import { Dashboard, DashboardElement, IDashboardElement } from "../ui/Dashboard"
 import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
+import { NoteList } from "../NoteComponent";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
     update: () => void
+    setImage?: (image: string) => void
 }) => {
     return (
         <DashboardElement title="Compendium">
@@ -52,6 +55,11 @@ export const CompendiumDashboardElement = (props: IDashboardElement & {
                         }}
                         data={Database.getInstance().getMonsters()}
                         update={props.update}
+                        onSelect={(statblock) => {
+                            if (props.setImage) {
+                                props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                            }
+                        }}
                     />
                 </Tab>
                 <Tab title="Items">
@@ -66,7 +74,6 @@ export const CompendiumDashboardElement = (props: IDashboardElement & {
                         update={props.update}
                     />
                 </Tab>
-                {props.children as React.ReactElement}
             </TabView>
         </DashboardElement>
     )
@@ -136,7 +143,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                         props.campaign.current.adventures.push({
                                             title: name,
                                             npcs: [],
-                                            encounters: []
+                                            encounters: [],
+                                            notes: []
                                         });
                                         props.update();
                                     },
@@ -222,10 +230,33 @@ export const CampaignDMView = (props: IDMAppView & {
                                             <CompendiumDashboardElement
                                                 update={props.update}
                                             >
-                                                <Tab title="Notes">
-                                                    Adventure Notes
-                                                </Tab>
                                             </CompendiumDashboardElement>
+                                            <DashboardElement>
+                                                <div className="text-xl font-bold">Adventure Notes</div>
+                                                <NoteList
+                                                    data={props.campaign.current.adventures[selectedAdventure].notes}
+                                                    update={props.update}
+                                                    allowAdd
+                                                    allowDelete
+                                                    searchBar
+                                                    onUpdateData={(data) => {
+                                                        props.campaign.current.adventures[selectedAdventure].notes = data;
+                                                        props.update();
+                                                    }}
+                                                />
+                                                <div className="text-xl font-bold">Notes</div>
+                                                <NoteList
+                                                    data={props.campaign.current.notes}
+                                                    update={props.update}
+                                                    allowAdd
+                                                    allowDelete
+                                                    searchBar
+                                                    onUpdateData={(data) => {
+                                                        props.campaign.current.notes = data;
+                                                        props.update();
+                                                    }}
+                                                />
+                                            </DashboardElement>
                                             <DashboardElement>
                                                 <div className="text-xl font-bold">Players</div>
                                                 <PlayerStatblockList
@@ -264,10 +295,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                                     }}
                                                 />
                                             </DashboardElement>
-                                            <DashboardElement
-                                                title="Encounters"
-                                            >
-                                                <div>You can put <i>random</i> Encounters here!</div>
+                                            <DashboardElement>
+                                                <div className="text-xl font-bold">Adventure Encounters</div>
                                                 <EncounterList
                                                     data={props.campaign.current.adventures[selectedAdventure].encounters}
                                                     update={props.update}
@@ -276,6 +305,22 @@ export const CampaignDMView = (props: IDMAppView & {
                                                     searchBar
                                                     onUpdateData={(data) => {
                                                         props.campaign.current.adventures[selectedAdventure].encounters = data;
+                                                        props.update();
+                                                    }}
+                                                    onSelect={(encounter) => {
+                                                        const board = encounter.board;
+                                                        props.loadCampaignBoard(board);
+                                                    }}
+                                                />
+                                                <div className="text-xl font-bold">Adventure Encounters</div>
+                                                <EncounterList
+                                                    data={props.campaign.current.encounters}
+                                                    update={props.update}
+                                                    allowAdd
+                                                    allowDelete
+                                                    searchBar
+                                                    onUpdateData={(data) => {
+                                                        props.campaign.current.encounters = data;
                                                         props.update();
                                                     }}
                                                     onSelect={(encounter) => {
@@ -331,11 +376,22 @@ export const CampaignDMView = (props: IDMAppView & {
                                         <Dashboard>
                                             <CompendiumDashboardElement
                                                 update={props.update}
+                                                setImage={props.setImage}
                                             >
-                                                <Tab title="Notes">
-                                                    Campaign Notes
-                                                </Tab>
                                             </CompendiumDashboardElement>
+                                            <DashboardElement title="Notes">
+                                                <NoteList
+                                                    data={props.campaign.current.notes}
+                                                    update={props.update}
+                                                    allowAdd
+                                                    allowDelete
+                                                    searchBar
+                                                    onUpdateData={(data) => {
+                                                        props.campaign.current.notes = data;
+                                                        props.update();
+                                                    }}
+                                                />
+                                            </DashboardElement>
                                             <DashboardElement>
                                                 <div className="text-xl font-bold">Players</div>
                                                 <PlayerStatblockList

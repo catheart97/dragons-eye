@@ -1,4 +1,5 @@
 import { Encounter } from "./Encounter"
+import { Note } from "./Note"
 import { Statblock } from "./Statblock"
 
 export type Adventure = {
@@ -6,4 +7,5 @@ export type Adventure = {
     title: string,
     npcs: Statblock[],
     encounters: Encounter[]
+    notes: Note[]
 }

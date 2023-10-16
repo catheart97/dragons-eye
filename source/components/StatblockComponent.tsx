@@ -187,6 +187,8 @@ const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
     )
 }
 
+import CharacterIcon from "../../resources/placeholders/character.png"
+
 export const RawStatblockComponent = (props: {
     createMode?: boolean,
     uniqueKey: number,
@@ -218,42 +220,90 @@ export const RawStatblockComponent = (props: {
     const [editMode, setEditMode] = React.useState(props.createMode ?? false);
 
     return (
-        <div className={"flex flex-col p-2 rounded-xl gap-2 pointer-events-auto " + (props.createMode ? "bg-white" : "")}>
-            <div className="text-3xl h-16 flex flex-col justify-center items-start" >
-                <input
-                    type="text"
-                    defaultValue={props.statblock.name}
-                    onChange={(e) => {
-                        statblock.name = e.target.value;
-                        update()
-                    }}
-                    className="bg-transparent focus:outline-none"
-                />
-                <div className="text-xs flex">
-                    <div>
-                        ID: {props.uniqueKey}
+        <div className={"flex flex-col rounded-xl bg-neutral-100 gap-2 pointer-events-auto pb-3 " + (props.createMode ? "bg-white" : "")}>
+            <div className="text-3xl h-56 w-full" style={{
+                backgroundImage: props.statblock.image != "" ? `url(${props.statblock.image})` : `url(${CharacterIcon})`,
+                backgroundPosition: "top",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat"
+            }} >
+                <div className="flex items-end h-full w-full p-3 bg-gradient-to-b from-neutral-100/0 to-neutral-100">
+                    <div className="flex flex-col items-start grow">
+                        <input
+                            type="text"
+                            defaultValue={props.statblock.name}
+                            onChange={(e) => {
+                                statblock.name = e.target.value;
+                                update()
+                            }}
+                            className="bg-transparent focus:outline-none w-full"
+                        />
+                        <div className="text-xs flex">
+                            {
+                                props.uniqueKey > 0 && (
+                                    <div className="pr-2">
+                                        ID: {props.uniqueKey}
+                                    </div>
+                                )
+                            }
+                            {
+                                props.createMode ? (
+                                    null
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setEditMode(!editMode);
+                                            update();
+                                        }}
+                                        className="flex items-center"
+                                    >
+                                        {
+                                            editMode ? (
+                                                <span className="msf">edit</span>
+                                            ) : (
+                                                <span className="mso">edit</span>
+                                            )
+                                        }
+                                    </button>
+                                )
+                            }
+                        </div>
                     </div>
                     {
-                        props.createMode ? (
-                            null
-                        ) : (
+                        statblock.image != "" ? (
                             <button
+                                className="flex items-center justify-center hover:bg-neutral-200 p-2 text-base rounded-xl"
                                 onClick={() => {
-                                    setEditMode(!editMode);
+                                    statblock.image = "";
                                     update();
                                 }}
-                                className="flex items-center pl-2"
                             >
-                                {
-                                    editMode ? (
-                                        <span className="msf">edit</span>
-                                    ) : (
-                                        <span className="mso">edit</span>
-                                    )
-                                }
+                                <span className="mso">close</span>
                             </button>
-                        )
+                        ) : null
                     }
+                    <button
+                        className="flex items-center justify-center hover:bg-neutral-200 p-2 text-base rounded-xl"
+                        onClick={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.onchange = (e) => {
+                                if (input.files && input.files.length > 0) {
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        if (e.target?.result) {
+                                            statblock.image = e.target.result as string;
+                                            update();
+                                        }
+                                    }
+                                    reader.readAsDataURL(input.files[0]);
+                                }
+                            }
+                            input.click();
+                        }}
+                    >
+                        <span className="mso">image</span>
+                    </button>
                 </div>
             </div>
 
@@ -335,7 +385,7 @@ export const RawStatblockComponent = (props: {
             {
                 !props.player ? (
                     <>
-                        <div className="w-full rounded-full overflow-hidden shadow">
+                        <div className="rounded-full overflow-hidden shadow mx-3">
                             <Tooltip
                                 className="h-fit w-full"
                             >
@@ -483,7 +533,7 @@ export const RawStatblockComponent = (props: {
                         </div>
 
 
-                        <div className="w-full rounded-xl overflow-hidden flex shadow">
+                        <div className="rounded-xl overflow-hidden flex shadow mx-3">
                             {
                                 Object.keys(statblock.stats).map((v, i) => {
                                     return (
@@ -515,36 +565,37 @@ export const RawStatblockComponent = (props: {
                             }
                         </div>
 
-                        <UIGroup title="Saving Throws">
-                            <div className="w-full rounded-xl overflow-hidden flex shadow">
-                                {
-                                    Object.keys(statblock.savingThrows).map((v, i) => {
-                                        return (
-                                            <div
-                                                className="flex flex-col grow items-stretch text-center"
-                                                key={i}
-                                            >
-                                                <div className="w-full bg-neutral-100 p-1">
-                                                    <input
-                                                        type="number"
-                                                        className="text-xs w-6 text-center bg-transparent"
-                                                        defaultValue={
-                                                            (statblock.savingThrows![v as keyof typeof Stat]).toFixed(0)}
-                                                        onChange={(e) => {
-                                                            statblock.savingThrows![v as keyof typeof Stat] = e.target.valueAsNumber;
-                                                            update()
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="w-full bg-neutral-50 p-1 text-xs">
-                                                    {v.substring(0, 3).toUpperCase()}
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
+                        <UIGroup title="Saving Throws" className="text-orange-600">
                         </UIGroup>
+                        <div className="rounded-xl overflow-hidden flex shadow mx-3">
+                            {
+                                Object.keys(statblock.savingThrows).map((v, i) => {
+                                    return (
+                                        <div
+                                            className="flex flex-col grow items-stretch text-center"
+                                            key={i}
+                                        >
+                                            <div className="w-full bg-neutral-100 p-1">
+                                                <input
+                                                    type="number"
+                                                    className="text-xs w-6 text-center bg-transparent"
+                                                    defaultValue={
+                                                        (statblock.savingThrows![v as keyof typeof Stat]).toFixed(0)}
+                                                    onChange={(e) => {
+                                                        statblock.savingThrows![v as keyof typeof Stat] = e.target.valueAsNumber;
+                                                        update()
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-full bg-neutral-50 p-1 text-xs">
+                                                {v.substring(0, 3).toUpperCase()}
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+
 
                         {
                             editMode || statblock.damageVulnerabilities.length > 0 ? (
@@ -897,7 +948,7 @@ export const NewStatblockComponent = (props: IAddComponent<Statblock>) => {
     const tempStatblock = React.useRef<Statblock>(constructDefaultStatblock());
     return (
         <div
-            className="h-fit transition-all duration-200 ease-in-out p-2 rounded-xl shadow"
+            className="h-fit transition-all duration-200 ease-in-out rounded-xl shadow"
         >
             <RawStatblockComponent
                 uniqueKey={-1}
@@ -908,7 +959,7 @@ export const NewStatblockComponent = (props: IAddComponent<Statblock>) => {
                 createMode={true}
                 player={false}
             />
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end p-2">
                 <button
                     className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                     onClick={() => {
@@ -934,7 +985,7 @@ export const NewDBStatblockComponent = (props: IAddComponent<Statblock>) => {
         >
             <Tab title="New Creature">
                 <div
-                    className="h-fit transition-all duration-200 ease-in-out p-2 rounded-xl shadow"
+                    className="h-fit transition-all duration-200 ease-in-out rounded-xl shadow"
                 >
                     <RawStatblockComponent
                         uniqueKey={-1}
@@ -943,7 +994,7 @@ export const NewDBStatblockComponent = (props: IAddComponent<Statblock>) => {
                             tempStatblock.current = s as Statblock;
                         }}
                     />
-                    <div className="w-full flex justify-end">
+                    <div className="w-full flex justify-end p-2">
                         <button
                             className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                             onClick={() => {
@@ -994,7 +1045,7 @@ export const NewPlayerStatblockComponent = (props: IAddComponent<PlayerStatblock
     const tempStatblock = React.useRef<Statblock>(constructDefaultStatblock());
     return (
         <div
-            className="h-fit transition-all duration-200 ease-in-out p-2 rounded-xl shadow"
+            className="h-fit transition-all duration-200 ease-in-out rounded-xl shadow"
         >
             <RawStatblockComponent
                 uniqueKey={-1}
@@ -1005,7 +1056,7 @@ export const NewPlayerStatblockComponent = (props: IAddComponent<PlayerStatblock
                 createMode={true}
                 player={true}
             />
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end p-2">
                 <button
                     className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                     onClick={() => {

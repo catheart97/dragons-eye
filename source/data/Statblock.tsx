@@ -12,6 +12,7 @@ export enum Stat {
 export type PlayerStatblock = {
     name: string;
     size: CreatureSize
+    image: string;
 }
 
 export enum DamageType {
@@ -138,8 +139,6 @@ export type Statblock = PlayerStatblock & {
 
     description: string;
 
-    image: string;
-
     alignment: string;
     type: CreatureType;
 
@@ -199,8 +198,8 @@ export const constructDefaultStatblock = (): Statblock => {
         reactions: [],
         traits: [],
         description: "",
-        image: "",
         alignment: "",
+        image: "",
         type: CreatureType.Humanoid
     }
 }
