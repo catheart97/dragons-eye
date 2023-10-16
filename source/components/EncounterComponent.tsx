@@ -3,7 +3,7 @@ import { Encounter } from "../data/Encounter";
 import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
 import { constructDefaultBoard } from "../data/Board";
 
-import EncounterIcon from "../../resources/placeholders/encounter.png"
+import EncounterIcon from "../../resources/placeholders/encounter.png?base64"
 import { UIGroup } from "./ui/UIGroup";
 import { NumberInput } from "./ui/NumberInput";
 

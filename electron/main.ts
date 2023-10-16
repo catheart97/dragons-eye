@@ -1,8 +1,6 @@
-import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } from 'electron'
-import path from 'node:path'
+import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } from 'electron';
+import path from 'node:path';
 import NPMLicenses from '../license.json?raw';
-import fsExtra from 'fs-extra';
-import { Database, GM5CompendiumJSON } from '../source/data/Database';
 
 type License = {
     name: string;
@@ -99,9 +97,6 @@ function createWindow() {
         submenu: [
             {
                 label: 'About',
-                // click: () => {
-                //     app.showAboutPanel();
-                // },
                 role: 'about'
             },
             {

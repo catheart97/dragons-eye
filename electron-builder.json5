@@ -24,6 +24,14 @@
         "name": "Dragon's Eye Board",
         "role": "Editor",
         "icon": "file.icns"
+      },
+      {
+        "ext": [
+          "dec", "json"
+        ],
+        "name": "Dragon's Eye Campaign",
+        "role": "Editor",
+        "icon": "file.icns"
       }
     ]
   },

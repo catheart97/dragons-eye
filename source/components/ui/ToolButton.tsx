@@ -12,7 +12,7 @@ export const ToolButton = (props: {
         disabled={props.disabled}
         className={[
           "rounded-xl p-1 m-1 h-8 flex items-center justify-center pl-3 pr-3 pointer-events-auto enabled:hover:scale-110 enabled:active:scale-100 transition-all linear duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
-          props.active ? "border-neutral-600  bg-neutral-400 border-2" : "bg-transparent border-0",
+          props.active ? "bg-orange-600 text-white" : "bg-transparent",
           props.className,
           (props.children as React.ReactElement<HTMLSpanElement>).type == "span" ? "w-8" : "w-fit"
         ].join(' ')}

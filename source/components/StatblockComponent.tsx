@@ -287,7 +287,7 @@ export const RawStatblockComponent = (props: {
                         onClick={() => {
                             const input = document.createElement("input");
                             input.type = "file";
-                            input.onchange = (e) => {
+                            input.onchange = (_e) => {
                                 if (input.files && input.files.length > 0) {
                                     const reader = new FileReader();
                                     reader.onload = (e) => {

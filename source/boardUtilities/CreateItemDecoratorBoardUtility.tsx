@@ -1,11 +1,11 @@
-import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, BoardItemType, ItemTypeIcons, ItemData } from "../data/Board"
-import { ToolButton } from "../components/ui/ToolButton";
-import { TextInput } from "../components/ui/TextInput";
-import { UIGroup } from "../components/ui/UIGroup";
-import { UIContainer } from "../components/ui/UIContainer";
+import { ItemList, NewItemComponent } from "../components/ItemComponent";
 import { Tab, TabView } from "../components/ui/TabView";
+import { TextInput } from "../components/ui/TextInput";
+import { ToolButton } from "../components/ui/ToolButton";
+import { UIContainer } from "../components/ui/UIContainer";
+import { UIGroup } from "../components/ui/UIGroup";
+import { Board, BoardDecoratorType, BoardItemType, BoardPosition, IBoardUtility, ItemData, ItemTypeIcons } from "../data/Board";
 import { Database } from "../data/Database";
-import { ItemComponent, NewItemComponent } from "../components/ItemComponent";
 
 export class CreateItemDecoratorBoardUtility implements IBoardUtility {
     board: Board;
@@ -198,78 +198,50 @@ export class CreateItemDecoratorBoardUtility implements IBoardUtility {
                             >
                                 <Tab title="New Item">
                                     <NewItemComponent
-                                        onSubmit={(item, toDB) => {
-                                            if (toDB) {
-                                                const items = Database.getInstance().getItems();
-                                                items.push(item);
-                                                Database.getInstance().updateItems(items);
-                                            }
+                                        onSubmit={(item) => {
+                                            const items = Database.getInstance().getItems();
+                                            items.push(item);
+                                            Database.getInstance().updateItems(items);
+
                                             this.itemBuffer.push(item);
                                             this.forceUpdate?.call(this);
                                         }}
                                     />
                                 </Tab>
                                 <Tab title="Item DB">
-                                    <div className="h-full p-2 flex flex-col gap-1">
-                                        <div className="flex rounded-xl shadow items-center">
-                                            <span className="mso p-2">search</span>
-                                            <input
-                                                className="grow h-full"
-                                                type="text"
-                                                onChange={(e) => {
-                                                    this.filter = e.target.value;
-                                                    this.forceUpdate?.call(this);
-                                                }}
-                                            />
-                                        </div>
-                                        {
-                                            Database.getInstance().getItems().map((item, idx) => {
-
-                                                if (!item.name.toLowerCase().includes(this.filter.toLowerCase()))       
-                                                    return null;
-
-                                                return (
-                                                    <ItemComponent
-                                                        key={idx}
-                                                        item={item}
-                                                        onDeleteRequest={() => {
-                                                            const items = Database.getInstance().getItems();
-                                                            items.splice(idx, 1);
-                                                            Database.getInstance().updateItems(items);
-                                                            this.forceUpdate?.call(this);
-                                                        }}
-                                                        onSelectionRequest={() => {
-                                                            this.itemBuffer.push(item);
-                                                            this.forceUpdate?.call(this);
-                                                        }}
-                                                    />
-                                                )
-                                            })
-                                        }
-                                    </div>
+                                    <ItemList
+                                        data={Database.getInstance().getItems()}
+                                        update={() => {
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        onSelect={(item) => {
+                                            this.itemBuffer.push(item);
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                        searchBar
+                                        allowDelete
+                                        onUpdateData={(data) => {
+                                            Database.getInstance().updateItems(data);
+                                            this.forceUpdate?.call(this);
+                                        }}
+                                    />
                                 </Tab>
                             </TabView>
 
                             <div className="flex flex-col grow h-0 rounded-xl bg-white p-2 mt-4">
                                 <UIGroup title="Chest" className="text-orange-600" />
-                                <div className="grow h-0">
-                                    <div className="flex flex-col gap-1 overflow-y-scroll">
-                                        {
-                                            this.itemBuffer.map((item) => {
-                                                return (
-                                                    <ItemComponent
-                                                        item={item}
-                                                        onDeleteRequest={() => {
-                                                            const idx = this.itemBuffer.indexOf(item);
-                                                            this.itemBuffer.splice(idx, 1);
-                                                            this.forceUpdate?.call(this);
-                                                        }}
-                                                    />
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </div>
+                                <ItemList
+                                    data={this.itemBuffer}
+                                    update={() => {
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    searchBar
+                                    allowDelete
+                                    onUpdateData={(data) => {
+                                        this.itemBuffer = data;
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                />
                             </div>
                         </>
 

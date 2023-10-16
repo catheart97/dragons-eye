@@ -3,9 +3,9 @@ import { Dialog } from "../ui/Dialog";
 import { IDMAppView } from "./IAppView";
 
 
-import AdventureIcon from "../../../resources/placeholders/adventure.png";
-import CampaignIcon from "../../../resources/placeholders/campaign.png";
-import CharacterIcon from "../../../resources/placeholders/character.png";
+import AdventureIcon from "../../../resources/placeholders/adventure.png?base64";
+import CampaignIcon from "../../../resources/placeholders/campaign.png?base64";
+import CharacterIcon from "../../../resources/placeholders/character.png?base64";
 
 import React, { useEffect } from "react";
 import { Board } from "../../data/Board";
@@ -165,7 +165,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                             className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
                                             key={adventure.title}
                                             style={{
-                                                backgroundImage: `url(${adventure.image ?? AdventureIcon})`,
+                                                backgroundImage: "url('" + (adventure.image ?? AdventureIcon) + "')",
                                                 backgroundSize: "cover",
                                                 backgroundPosition: "top"
                                             }}

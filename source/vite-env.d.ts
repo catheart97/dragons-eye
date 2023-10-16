@@ -9,6 +9,21 @@ declare global {
     fsExtra: typeof fsExtra;
     userData: () => Promise<string>
   }
+
+  declare module "*.png?base64" {
+    const value: string;
+    export default value;
+  }
+  
+  declare module "*.jpg?base64" {
+    const value: string;
+    export default value;
+  }
+  
+  declare module "*.jpeg?base64" {
+    const value: string;
+    export default value;
+  }
 }
 
 type License = {
@@ -27,5 +42,20 @@ type License = {
 
 declare module "**/licenses.json" {
   const value: License[];
+  export default value;
+}
+
+declare module "*.png?base64" {
+  const value: string;
+  export default value;
+}
+
+declare module "*.jpg?base64" {
+  const value: string;
+  export default value;
+}
+
+declare module "*.jpeg?base64" {
+  const value: string;
   export default value;
 }

@@ -1,6 +1,6 @@
 import { IPlayerAppView } from "./IAppView";
 
-import Icon from "../../../resources/icon.png"
+import Icon from "../../../resources/icon.png?base64"
 
 export const CampaignPlayerView = (props: IPlayerAppView & {
     image: string

@@ -167,7 +167,7 @@ export const App = () => {
                                 dialogHandle={dialogHandle}
                             />
                             <button 
-                                className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:scale-110 active:scale-100 transition-all duration-200 ease-in-out"
+                                className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:bg-orange-600 hover:text-white  transition-all duration-200 ease-in-out text-xl"
                                 onClick={() => {
                                     loadCampaignBoard(null);
                                 }}

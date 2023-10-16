@@ -2,14 +2,14 @@
   "name": "dragons-eye",
   "private": true,
   "author": "Ronja Schnur (catheart97)",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "dev": "vite",
     "predev": "license-report > license.json",
     "prebuild": "license-report > license.json",
     "preprod": "license-report > license.json",
-    "prod": "npm version patch && tsc && vite build && electron-builder",
-    "build": "tsc && vite build && electron-builder -mw --x64 --arm64",
+    "prod": "npm version patch && tsc && vite build && electron-builder -mw --x64 --arm64",
+    "build": "tsc && vite build && electron-builder -m --arm64",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

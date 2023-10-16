@@ -1,10 +1,10 @@
-import { Database } from "../data/Database";
-import { NewSpellComponent, SpellComponent } from "../components/SpellComponent";
+import { CanvasBaseSize } from "../components/BoardComponent";
+import { SpellList } from "../components/SpellComponent";
 import { Tab, TabView } from "../components/ui/TabView";
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIContainer } from "../components/ui/UIContainer";
-import { BoardPosition, BoardCondition, IBoardUtility, SpellShape } from "../data/Board"
-import { CanvasBaseSize } from "../components/BoardComponent";
+import { BoardCondition, BoardPosition, IBoardUtility, SpellShape } from "../data/Board";
+import { Database } from "../data/Database";
 
 export class SpellBoardUtility implements IBoardUtility {
     p0: BoardPosition | null = null
@@ -241,48 +241,12 @@ export class SpellBoardUtility implements IBoardUtility {
                         </div>
                     </Tab>
                     <Tab title="Spell DB">
-                        {/** Add spell */}
-                        <NewSpellComponent
-                            onSubmit={(spell) => {
-                                const spells = Database.getInstance().getSpells();
-                                spells.push(spell);
-                                Database.getInstance().updateSpells(spells);
+                        <SpellList
+                            data={Database.getInstance().getSpells()}
+                            update={() => {
                                 this.forceUpdate?.call(this);
                             }}
                         />
-
-                        {/** Search bar */}
-                        <div className="flex rounded-xl shadow items-center m-2">
-                            <span className="mso p-2">search</span>
-                            <input
-                                className="grow h-full"
-                                type="text"
-                                onChange={(e) => {
-                                    this.filter = e.target.value;
-                                    this.forceUpdate?.call(this);
-                                }}
-                            />
-                        </div>
-                        {/** Spell list */}
-                        <div className="flex flex-col gap-2 p-2">
-                            {
-                                Database.getInstance().getSpells().map((spell, i) => {
-                                    if (!spell.name.toLowerCase().includes(this.filter.toLowerCase()))
-                                        return null;
-
-                                    return <SpellComponent
-                                        key={spell.name}
-                                        spell={spell}
-                                        onDeleteRequest={() => {
-                                            const spells = Database.getInstance().getSpells();
-                                            spells.splice(i, 1);
-                                            Database.getInstance().updateSpells(spells);
-                                            this.forceUpdate?.call(this);
-                                        }}
-                                    />
-                                })
-                            }
-                        </div>
                     </Tab>
                 </TabView>
             </UIContainer>

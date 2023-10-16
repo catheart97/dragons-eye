@@ -1,7 +1,7 @@
 import React from "react";
-import { UIGroup } from "./ui/UIGroup";
 import { Spell } from "../data/Spell";
-import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent, TListElementComponent } from "./ui/TListComponent";
+import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
+import { UIGroup } from "./ui/UIGroup";
 
 export const NewSpellComponent = (props: IAddComponent<Spell>) => {
     const nameInput = React.useRef<HTMLInputElement>(null);

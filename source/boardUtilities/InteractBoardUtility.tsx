@@ -49,7 +49,11 @@ export class InteractBoardUtility implements IBoardUtility {
                                 }}
                                 className="absolute w-16 h-16 flex justify-center items-center bg-red-500 rounded-full text-white text-2xl pointer-events-auto hover:scale-110 transition-all duration-300 ease-in-out top-2 right-2"
                             ><span className="mso">close</span></button>
-                        {attachment.map((item, i) => <ItemComponent item={item} key={i} />)}
+                        {attachment.map((item, i) => <ItemComponent data={item} key={i} updateData={
+                            (item) => {
+                                attachment[i] = item;
+                            }
+                        } />)}
                     </div>
                 )
 

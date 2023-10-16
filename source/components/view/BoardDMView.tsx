@@ -1,23 +1,23 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import { ToolButton } from '../ui/ToolButton';
-import { Board, BoardTerrain, IBoardUtility, constructDefaultBoard } from '../../data/Board';
-import { TerrainBoardUtility } from '../../boardUtilities/TerrainBoardUtility';
-import { SpellBoardUtility } from '../../boardUtilities/SpellBoardUtility';
-import { BoardComponent, BoardComponentHandle } from '../BoardComponent';
 import { ConditionBoardUtility } from '../../boardUtilities/ConditionBoardUtility';
 import { CreateCreatureDecoratorBoardUtility } from '../../boardUtilities/CreateCreatureDecoratorBoardUtility';
-import { TrashDecoratorBoardUtility } from '../../boardUtilities/TrashDecoratorBoardUtility';
 import { MoveDecoratorBoardUtility } from '../../boardUtilities/MoveDecoratorBoardUtility';
+import { SpellBoardUtility } from '../../boardUtilities/SpellBoardUtility';
+import { TerrainBoardUtility } from '../../boardUtilities/TerrainBoardUtility';
+import { TrashDecoratorBoardUtility } from '../../boardUtilities/TrashDecoratorBoardUtility';
+import { Board, BoardTerrain, IBoardUtility } from '../../data/Board';
+import { BoardComponent, BoardComponentHandle } from '../BoardComponent';
+import { ToolButton } from '../ui/ToolButton';
 
+import { Rect } from '../../Rect';
+import { CreateItemDecoratorBoardUtility } from '../../boardUtilities/CreateItemDecoratorBoardUtility';
+import { HiddenBoardUtility } from '../../boardUtilities/HiddenBoardUtility';
+import { ImportanceRectUtility } from '../../boardUtilities/ImportanceRectBoardUtility';
+import { InitiaitveBoardUtility } from '../../boardUtilities/InitiativeBoardUtility';
 import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility';
 import { Dialog } from '../ui/Dialog';
-import { HiddenBoardUtility } from '../../boardUtilities/HiddenBoardUtility';
-import { Rect } from '../../Rect';
-import { ImportanceRectUtility } from '../../boardUtilities/ImportanceRectBoardUtility';
 import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
-import { InitiaitveBoardUtility } from '../../boardUtilities/InitiativeBoardUtility';
-import { CreateItemDecoratorBoardUtility } from '../../boardUtilities/CreateItemDecoratorBoardUtility';
 import { IDMAppView } from './IAppView';
 
 export type BoardDMViewProps = {
@@ -46,8 +46,6 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
     }
 
     React.useImperativeHandle(ref, () => handle);
-
-    const registerListener = React.useRef<boolean>(false);
 
     React.useEffect(() => {
         renderUI()
@@ -87,7 +85,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                     importanceRect={props.importanceRect}
                     setImportanceRect={props.setImportanceRect}
                 />
-                <div className='absolute left-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-start gap-1 z-[60] justify-end top-0'>
+                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
                     {
                         utilities.current[currentUtility] != undefined ? (
                             utilities.current[currentUtility]!.userInterface()
