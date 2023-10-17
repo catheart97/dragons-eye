@@ -49,7 +49,7 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
     return (
         <>
             <div className={"pointer-events-none fixed top-0 bottom-0 right-0 left-0 bg-black/20 transition-opacity duration-200 ease-in-out " + (children ? "opacity-100" : "opacity-0")}>&nbsp;</div>
-            <dialog className={"w-96 h-96 bg-neutral-50 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 " + (children ? "" : "hidden")} ref={dialogRef}>
+            <dialog className={"w-10/12 h-full bg-neutral-50 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 " + (children ? "" : "hidden")} ref={dialogRef}>
                 <div className="flex items-center select-none w-full justify-between">
                     <div className="text-3xl">{title}</div>
                     <button className="focus:outline-none transition-all hover:scale-110 active:scale-100 duration-200 ease-in" onClick={() => {

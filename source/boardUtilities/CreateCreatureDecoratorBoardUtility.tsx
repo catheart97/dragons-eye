@@ -22,7 +22,7 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
 
     itemType: BoardItemType = BoardItemType.Door;
 
-    save2DB = true;
+    save2DB = false;
     doorData: "locked" | "unlocked" = "locked";
     trapData: {
         armed: boolean,
@@ -113,7 +113,8 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
         if (campaign != null) {
             campaign.current.adventures.forEach((a) => {
                 a.encounters.forEach((e) => {
-                    if (e.board == this.board) {
+                    console.log(e.name);
+                    if (e.board === this.board) {
                         adventure = a;
                     }
                 })

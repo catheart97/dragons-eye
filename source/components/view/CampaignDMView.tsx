@@ -172,8 +172,8 @@ export const CampaignDMView = (props: IDMAppView & {
                             {
                                 props.campaign.current.adventures.map((adventure, i) => {
                                     return (
-                                        <button
-                                            className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden flex items-end " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
+                                        <div
+                                            className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden flex items-end cursor-pointer " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
                                             key={adventure.title + i}
                                             style={{
                                                 backgroundImage: "url('" + (adventure.image ?? AdventureIcon) + "')",
@@ -220,7 +220,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                     )
                                                 }
                                             </div>
-                                        </button>
+                                        </div>
                                     )
                                 })
                             }
@@ -319,6 +319,9 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.update();
                                                     }}
                                                     update={props.update}
+                                                    onSelect={(statblock) => {
+                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                                    }}
                                                 />
                                                 <div className="text-xl font-bold">NPCs</div>
                                                 <DBStatblockList
@@ -330,6 +333,9 @@ export const CampaignDMView = (props: IDMAppView & {
                                                     onUpdateData={(data) => {
                                                         props.campaign.current.npcs = data;
                                                         props.update();
+                                                    }}
+                                                    onSelect={(statblock) => {
+                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
                                                     }}
                                                 />
                                                 <div className="text-xl font-bold">Adventure NPCs</div>
@@ -343,18 +349,21 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.campaign.current.adventures[selectedAdventure].npcs = data;
                                                         props.update();
                                                     }}
+                                                    onSelect={(statblock) => {
+                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                                    }}
                                                 />
                                             </DashboardElement>
                                             <DashboardElement>
-                                                <div className="text-xl font-bold">Adventure Encounters</div>
+                                                <div className="text-xl font-bold">Encounters</div>
                                                 <EncounterList
-                                                    data={props.campaign.current.adventures[selectedAdventure].encounters}
+                                                    data={props.campaign.current.encounters}
                                                     update={props.update}
                                                     allowAdd
                                                     allowDelete
                                                     searchBar
                                                     onUpdateData={(data) => {
-                                                        props.campaign.current.adventures[selectedAdventure].encounters = data;
+                                                        props.campaign.current.encounters = data;
                                                         props.update();
                                                     }}
                                                     onSelect={(encounter) => {
@@ -364,13 +373,13 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 />
                                                 <div className="text-xl font-bold">Adventure Encounters</div>
                                                 <EncounterList
-                                                    data={props.campaign.current.encounters}
+                                                    data={props.campaign.current.adventures[selectedAdventure].encounters}
                                                     update={props.update}
                                                     allowAdd
                                                     allowDelete
                                                     searchBar
                                                     onUpdateData={(data) => {
-                                                        props.campaign.current.encounters = data;
+                                                        props.campaign.current.adventures[selectedAdventure].encounters = data;
                                                         props.update();
                                                     }}
                                                     onSelect={(encounter) => {
@@ -456,6 +465,9 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.update();
                                                     }}
                                                     update={props.update}
+                                                    onSelect={(statblock) => {
+                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                                    }}
                                                 />
                                                 <div className="text-xl font-bold">NPCs</div>
                                                 <DBStatblockList
@@ -467,6 +479,9 @@ export const CampaignDMView = (props: IDMAppView & {
                                                     onUpdateData={(data) => {
                                                         props.campaign.current.npcs = data;
                                                         props.update();
+                                                    }}
+                                                    onSelect={(statblock) => {
+                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
                                                     }}
                                                 />
                                             </DashboardElement>

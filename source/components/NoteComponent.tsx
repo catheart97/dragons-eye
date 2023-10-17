@@ -7,6 +7,18 @@ import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
 export const NoteComponent = (props: IViewComponent<Note>) => {
 
     const forceUpdate = useForceUpdate();
+    const areaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    const updateArea = () => {
+        if (areaRef.current) {
+            areaRef.current.style.height = "1px";
+            areaRef.current.style.height = (areaRef.current.scrollHeight + 2) + "px";
+        }
+    }
+    
+    React.useEffect(() => {
+        updateArea();
+    }, []);
 
     return (
         <div className="flex flex-col justify-end p-3 items-start w-full gap-2">
@@ -21,10 +33,12 @@ export const NoteComponent = (props: IViewComponent<Note>) => {
             >
             </input>
             <textarea
-                className="bg-transparent focus:outline-none w-full min-h-96"
+                ref={areaRef}
+                className="bg-transparent focus:outline-none w-full"
                 defaultValue={props.data.description}
                 placeholder="Write your note here..."
                 onChange={(e) => {
+                    updateArea();
                     props.data.description = e.target.value;
                     props.updateData(props.data);
                     forceUpdate();

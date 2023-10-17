@@ -307,6 +307,27 @@ export const RawStatblockComponent = (props: {
                 </div>
             </div>
 
+            {/* Description */}
+            {
+                editMode || statblock.description.length > 0 ? (
+                    <>
+                        <UIGroup title="Description" className="text-orange-600">
+                        </UIGroup>
+                        <div className="flex flex-col gap-1 w-full p-1 pl-3">
+                            <textarea
+                                className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
+                                defaultValue={statblock.description}
+                                placeholder="Description..."
+                                onChange={(e) => {
+                                    statblock.description = e.target.value;
+                                    update()
+                                }}
+                            />
+                        </div>
+                    </>
+                ) : null
+            }
+
             {
                 !props.player ? (
                     <UIGroup title="Armor Class">
@@ -914,27 +935,6 @@ export const RawStatblockComponent = (props: {
                             ) : null
 
                         }
-
-                        {/* Description */}
-                        {
-                            editMode || statblock.description.length > 0 ? (
-                                <>
-                                    <UIGroup title="Description" className="text-orange-600">
-                                    </UIGroup>
-                                    <div className="flex flex-col gap-1 w-full p-1 pl-3">
-                                        <textarea
-                                            className="text-xs w-8 text-start bg-transparent focus:outline-none w-full"
-                                            defaultValue={statblock.description}
-                                            placeholder="Description..."
-                                            onChange={(e) => {
-                                                statblock.description = e.target.value;
-                                                update()
-                                            }}
-                                        />
-                                    </div>
-                                </>
-                            ) : null
-                        }
                     </>
                 ) : (
                     <></>
@@ -1077,7 +1077,7 @@ export const PlayerStatblockComponent = (props: IViewComponent<PlayerStatblock>)
             uniqueKey={-1}
             statblock={notPlayer}
             updateStatblock={props.updateData as (s: Statblock | PlayerStatblock) => void}
-            player={false}
+            player={true}
             createMode={false}
         />
     )
