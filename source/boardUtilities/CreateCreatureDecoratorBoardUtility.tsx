@@ -2,11 +2,14 @@ import { BoardPosition, IBoardUtility, BoardDecoratorType, Board, CreatureType, 
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIGroup } from "../components/ui/UIGroup";
 import { PlayerStatblock, Statblock, constructDefaultStatblock } from "../data/Statblock";
-import { RawStatblockComponent, StatblockList } from "../components/StatblockComponent";
+import { PlayerStatblockList, RawStatblockComponent, StatblockList } from "../components/StatblockComponent";
 import { Switch } from "../components/ui/Switch";
 import { Database } from "../data/Database";
 import { Tab, TabView } from "../components/ui/TabView";
 import { UIContainer } from "../components/ui/UIContainer";
+import { CampaignContext } from "../data/Campaign";
+import React from "react";
+import { Adventure } from "../data/Adventure";
 
 export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
     board: Board;
@@ -104,6 +107,19 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
     }
 
     userInterface() {
+
+        const campaign = React.useContext(CampaignContext);
+        let adventure: Adventure | null = null;
+        if (campaign != null) {
+            campaign.current.adventures.forEach((a) => {
+                a.encounters.forEach((e) => {
+                    if (e.board == this.board) {
+                        adventure = a;
+                    }
+                })
+            })
+        }
+
         return (
             <UIContainer className="grow flex flex-col">
                 <TabView
@@ -154,6 +170,57 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                             }}
                         />
                     </Tab>
+                    {
+                        campaign != null ? (
+                            <Tab title="Campaign">
+                                <div className="text-xl font-bold p-2">Players</div>
+                                <PlayerStatblockList
+                                    data={campaign.current.players}
+                                    update={() => {
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    onSelect={(statblock) => {
+                                        this.creatureAttitude = CreatureAttitude.Player;
+                                        this.creatureStatblock = statblock;
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    searchBar
+                                />
+                                {
+                                    adventure != null ? (
+                                        <>
+                                            <div className="text-xl font-bold p-2">Adventure NPCs</div>
+                                            <StatblockList
+                                                data={(adventure as Adventure).npcs}
+                                                update={() => {
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                onSelect={(statblock) => {
+                                                    this.creatureAttitude = CreatureAttitude.Ally;
+                                                    this.creatureStatblock = statblock;
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                searchBar
+                                            />
+                                        </>
+                                    ) : null
+                                }
+                                <div className="text-xl font-bold p-2">NPCs</div>
+                                <StatblockList
+                                    data={campaign.current.npcs}
+                                    update={() => {
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    onSelect={(statblock) => {
+                                        this.creatureAttitude = CreatureAttitude.Ally;
+                                        this.creatureStatblock = statblock;
+                                        this.forceUpdate?.call(this);
+                                    }}
+                                    searchBar
+                                />
+                            </Tab>
+                        ) : <></>
+                    }
                 </TabView>
                 <UIGroup title="Attitude">
                     <ToolButton

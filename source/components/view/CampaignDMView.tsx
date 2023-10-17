@@ -90,13 +90,24 @@ export const CampaignDMView = (props: IDMAppView & {
         props.setImage(props.campaign.current.image ?? CampaignIcon);
     }, [])
 
+    const bgImage = (
+        selectedAdventure >= 0 ? (
+            props.campaign.current.adventures[selectedAdventure]?.image ?? AdventureIcon
+        ) : (
+            props.campaign.current.image ?? CampaignIcon
+        )
+    )
+
     return (
         <>
             <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex basis-1 border-r-4 border-orange-600 grow basis-2' style={{
-                minWidth: "50vw!important"
+                minWidth: "50vw!important",
+                backgroundImage: "url('" + (bgImage) + "')",
+                backgroundSize: "cover",
+                backgroundPosition: "center"
             }}>
                 <div className="w-full h-full flex">
-                    <div className="basis-2/12 max-w-44 bg-neutral-100 shadow h-full flex flex-col gap-2 p-4">
+                    <div className="basis-2/12 max-w-44 bg-neutral-100/90 shadow h-full flex flex-col gap-2 p-4">
 
                         <img
                             className="w-full h-auto rounded-xl shadow-xl"
@@ -112,7 +123,7 @@ export const CampaignDMView = (props: IDMAppView & {
 
                         <button
                             className={[
-                                "w-full py-2 rounded-xl text-start text-orange-600 transition-all duration-200 ease-in-out shrink-0 overflow-hidden hover:bg-neutral-100",
+                                "w-full py-2 rounded-xl text-start text-orange-600 transition-all duration-200 ease-in-out shrink-0 overflow-hidden hover:text-orange-600",
                                 selectedAdventure == -1 ? "saturate-100" : "saturate-0 hover:saturate-100"
                             ].join(" ")}
                             onClick={() => {
@@ -162,8 +173,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                 props.campaign.current.adventures.map((adventure, i) => {
                                     return (
                                         <button
-                                            className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
-                                            key={adventure.title}
+                                            className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden flex items-end " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
+                                            key={adventure.title + i}
                                             style={{
                                                 backgroundImage: "url('" + (adventure.image ?? AdventureIcon) + "')",
                                                 backgroundSize: "cover",
@@ -174,8 +185,40 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.setImage(adventure.image ?? AdventureIcon);
                                             }}
                                         >
-                                            <div className="h-full w-full bg-gradient-to-t from-black/80 to-black/20 flex items-end p-3">
-                                                {adventure.title}
+                                            <div className="h-full w-full items-end flex bg-gradient-to-t from-black/80 to-black/20 gap-2">
+                                                <div className="grow p-3 text-start">
+                                                    {adventure.title}
+                                                </div>
+                                                {
+                                                    i != 0 && (
+                                                        <button 
+                                                            className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                            onClick={() => {
+                                                                const temp = props.campaign.current.adventures[i];
+                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i-1];
+                                                                props.campaign.current.adventures[i-1] = temp;
+                                                                props.update();
+                                                            }}
+                                                        >
+                                                            <span className="mso">arrow_upward</span>
+                                                        </button>
+                                                    )
+                                                }
+                                                {
+                                                    i != props.campaign.current.adventures.length - 1 && (
+                                                        <button 
+                                                            className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                            onClick={() => {
+                                                                const temp = props.campaign.current.adventures[i];
+                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i+1];
+                                                                props.campaign.current.adventures[i+1] = temp;
+                                                                props.update();
+                                                            }}
+                                                        >
+                                                            <span className="mso">arrow_downward</span>
+                                                        </button>
+                                                    )
+                                                }
                                             </div>
                                         </button>
                                     )
@@ -184,7 +227,10 @@ export const CampaignDMView = (props: IDMAppView & {
                         </div>
 
                     </div>
-                    <div className="basis-10/12 bg-black h-full flex flex-col">
+                    <div
+                        className="basis-10/12 h-full flex flex-col backdrop-blur-lg"
+
+                    >
                         {
                             props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                 <div className="w-full h-full flex flex-col gap-3">
@@ -244,6 +290,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.update();
                                                     }}
                                                     setImage={props.setImage}
+                                                    dialogHandle={props.dialogHandle}
                                                 />
                                                 <div className="text-xl font-bold">Notes</div>
                                                 <NoteList
@@ -257,6 +304,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         props.campaign.current.notes = data;
                                                         props.update();
                                                     }}
+                                                    dialogHandle={props.dialogHandle}
                                                 />
                                             </DashboardElement>
                                             <DashboardElement>
@@ -384,6 +432,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                             <DashboardElement title="Notes">
                                                 <NoteList
                                                     setImage={props.setImage}
+                                                    dialogHandle={props.dialogHandle}
                                                     data={props.campaign.current.notes}
                                                     update={props.update}
                                                     allowAdd

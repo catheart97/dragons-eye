@@ -1,10 +1,10 @@
-import React from "react"
+import React from "react";
 
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardTerrain, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, BoardItemType, TerrainColors, TrapData } from "../data/Board"
-import { useForceUpdate } from "../utility"
 import { Rect } from "../Rect";
-import { TexturePool } from "../data/TexturePool";
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
 import { CreatureSize } from "../data/Statblock";
+import { TexturePool } from "../data/TexturePool";
+import { useForceUpdate } from "../utility";
 
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
@@ -18,27 +18,22 @@ const drawTerrain: BoardCallback = (canvas, board, position, _playerView) => {
 
     // render terrain
     const terrain = board.terrain[idx]
-    if (terrain == BoardTerrain.Wall) {
-        ctx.fillStyle = TerrainColors[terrain];
-        ctx.fillRect(
-            position.x * CanvasBaseSize + LineWidth / 2,
-            position.y * CanvasBaseSize + LineWidth / 2,
-            CanvasBaseSize - LineWidth,
-            CanvasBaseSize - LineWidth
-        );
-    } else {
-        const texturePool = TexturePool.getInstance().get();
-        if (!texturePool) {
-            return;
-        }
-        ctx.drawImage(
-            texturePool!.TerrainTextures[terrain],
-            position.x * CanvasBaseSize + LineWidth / 2,
-            position.y * CanvasBaseSize + LineWidth / 2,
-            CanvasBaseSize - LineWidth,
-            CanvasBaseSize - LineWidth
-        );
+    const texturePool = TexturePool.getInstance().get();
+    if (!texturePool) {
+        return;
     }
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+        Math.random() > 0.95 ?
+            texturePool.AltTerrainTextures[terrain] :
+            texturePool.TerrainTextures[terrain],
+        position.x * CanvasBaseSize + LineWidth / 2,
+        position.y * CanvasBaseSize + LineWidth / 2,
+        CanvasBaseSize - LineWidth,
+        CanvasBaseSize - LineWidth
+    );
+    ctx.imageSmoothingEnabled = false;
+
 }
 
 const drawCondition: BoardCallback = (canvas, board, position, _playerView) => {
@@ -127,7 +122,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
 
             ctx.fillStyle = darkenedColor;
             ctx.textAlign = 'center';
-            ctx.fillText( 
+            ctx.fillText(
                 CanvasCreatureTypeIcons[attachment.type],
                 x * CanvasBaseSize + CanvasBaseSize / 2,
                 y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 16,
@@ -147,28 +142,24 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
             if (attachment.type == BoardItemType.Door) {
                 const data = attachment.data as DoorData;
                 ctx.lineWidth = LineWidth;
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(
-                    position.x * CanvasBaseSize + LineWidth / 2,
-                    position.y * CanvasBaseSize + LineWidth / 2,
-                    CanvasBaseSize - LineWidth,
-                    CanvasBaseSize - LineWidth
-                );
-
                 ctx.font = `${CanvasBaseSize - LineWidth * 2}px Material Symbols`;
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#ffffff";
                 if (playerView || data == "locked") {
-                    ctx.fillText(
-                        "door_front",
+                    ctx.drawImage(
+                        TexturePool.getInstance().get()!.DoorTextures.closed,
                         position.x * CanvasBaseSize + LineWidth,
-                        position.y * CanvasBaseSize + CanvasBaseSize - LineWidth
+                        position.y * CanvasBaseSize + LineWidth,
+                        CanvasBaseSize - LineWidth * 2,
+                        CanvasBaseSize - LineWidth * 2
                     )
                 } else {
-                    ctx.fillText(
-                        "door_open",
+                    ctx.drawImage(
+                        TexturePool.getInstance().get()!.DoorTextures.open,
                         position.x * CanvasBaseSize + LineWidth,
-                        position.y * CanvasBaseSize + CanvasBaseSize - LineWidth
+                        position.y * CanvasBaseSize + LineWidth,
+                        CanvasBaseSize - LineWidth * 2,
+                        CanvasBaseSize - LineWidth * 2
                     )
                 }
             } else if (!playerView && attachment.type == BoardItemType.Trap) {
@@ -250,12 +241,111 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
         if (!playerView) {
             ctx.globalAlpha = .5;
         }
-        ctx.fillRect(
-            position.x * CanvasBaseSize + LineWidth / 2,
-            position.y * CanvasBaseSize + LineWidth / 2,
-            CanvasBaseSize - LineWidth,
-            CanvasBaseSize - LineWidth
+        ctx.save();
+
+        const pool = TexturePool.getInstance().get()!
+
+        let texture : HTMLImageElement = pool.FogTextures.center;
+        let angle = 0;
+        const top = board.hidden[idx + board.width] != undefined;
+        const bottom = board.hidden[idx - board.width] != undefined;
+        const left = board.hidden[idx - 1] != undefined;
+        const right = board.hidden[idx + 1] != undefined;
+
+        if (top && bottom && left && right) {
+            texture = pool.FogTextures.center;
+            angle = 0;
+        }
+        
+        if (!top && bottom && left && right) {
+            texture = pool.FogTextures.side;
+            angle =  Math.PI / 2;
+        }
+
+        if (top && !bottom && left && right) {
+            texture = pool.FogTextures.side;
+            angle = 3 * Math.PI / 2;
+        }
+
+        if (top && bottom && !left && right) {
+            texture = pool.FogTextures.side;
+            angle = Math.PI;
+        }
+
+        if (top && bottom && left && !right) {
+            texture = pool.FogTextures.side;
+            angle = 0;
+        }
+
+        if (top && bottom && !left && !right) {
+            texture = pool.FogTextures.tunnel;
+            angle = 0;
+        }
+
+        if (!top && !bottom && left && right) {
+            texture = pool.FogTextures.tunnel;
+            angle = Math.PI / 2;
+        }
+
+        if (!top && bottom && !left && right) {
+            texture = pool.FogTextures.corner;
+            angle = Math.PI;
+        }
+
+        if (!top && bottom && left && !right) {
+            texture = pool.FogTextures.corner;
+            angle = Math.PI / 2;
+        }
+
+        if (top && !bottom && !left && right) {
+            texture = pool.FogTextures.corner;
+            angle = 3 * Math.PI / 2;
+        }
+
+        if (top && !bottom && left && !right) {
+            texture = pool.FogTextures.corner;
+            angle = 0;
+        }
+
+        if (!top && !bottom && !left && !right) {
+            texture = pool.FogTextures.none;
+            angle = 0;
+        }
+
+        if (!top && !bottom && !left && right) {
+            texture = pool.FogTextures.single;
+            angle = Math.PI;
+        }
+
+        if (!top && !bottom && left && !right) {
+            texture = pool.FogTextures.single;
+            angle = 0;
+        }
+
+        if (!top && bottom && !left && !right) {
+            texture = pool.FogTextures.single;
+            angle = Math.PI / 2;
+        }
+
+        if (top && !bottom && !left && !right) {
+            texture = pool.FogTextures.single;
+            angle = 3 * Math.PI / 2;
+        }
+
+        ctx.translate(
+            position.x * CanvasBaseSize + CanvasBaseSize / 2, 
+            position.y * CanvasBaseSize + CanvasBaseSize / 2
         );
+        ctx.rotate(angle);
+
+        ctx.drawImage(
+            texture,
+            -CanvasBaseSize / 2 + LineWidth,
+            -CanvasBaseSize / 2 + LineWidth,
+            CanvasBaseSize - LineWidth * 2,
+            CanvasBaseSize - LineWidth * 2
+        )
+        ctx.restore();
         ctx.globalAlpha = 1;
     }
 }
@@ -274,7 +364,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
             }
         }
     }
-    
+
 
     // draw scene
     forEachTile(drawTerrain);
@@ -372,7 +462,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
             <div className="min-h-full flex items-center" style={{
                 justifyContent: 'safe center'
             }}>
-                <div 
+                <div
                     className="flex flex-col"
                     style={{
                         padding: "40rem"

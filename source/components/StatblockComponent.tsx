@@ -963,7 +963,7 @@ export const NewStatblockComponent = (props: IAddComponent<Statblock>) => {
                 <button
                     className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                     onClick={() => {
-                        props.onSubmit(tempStatblock.current);
+                        props.onSubmit(structuredClone(tempStatblock.current));
                     }}
                 >
                     Add <span className="mso px-2 p-1">add</span>
@@ -998,7 +998,7 @@ export const NewDBStatblockComponent = (props: IAddComponent<Statblock>) => {
                         <button
                             className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                             onClick={() => {
-                                props.onSubmit(tempStatblock.current);
+                                props.onSubmit(structuredClone(tempStatblock.current));
                             }}
                         >
                             Add <span className="mso px-2 p-1">add</span>
@@ -1060,7 +1060,7 @@ export const NewPlayerStatblockComponent = (props: IAddComponent<PlayerStatblock
                 <button
                     className="rounded-xl text-white self-end p-2 pl-4 bg-orange-600 flex items-center"
                     onClick={() => {
-                        props.onSubmit(tempStatblock.current);
+                        props.onSubmit(structuredClone(tempStatblock.current));
                     }}
                 >
                     Add <span className="mso px-2 p-1">add</span>

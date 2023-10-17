@@ -7,6 +7,7 @@ import { useForceUpdate } from "./utility"
 import { CampaignApp } from "./components/view/CampaignApp"
 import { UIGroup } from "./components/ui/UIGroup"
 import { NumberInput } from "./components/ui/NumberInput"
+import { DEFile, DEFileType, makeBoardFile, makeCampaignFile } from "./data/DEFile"
 
 enum AppMode {
     Campaign,
@@ -53,15 +54,17 @@ export const App = () => {
         window.ipcRenderer.on('r-open-file', (_e, fn: string) => {
             try {
 
-                if (fn.endsWith(".deb")) {
+                const data = window.fsExtra.readJsonSync(fn);
+                let file = data as DEFile;
+
+                if (file.type == DEFileType.BoardFile) {
                     mode.current = AppMode.Board;
-                    const data = window.fsExtra.readJsonSync(fn);
-                    board.current = data as Board;
+                    board.current = file.data as Board;
                 } else {
                     mode.current = AppMode.Campaign;
-                    const data = window.fsExtra.readJsonSync(fn);
-                    campaign.current = data as Campaign;
+                    campaign.current = file.data as Campaign;
                 }
+                
                 fileName.current = fn;
                 forceUpdate();
             } catch (e: any) {
@@ -74,9 +77,9 @@ export const App = () => {
             } else {
                 try {
                     if (mode.current == AppMode.Campaign) {
-                        window.fsExtra.writeFileSync(fileName.current, JSON.stringify(campaign.current));
+                        window.fsExtra.writeFileSync(fileName.current, JSON.stringify(makeCampaignFile(campaign.current)));
                     } else {
-                        window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                        window.fsExtra.writeFileSync(fileName.current, JSON.stringify(makeBoardFile(board.current)));
                     }
                 } catch (e: any) {
                     dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
@@ -87,9 +90,9 @@ export const App = () => {
             fileName.current = fn;
             try {
                 if (mode.current == AppMode.Campaign) {
-                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(campaign.current));
+                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(makeCampaignFile(campaign.current)));
                 } else {
-                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(board.current));
+                    window.fsExtra.writeFileSync(fileName.current, JSON.stringify(makeBoardFile(board.current)));
                 }
             } catch (e: any) {
                 dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
@@ -166,7 +169,7 @@ export const App = () => {
                                 playerViewOpen={playerViewOpen.current}
                                 dialogHandle={dialogHandle}
                             />
-                            <button 
+                            <button
                                 className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:bg-orange-600 hover:text-white  transition-all duration-200 ease-in-out text-xl"
                                 onClick={() => {
                                     loadCampaignBoard(null);

@@ -2,6 +2,7 @@ import React from "react";
 import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
 import { Note } from "../data/Note";
 import { useForceUpdate } from "../utility";
+import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
 
 export const NoteComponent = (props: IViewComponent<Note>) => {
 
@@ -42,29 +43,82 @@ export const NoteComponent = (props: IViewComponent<Note>) => {
                                     backgroundPosition: "center",
                                 }}
                             >
+
                                 <div className="flex bg-neutral-800/80 text-neutral-50">
                                     {
-                                        props.setImage && (
-                                            <button
+                                        props.dialogHandle && (
+                                            <Tooltip
                                                 className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
-                                                onClick={() => {
-                                                    props.setImage!(image);
-                                                }}
                                             >
-                                                <span className="mso">visibility</span>
-                                            </button>
+                                                <TooltipTarget>
+                                                    <button
+                                                        className="grow flex items-center justify-center"
+                                                        onClick={() => {
+                                                            props.dialogHandle?.current?.open(
+                                                                <div
+                                                                    className="w-full h-full"
+                                                                    style={{
+                                                                        backgroundImage: `url(${image})`,
+                                                                        backgroundSize: "contain",
+                                                                        backgroundPosition: "center",
+                                                                        backgroundRepeat: "no-repeat",
+                                                                    }}
+                                                                ></div>,
+                                                                undefined,
+                                                                ""
+                                                            )
+                                                        }}
+                                                    >
+                                                        <span className="mso">visibility</span>
+                                                    </button>
+                                                </TooltipTarget>
+                                                <TooltipContent>
+                                                    <div className="text-neutral-800">Show Image in Dialog (Not shown to players!)</div>
+                                                </TooltipContent>
+                                            </Tooltip>
                                         )
                                     }
-                                    <button
+                                    {
+                                        props.setImage && (
+                                            <Tooltip
+                                                className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
+                                            >
+                                                <TooltipTarget>
+                                                    <button
+                                                        className="grow flex justify-center items-center"
+                                                        onClick={() => {
+                                                            props.setImage!(image);
+                                                        }}
+                                                    >
+                                                        <span className="mso">visibility_lock</span>
+                                                    </button>
+                                                </TooltipTarget>
+                                                <TooltipContent>
+                                                    <div className="text-neutral-800">Show Image on Player Screen.</div>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )
+                                    }
+                                    <Tooltip
                                         className="grow p-2 flex justify-center items-center hover:bg-neutral-900"
-                                        onClick={() => {
-                                            props.data.images.splice(index, 1);
-                                            props.updateData(props.data);
-                                            forceUpdate();
-                                        }}
                                     >
-                                        <span className="mso">delete</span>
-                                    </button>
+                                        <TooltipTarget>
+                                            <button
+                                                className="grow flex justify-center items-center"
+                                                onClick={() => {
+                                                    props.data.images.splice(index, 1);
+                                                    props.updateData(props.data);
+                                                    forceUpdate();
+                                                }}
+                                            >
+                                                <span className="mso">delete</span>
+                                            </button>
+                                        </TooltipTarget>
+                                        <TooltipContent>
+                                            <div className="text-neutral-800">Delete Image from Note.</div>
+                                        </TooltipContent>
+                                    </Tooltip>
+
                                 </div>
                             </div>
                         )
