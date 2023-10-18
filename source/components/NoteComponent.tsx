@@ -2,33 +2,65 @@ import React from "react";
 import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
 import { Note } from "../data/Note";
 import { useForceUpdate } from "../utility";
+import Markdown from "marked-react";
 
-export const NoteComponent = (props: IViewComponent<Note>) => {
+export const NoteComponent = (props: IViewComponent<Note> & {
+    editMode?: boolean,
+}) => {
 
     const forceUpdate = useForceUpdate();
+    const [editMode, setEditMode] = React.useState(props.editMode ?? false);
 
     return (
         <div className="flex flex-col justify-end p-3 items-start w-full gap-2">
-            <input
-                className="text-2xl w-full bg-transparent focus:outline-none"
-                defaultValue={props.data.name}
-                placeholder="Title"
-                onChange={(e) => {
-                    props.data.name = e.target.value;
-                    props.updateData(props.data);
-                }}
-            >
-            </input>
-            <textarea
-                className="bg-transparent focus:outline-none w-full min-h-96"
-                defaultValue={props.data.description}
-                placeholder="Write your note here..."
-                onChange={(e) => {
-                    props.data.description = e.target.value;
-                    props.updateData(props.data);
-                    forceUpdate();
-                }}
-            />
+            <div className="flex w-full items-center">
+                <input
+                    className="text-2xl w-full bg-transparent focus:outline-none grow"
+                    defaultValue={props.data.name}
+                    placeholder="Title"
+                    onChange={(e) => {
+                        props.data.name = e.target.value;
+                        props.updateData(props.data);
+                    }}
+                >
+                </input>
+                {
+                    !props.editMode ? (
+                        <button
+                            className="px-2 p-1 hover:bg-orange-600 rounded-xl hover:text-white transition-all duration-200 ease-in-out items-center justify-center flex"
+                            onClick={() => {
+                                setEditMode(!editMode);
+                            }}
+                        >
+                            {
+                                editMode ? (
+                                    <span className="mso">edit</span>
+                                ) : (
+                                    <span className="msf">edit</span>
+                                )
+                            }
+                        </button>
+                    ) : null
+                }
+            </div>
+            {
+                props.editMode || editMode ? (
+                    <textarea
+                        className="bg-transparent focus:outline-none w-full min-h-96"
+                        defaultValue={props.data.description}
+                        placeholder="Write your note here..."
+                        onChange={(e) => {
+                            props.data.description = e.target.value;
+                            props.updateData(props.data);
+                            forceUpdate();
+                        }}
+                    />
+                ) : (
+                    <div className="prose">
+                        <Markdown>{props.data.description}</Markdown>
+                    </div>
+                )
+            }
             <div className="flex flex-wrap w-full h-fit gap-2">
                 {
                     props.data.images.map((image, index) => {
@@ -112,12 +144,13 @@ export const NewNoteComponent = (props: IAddComponent<Note>) => {
                 updateData={(data) => {
                     noteRef.current = data;
                 }}
+                editMode
             />
             <div className="flex justify-end p-2">
                 <button
                     className="flex justify-center items-center gap-2 bg-orange-600 rounded-xl p-2 px-4 text-white"
                     onClick={() => {
-                        props.onSubmit(noteRef.current);
+                        props.onSubmit(structuredClone(noteRef.current));
                     }}
                 >
                     <span className="mso">add</span> Note

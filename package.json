@@ -21,6 +21,7 @@
     "fs-extra": "^11.1.1",
     "he": "^1.2.0",
     "license-report": "^6.4.0",
+    "marked-react": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-grid-layout": "^1.4.2",
@@ -29,6 +30,7 @@
     "xml2json": "^0.12.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.11",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
