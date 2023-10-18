@@ -1,4 +1,5 @@
 import React from "react"
+import { DialogHandle } from "./Dialog"
 
 export interface IAddComponent<T> {
     onSubmit: (data: T) => void
@@ -8,6 +9,7 @@ export interface IViewComponent<T> {
     data: T
     updateData: (data: T) => void
     setImage?: (image: string) => void
+    dialogHandle?: React.RefObject<DialogHandle>
 }
 
 export interface ITListElementProps<T> {
@@ -16,6 +18,7 @@ export interface ITListElementProps<T> {
     onDeleteRequest?: () => void
     onUpdateRequest: (data: T) => void
     setImage?: (image: string) => void
+    dialogHandle?: React.RefObject<DialogHandle>
     data: T
 }
 
@@ -72,6 +75,7 @@ export const TListElementComponent = <T extends {
                         data={props.data}
                         updateData={props.onUpdateRequest}
                         setImage={props.setImage}
+                        dialogHandle={props.dialogHandle}
                     ></props.viewComponent>
                 ) : null
             }
@@ -87,6 +91,7 @@ export interface ITListComponentProps<T> {
     searchBar?: boolean
     data: Array<T>
     setImage?: (image: string) => void
+    dialogHandle?: React.RefObject<DialogHandle>
     update: () => void
 }
 
@@ -169,6 +174,7 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
                             }}
                             onSelect={props.onSelect}
                             setImage={props.setImage}
+                            dialogHandle={props.dialogHandle}
                         ></TListElementComponent>
                     )
                 })

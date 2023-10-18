@@ -230,6 +230,7 @@ function createWindow() {
                 click: () => {
                     const fn = dialog.showSaveDialogSync({
                         filters: [
+                            { name: "Dragon's Eye Campaign", extensions: ['json', 'dec'] },
                             { name: "Dragon's Eye Board", extensions: ['deb', "json"] },
                             { name: 'All Files', extensions: ['*'] }
                         ],

@@ -37,4 +37,4 @@ export const EmptyCampaign: Campaign = {
     notes: []
 }
 
-export const CampaignContext = React.createContext<React.MutableRefObject<Campaign> | null>(null)
+export const CampaignContext = React.createContext<React.MutableRefObject<Campaign> | null>(null);

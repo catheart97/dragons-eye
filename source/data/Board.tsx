@@ -430,7 +430,7 @@ export const constructDefaultBoard = (w: number, h: number): Board => {
         const x = i % w;
         const y = Math.floor(i / w);
         if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
-            board[i] = BoardTerrain.Tile;
+            board[i] = BoardTerrain.Stone;
         }
     }
     return {

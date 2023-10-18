@@ -48,5 +48,8 @@ export default defineConfig({
     }),
     fullReloadAlways,
     base64Plugin
-  ]
+  ],
+  define: {
+    APP_VERSION: JSON.stringify(require('./package.json').version),
+  }
 })

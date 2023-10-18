@@ -11,7 +11,7 @@ export const Tab = (_props: ITab) => {
 
 export type TabViewProps = {
     defaultIndex?: number
-    children: React.ReactElement<ITab>[]
+    children: React.ReactElement<ITab | undefined>[]
     className?: string
     tabClassName?: string
     tabStyle?: React.CSSProperties
@@ -27,6 +27,8 @@ export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, Tab
     React.useImperativeHandle(ref, () => ({
         setActiveIndex: setActiveIndex
     }));
+
+    const tabs = props.children.filter(v => v) as React.ReactElement<ITab>[];
 
     return (
         <div className={"w-full flex flex-col rounded-xl bg-white overflow-hidden " + props.className}>
@@ -44,7 +46,7 @@ export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, Tab
                 </div>
 
                 {
-                    props.children.map((v, i) => {
+                    tabs.map((v, i) => {
                         return (
                             <button
                                 key={i}
@@ -68,7 +70,7 @@ export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, Tab
             <div 
                 className={"w-full grow flex flex-col gap-1 " + props.tabClassName}
             >
-                {props.children[activeIndex].props.children ?? <></>}
+                {tabs[activeIndex].props.children ?? <></>}
             </div>
 
         </div>
