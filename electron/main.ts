@@ -270,7 +270,7 @@ function createWindow() {
             },
             {
                 label: 'Select All',
-                accelerator: 'CmdOrCtrl+Shift+A',
+                accelerator: 'CmdOrCtrl+A',
                 role: 'selectAll'
             }
         ]
