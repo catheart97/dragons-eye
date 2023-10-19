@@ -1,25 +1,33 @@
 import React from "react"
-import { Campaign } from "../data/Campaign"
+import { Campaign, CampaignContext } from "../data/Campaign"
 import { NoteList } from "./NoteComponent"
 import { useForceUpdate } from "../utility"
 import { Database } from "../data/Database"
+import { Dialog, DialogHandle } from "./ui/Dialog"
 
 
-export const DMScreenComponent = (props: {
-    campaign: React.MutableRefObject<Campaign>
-}) => {
+export const DMScreenComponent = () => {
 
     const forceUpdate = useForceUpdate();
+
+    const campaign = React.useContext(CampaignContext);
+    const dialogHandle = React.useRef<DialogHandle>(null);
+
     return (
         <div className="h-full w-full flex">
-            <div className="h-full w-96">
-                <div className="text-xl font-bold">Campaign Notes</div>
-                <NoteList
-                    data={props.campaign.current.notes}
-                    update={forceUpdate}
-                    alwaysExpanded
-                />
-            </div>
+            {
+                campaign ? (
+                    <div className="h-full w-96">
+                        <div className="text-xl font-bold">Campaign Notes</div>
+                        <NoteList
+                            data={campaign.current.notes}
+                            update={forceUpdate}
+                            alwaysExpanded
+                            dialogHandle={dialogHandle}
+                        />
+                    </div>
+                ) : null
+            }
             <div className="h-full grow">
                 <div className="text-xl font-bold">Database General Notes</div>
                 <NoteList
@@ -33,8 +41,10 @@ export const DMScreenComponent = (props: {
                     allowAdd
                     allowDelete
                     alwaysExpanded
+                    dialogHandle={dialogHandle}
                 />
             </div>
+            <Dialog ref={dialogHandle}></Dialog>
         </div>
     )
 }

@@ -338,9 +338,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                             className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
                                             onClick={() => {
                                                 props.dialogHandle.current?.open(<>
-                                                    <DMScreenComponent 
-                                                        campaign={props.campaign}
-                                                    />
+                                                    <DMScreenComponent />
                                                 </>, undefined, "Dungeon Master's Screen", true);
                                             }}
                                         >
@@ -511,9 +509,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                             className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
                                             onClick={() => {
                                                 props.dialogHandle.current?.open(<>
-                                                    <DMScreenComponent 
-                                                        campaign={props.campaign}
-                                                    />
+                                                    <DMScreenComponent />
                                                 </>, undefined, "Dungeon Master's Screen", true);
                                             }}
                                         >

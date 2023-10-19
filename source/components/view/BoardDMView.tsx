@@ -20,6 +20,7 @@ import { Dialog } from '../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
 import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
+import { DMScreenComponent } from '../DMScreenComponent';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -120,6 +121,16 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                                 )
                             })
                         }
+                        <ToolButton
+                            onClick={() => {
+                                props.dialogHandle.current?.open(<>
+                                    <DMScreenComponent />
+                                </>, undefined, "Dungeon Master's Screen", true);
+                            }}
+                            active={false}
+                        >
+                            <span className='msf'>map</span>
+                        </ToolButton>
                     </div>
                 </div>
             </div>
