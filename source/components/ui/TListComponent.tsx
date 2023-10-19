@@ -64,7 +64,7 @@ export const TListElementComponent = <T extends {
                     ) : null
                 }
                 {
-                    !props.alwaysExpanded ?? (
+                    !props.alwaysExpanded ? (
                         <button
                             className='text-xs hover:bg-gray-200 w-8 p-1 flex justify-center items-center'
                             onClick={() => {
@@ -75,7 +75,7 @@ export const TListElementComponent = <T extends {
                                 !expanded ? <span className="mso">arrow_downward</span> : <span className="mso">arrow_upward</span>
                             }
                         </button>
-                    )
+                    ) : null
                 }
             </div>
             {
