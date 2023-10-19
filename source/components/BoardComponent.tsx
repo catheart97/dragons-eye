@@ -245,7 +245,7 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
 
         const pool = TexturePool.getInstance().get()!
 
-        let texture : HTMLImageElement = pool.FogTextures.center;
+        let texture: HTMLImageElement = pool.FogTextures.center;
         let angle = 0;
         const top = board.hidden[idx + board.width] != undefined;
         const bottom = board.hidden[idx - board.width] != undefined;
@@ -256,10 +256,10 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
             texture = pool.FogTextures.center;
             angle = 0;
         }
-        
+
         if (!top && bottom && left && right) {
             texture = pool.FogTextures.side;
-            angle =  Math.PI / 2;
+            angle = Math.PI / 2;
         }
 
         if (top && !bottom && left && right) {
@@ -333,7 +333,7 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
         }
 
         ctx.translate(
-            position.x * CanvasBaseSize + CanvasBaseSize / 2, 
+            position.x * CanvasBaseSize + CanvasBaseSize / 2,
             position.y * CanvasBaseSize + CanvasBaseSize / 2
         );
         ctx.rotate(angle);
@@ -419,6 +419,8 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
         }
     }
 
+    const rectRef = React.useRef<HTMLDivElement>(null);
+
     React.useEffect(() => {
         TexturePool.getInstance().constructTexturePool().then(() => {
             draw();
@@ -442,7 +444,41 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
         }
     }));
 
+    React.useEffect(() => {
+        
+        // adjust zoom and scroll positions to importanceRect
+        if (props.playerView && canvasRef.current && props.importanceRect) {
+            console.log("called");
+
+            const importanceCanvas : Rect = {
+                x: props.importanceRect.x * CanvasBaseSize,
+                y: props.importanceRect.y * CanvasBaseSize,
+                width: props.importanceRect.width * CanvasBaseSize,
+                height: props.importanceRect.height * CanvasBaseSize
+            }
+
+            const viewportWidth = canvasRef.current.clientWidth;
+            const viewportHeight = canvasRef.current.clientHeight;
+
+            
+            let z = Math.max(viewportWidth / importanceCanvas.width, viewportHeight / importanceCanvas.height);
+            z = Math.min(Math.max(z / 3, .2), 2);
+            console.log(z);
+            setZoom(z);
+            
+            console.log(viewportWidth, viewportHeight);
+        }
+    }, [props.importanceRect])
+
     const [zoom, setZoom] = React.useState<number>(.2);
+
+    React.useEffect(() => {
+        rectRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+        });
+    }, [zoom])
 
     return (
         <div
@@ -577,6 +613,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                 }
                                 {
                                     <div
+                                        ref={rectRef}
                                         className="pointer-events-none absolute border-4 border-orange-600"
                                         style={{
                                             left: props.importanceRect ? (props.importanceRect.x * CanvasBaseSize + 'px') : "0px",

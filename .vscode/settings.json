@@ -1,0 +1,6 @@
+{
+    "task.autoDetect": "off",
+    "files.associations": {
+        "*.json5": "json"
+    }
+}

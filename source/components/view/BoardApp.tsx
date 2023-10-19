@@ -1,7 +1,7 @@
 import { BoardDMView } from './BoardDMView';
 import React from 'react';
 import { BoardPlayerView, BoardPlayerViewHandle } from './BoardPlayerView';
-import { Board } from '../../data/Board';
+import { Board, OnePageDungeon, constructFromOnePageDungeon } from '../../data/Board';
 import { useForceUpdate } from '../../utility';
 import { Rect } from '../../Rect';
 import { IAppView } from './IAppView';
@@ -19,6 +19,20 @@ const BoardApp = (props: IAppView & {
         forceUpdate();
         playerView.current?.update();
     }
+
+    React.useEffect(() => {
+        window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
+            try {
+                const newBoard = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
+                Object.keys(newBoard).forEach((key) => {
+                    (props.board.current as any)[key] = (newBoard as any)[key];
+                });
+                update();
+            } catch (e: any) {
+                props.dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+            }
+        });
+    }, [])
 
     React.useEffect(() => {
         playerView.current?.update();

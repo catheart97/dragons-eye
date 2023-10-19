@@ -20,32 +20,37 @@ export interface ITListElementProps<T> {
     setImage?: (image: string) => void
     dialogHandle?: React.RefObject<DialogHandle>
     data: T
+    alwaysExpanded?: boolean
 }
 
 export const TListElementComponent = <T extends {
     name: string
 }>(props: ITListElementProps<T>) => {
-    const [expanded, setExpanded] = React.useState(false);
+    const [expanded, setExpanded] = React.useState(props.alwaysExpanded ?? false);
 
     return (
         <div className="rounded-xl overflow-hidden bg-neutral-100">
-            <div className='w-full flex'>
+            <div className='w-full flex justify-end'>
                 {
-                    props.onSelect ? (
-                        <button
-                            onClick={() => {
-                                props.onSelect!(props.data)
-                            }}
-                            className="w-full grow p-2 flex items-center hover:bg-neutral-200 transition-all duration-200 ease-in-out"
-                        >
-                            {props.data.name}
-                        </button>
+                    props.alwaysExpanded ? (
+                        <></>
                     ) : (
-                        <div
-                            className="w-full grow p-2 flex items-center"
-                        >
-                            {props.data.name}
-                        </div>
+                        props.onSelect ? (
+                            <button
+                                onClick={() => {
+                                    props.onSelect!(props.data)
+                                }}
+                                className="w-full grow p-2 flex items-center hover:bg-neutral-200 transition-all duration-200 ease-in-out"
+                            >
+                                {props.data.name}
+                            </button>
+                        ) : (
+                            <div
+                                className="w-full grow p-2 flex items-center"
+                            >
+                                {props.data.name}
+                            </div>
+                        )
                     )
                 }
                 {
@@ -58,16 +63,20 @@ export const TListElementComponent = <T extends {
                         </button>
                     ) : null
                 }
-                <button
-                    className='text-xs hover:bg-gray-200 w-8 p-1 flex justify-center items-center'
-                    onClick={() => {
-                        setExpanded(!expanded);
-                    }}
-                >
-                    {
-                        !expanded ? <span className="mso">arrow_downward</span> : <span className="mso">arrow_upward</span>
-                    }
-                </button>
+                {
+                    !props.alwaysExpanded ?? (
+                        <button
+                            className='text-xs hover:bg-gray-200 w-8 p-1 flex justify-center items-center'
+                            onClick={() => {
+                                setExpanded(!expanded);
+                            }}
+                        >
+                            {
+                                !expanded ? <span className="mso">arrow_downward</span> : <span className="mso">arrow_upward</span>
+                            }
+                        </button>
+                    )
+                }
             </div>
             {
                 expanded ? (
@@ -93,6 +102,8 @@ export interface ITListComponentProps<T> {
     setImage?: (image: string) => void
     dialogHandle?: React.RefObject<DialogHandle>
     update: () => void
+    alwaysExpanded?: boolean
+    className?: string
 }
 
 export const TListComponent = <T extends { name: string }>(props: ITListComponentProps<T> & {
@@ -154,31 +165,34 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
                     )
                 }
             </div>
-            {
-                props.data.map((t, i) => {
-                    if (!t.name.toLowerCase().includes(filter.toLowerCase())) return null;
-                    return (
-                        <TListElementComponent
-                            key={i}
-                            data={t}
-                            viewComponent={props.viewComponent}
-                            onDeleteRequest={() => {
-                                props.data.splice(i, 1);
-                                props.onUpdateData?.(props.data);
-                                props.update();
-                            }}
-                            onUpdateRequest={(data: T) => {
-                                props.data[i] = data;
-                                props.onUpdateData?.(props.data);
-                                props.update();
-                            }}
-                            onSelect={props.onSelect}
-                            setImage={props.setImage}
-                            dialogHandle={props.dialogHandle}
-                        ></TListElementComponent>
-                    )
-                })
-            }
+            <div className={props.className ?? "flex flex-col gap-2"}>
+                {
+                    props.data.map((t, i) => {
+                        if (!t.name.toLowerCase().includes(filter.toLowerCase())) return null;
+                        return (
+                            <TListElementComponent
+                                key={i}
+                                data={t}
+                                viewComponent={props.viewComponent}
+                                onDeleteRequest={() => {
+                                    props.data.splice(i, 1);
+                                    props.onUpdateData?.(props.data);
+                                    props.update();
+                                }}
+                                onUpdateRequest={(data: T) => {
+                                    props.data[i] = data;
+                                    props.onUpdateData?.(props.data);
+                                    props.update();
+                                }}
+                                onSelect={props.onSelect}
+                                setImage={props.setImage}
+                                dialogHandle={props.dialogHandle}
+                                alwaysExpanded={props.alwaysExpanded}
+                            ></TListElementComponent>
+                        )
+                    })
+                }
+            </div>
         </div>
     )
 }

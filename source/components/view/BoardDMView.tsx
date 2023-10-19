@@ -19,6 +19,7 @@ import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility'
 import { Dialog } from '../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
+import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -54,16 +55,17 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
     const setupUtilities = () => {
         utilities.current = [
             new InteractBoardUtility(board.current),
-            new SpellBoardUtility(),
+            new MoveDecoratorBoardUtility(board.current),
             new InitiaitveBoardUtility(board.current),
-            new TerrainBoardUtility(board.current, BoardTerrain.Grass),
-            new ConditionBoardUtility(board.current, null),
+            new SpellBoardUtility(),
             new CreateCreatureDecoratorBoardUtility(board.current),
             new CreateItemDecoratorBoardUtility(board.current),
-            new MoveDecoratorBoardUtility(board.current),
             new TrashDecoratorBoardUtility(board.current),
+            new TerrainBoardUtility(board.current, BoardTerrain.Grass),
+            new ConditionBoardUtility(board.current, null),
             new HiddenBoardUtility(board.current),
-            new ImportanceRectUtility(props.setImportanceRect)
+            new ImportanceRectUtility(props.setImportanceRect),
+            new SizeBoardUtility(board.current)
         ];
         utilities.current.forEach(element => {
             element.forceUpdate = renderUI;

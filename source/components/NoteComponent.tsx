@@ -4,6 +4,7 @@ import { Note } from "../data/Note";
 import { useForceUpdate } from "../utility";
 import Markdown from "marked-react";
 import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
+import { ZoomImage } from "./ui/ZoomImage";
 
 export const NoteComponent = (props: IViewComponent<Note> & {
     editMode?: boolean,
@@ -87,17 +88,12 @@ export const NoteComponent = (props: IViewComponent<Note> & {
                                                         className="grow flex items-center justify-center"
                                                         onClick={() => {
                                                             props.dialogHandle?.current?.open(
-                                                                <div
-                                                                    className="w-full h-full"
-                                                                    style={{
-                                                                        backgroundImage: `url(${image})`,
-                                                                        backgroundSize: "contain",
-                                                                        backgroundPosition: "center",
-                                                                        backgroundRepeat: "no-repeat",
-                                                                    }}
-                                                                ></div>,
+                                                                <ZoomImage
+                                                                    src={image}
+                                                                />,
                                                                 undefined,
-                                                                ""
+                                                                "",
+                                                                true
                                                             )
                                                         }}
                                                     >

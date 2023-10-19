@@ -2,11 +2,13 @@ import { CreatureCondition, CreatureSize, CreatureType, DamageType, Statblock, S
 import { userData } from "./Environment";
 import { Item, ItemType } from "./Item";
 import { Spell } from "./Spell";
+import { Note } from "./Note";
 
 type Schema = {
     spells: Spell[],
     monsters: Statblock[]
-    items: Item[]
+    items: Item[],
+    notes?: Note[]
 }
 export type DatabaseSchema = Schema;
 
@@ -136,12 +138,21 @@ export class Database {
         }
     }
 
+    public getNotes(): Note[] {
+        return this.data.notes ?? [];
+    }
+
     public getSpells(): Spell[] {
         return this.data.spells;
     }
 
     public getMonsters(): Statblock[] {
         return this.data.monsters;
+    }
+
+    public updateNotes(notes: Note[]) {
+        this.data.notes = notes;
+        this.commit();
     }
 
     public updateSpells(spells: Spell[]) {

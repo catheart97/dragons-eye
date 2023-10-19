@@ -8,7 +8,7 @@ import CampaignIcon from "../../../resources/placeholders/campaign.png?base64";
 import CharacterIcon from "../../../resources/placeholders/character.png?base64";
 
 import React, { useEffect } from "react";
-import { Board } from "../../data/Board";
+import { Board, OnePageDungeon, constructFromOnePageDungeon } from "../../data/Board";
 import { Database } from "../../data/Database";
 import { EncounterList } from "../EncounterComponent";
 import { ItemList } from "../ItemComponent";
@@ -19,6 +19,8 @@ import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
 import { NoteList } from "../NoteComponent";
+import { Encounter } from "../../data/Encounter";
+import { DMScreenComponent } from "../DMScreenComponent";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
@@ -97,6 +99,57 @@ export const CampaignDMView = (props: IDMAppView & {
             props.campaign.current.image ?? CampaignIcon
         )
     )
+
+    React.useEffect(() => {
+        window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
+            try {
+                const newBoard = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
+
+                let encounterTitle = "";
+                let encounterDescription = "";
+
+                props.dialogHandle.current?.open((
+                    <>
+                        <UIGroup title="Encounter Title">
+                            <TextInput
+                                onChange={(e) => {
+                                    encounterTitle = e.target.value;
+                                }}
+                            />
+                        </UIGroup>
+
+                        <UIGroup title="Encounter Description">
+                            <TextInput
+                                onChange={(e) => {
+                                    encounterDescription = e.target.value;
+                                }}
+                            />
+                        </UIGroup>
+                    </>
+                ), {
+                    success() {
+                        const encounter: Encounter = {
+                            name: encounterTitle,
+                            description: encounterDescription,
+                            board: newBoard
+                        }
+
+                        if (selectedAdventure >= 0) {
+                            props.campaign.current.adventures[selectedAdventure].encounters.push(encounter);
+                        } else {
+                            props.campaign.current.encounters.push(encounter);
+                        }
+                        props.update();
+                    },
+                    failure() { }
+                }, "Import Dungeon")
+
+                props.update();
+            } catch (e: any) {
+                props.dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
+            }
+        });
+    }, [])
 
     return (
         <>
@@ -191,12 +244,12 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 </div>
                                                 {
                                                     i != 0 && (
-                                                        <button 
+                                                        <button
                                                             className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
                                                             onClick={() => {
                                                                 const temp = props.campaign.current.adventures[i];
-                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i-1];
-                                                                props.campaign.current.adventures[i-1] = temp;
+                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i - 1];
+                                                                props.campaign.current.adventures[i - 1] = temp;
                                                                 props.update();
                                                             }}
                                                         >
@@ -206,12 +259,12 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 }
                                                 {
                                                     i != props.campaign.current.adventures.length - 1 && (
-                                                        <button 
+                                                        <button
                                                             className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
                                                             onClick={() => {
                                                                 const temp = props.campaign.current.adventures[i];
-                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i+1];
-                                                                props.campaign.current.adventures[i+1] = temp;
+                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i + 1];
+                                                                props.campaign.current.adventures[i + 1] = temp;
                                                                 props.update();
                                                             }}
                                                         >
@@ -219,6 +272,16 @@ export const CampaignDMView = (props: IDMAppView & {
                                                         </button>
                                                     )
                                                 }
+                                                <button
+                                                    className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                    onClick={() => {
+                                                        setSelectedAdventure(-1);
+                                                        props.campaign.current.adventures.splice(i, 1);
+                                                        props.update();
+                                                    }}
+                                                >
+                                                    <span className="mso">delete</span>
+                                                </button>
                                             </div>
                                         </div>
                                     )
@@ -270,6 +333,19 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.update();
                                             }}
                                         />
+                                        <div className="grow"></div>
+                                        <button
+                                            className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
+                                            onClick={() => {
+                                                props.dialogHandle.current?.open(<>
+                                                    <DMScreenComponent 
+                                                        campaign={props.campaign}
+                                                    />
+                                                </>, undefined, "Dungeon Master's Screen", true);
+                                            }}
+                                        >
+                                            <span className="msf">map</span>
+                                        </button>
                                     </div>
                                     <div className="grow w-full overflow-x-scroll">
                                         <Dashboard>
@@ -430,6 +506,19 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.update();
                                             }}
                                         />
+                                        <div className="grow"></div>
+                                        <button
+                                            className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
+                                            onClick={() => {
+                                                props.dialogHandle.current?.open(<>
+                                                    <DMScreenComponent 
+                                                        campaign={props.campaign}
+                                                    />
+                                                </>, undefined, "Dungeon Master's Screen", true);
+                                            }}
+                                        >
+                                            <span className="msf">map</span>
+                                        </button>
                                     </div>
                                     <div className="grow w-full overflow-x-scroll">
                                         <Dashboard>

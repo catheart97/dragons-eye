@@ -20,14 +20,15 @@ export const App = () => {
 
     // mode and data depending on mode
     const mode = React.useRef<AppMode>(AppMode.Campaign);
+    const playerViewOpen = React.useRef<boolean>(false);
+    
     const board = React.useRef<Board>(constructDefaultBoard(15, 15));
     const campaign = React.useRef<Campaign>(structuredClone(EmptyCampaign));
-    const registered = React.useRef<boolean>(false);
-
+    
     // handle for dialogs (these shall only be shown on dm views)
     const dialogHandle: React.MutableRefObject<DialogHandle | null> = React.useRef<DialogHandle | null>(null);
     const fileName = React.useRef<string>("");
-    const playerViewOpen = React.useRef<boolean>(false);
+    const registered = React.useRef<boolean>(false);
 
     const campaignBoard = React.useRef<Board | null>(null);
     const loadCampaignBoard = (board: Board | null) => {
@@ -43,13 +44,6 @@ export const App = () => {
             playerViewOpen.current = !playerViewOpen.current;
             console.log(playerViewOpen.current)
             forceUpdate();
-        });
-        window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
-            try {
-                board.current = constructFromOnePageDungeon(window.fsExtra.readJsonSync(fn) as OnePageDungeon);
-            } catch (e: any) {
-                dialogHandle.current?.open(<div className='flex flex-col gap-2 w-full'>{e}</div>, undefined, "Error");
-            }
         });
         window.ipcRenderer.on('r-open-file', (_e, fn: string) => {
             try {
