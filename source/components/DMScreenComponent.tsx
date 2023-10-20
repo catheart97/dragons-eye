@@ -22,7 +22,7 @@ export const DMScreenComponent = () => {
                         <NoteList
                             data={campaign.current.notes}
                             update={forceUpdate}
-                            alwaysExpanded
+                            // alwaysExpanded
                             dialogHandle={dialogHandle}
                         />
                     </div>
@@ -40,7 +40,7 @@ export const DMScreenComponent = () => {
                     update={forceUpdate}
                     allowAdd
                     allowDelete
-                    alwaysExpanded
+                    // alwaysExpanded
                     dialogHandle={dialogHandle}
                 />
             </div>

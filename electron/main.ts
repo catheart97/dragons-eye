@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } from 'electron';
 import path from 'node:path';
 import NPMLicenses from '../license.json?raw';
+import fsExtra from 'fs-extra';
 
 type License = {
     name: string;
@@ -69,7 +70,11 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 function createWindow() {
 
     ipcMain.handle("m-userData", (_event, _arg) => {
-        return app.getPath("userData");
+        const path = app.getPath("documents") + "/Dragon's Eye/";
+        if (!fsExtra.existsSync(path)) {
+            fsExtra.mkdirSync(path);
+        }
+        return path;
     });
 
     win = new BrowserWindow({
