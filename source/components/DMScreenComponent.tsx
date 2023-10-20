@@ -1,8 +1,8 @@
 import React from "react"
-import { Campaign, CampaignContext } from "../data/Campaign"
-import { NoteList } from "./NoteComponent"
-import { useForceUpdate } from "../utility"
+import { CampaignContext } from "../data/Campaign"
 import { Database } from "../data/Database"
+import { useForceUpdate } from "../utility"
+import { NoteList } from "./NoteComponent"
 import { Dialog, DialogHandle } from "./ui/Dialog"
 
 
