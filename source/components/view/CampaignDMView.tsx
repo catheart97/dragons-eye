@@ -241,7 +241,7 @@ export const CampaignDMView = (props: IDMAppView & {
                     <div className="w-72 bg-neutral-100/90 shadow h-full flex items-center justify-end gap-2 transition-[width] ease-in-out duration-200" style={{
                         width: sidebarOpen ? "18rem" : "1rem",
                     }}>
-                        
+
                         <div className="grow flex flex-col overflow-hidden h-full p-4">
                             <img
                                 className="w-full h-auto rounded-xl shadow-xl"
@@ -371,25 +371,47 @@ export const CampaignDMView = (props: IDMAppView & {
                             </div>
                         </div>
 
-                        <button className="w-4 hover:text-orange-600 h-full flex items-center bg-neutral-800/20">
-                            <span className="mso" onClick={() => {
+                        <button className="w-4 hover:text-orange-600 h-full flex items-center bg-neutral-800/20" onClick={() => {
                                 setSidebarOpen(!sidebarOpen);
-                            }}>{
-                                sidebarOpen ? "chevron_left" : "chevron_right"
-                            }</span>
+                            }}>
+                            <span className="mso" >{
+                                    sidebarOpen ? "chevron_left" : "chevron_right"
+                                }</span>
                         </button>
                     </div>
                     <div
                         className="grow h-full flex flex-col backdrop-blur-lg"
 
                     >
-                        <div className="w-full h-full flex flex-col gap-3">
-                            <div className="h-44 p-4 flex items-center shrink-0 gap-6">
+                        <div className="w-full h-full flex flex-col gap-1">
+
+                            <input
+                                type="text"
+                                className="bg-neutral-800/20 text-3xl text-white font-black focus:outline-none w-full h-16 p-4"
+                                value={
+                                    props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                        props.campaign.current.adventures[selectedAdventure].title
+                                    ) : (
+                                        props.campaign.current.title
+                                    )
+                                }
+                                onChange={(e) => {
+                                    if (props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1) {
+                                        props.campaign.current.adventures[selectedAdventure].title = e.target.value;
+                                        props.update();
+                                    } else {
+                                        props.campaign.current.title = e.target.value;
+                                        props.update();
+                                    }
+                                }}
+                            />
+
+                            <div className="h-26 w-full overflow-x-scroll px-4 p-2 flex items-center shrink-0 gap-6">
                                 {
                                     props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                         <>
                                             <button
-                                                className="w-auto h-full"
+                                                className="w-fit h-fit shrink-0"
                                                 onClick={() => {
                                                     // open file dialog 
                                                     const input = document.createElement('input');
@@ -410,24 +432,16 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 }}
                                             >
                                                 <img
-                                                    className="w-auto h-full rounded-xl shadow-xl"
+                                                    className="w-24 h-24 rounded-xl shadow-xl"
                                                     src={props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon}
                                                 />
                                             </button>
-                                            <input
-                                                type="text"
-                                                className="text-3xl text-white font-black focus:outline-none bg-transparent"
-                                                value={props.campaign.current.adventures[selectedAdventure].title}
-                                                onChange={(e) => {
-                                                    props.campaign.current.adventures[selectedAdventure].title = e.target.value;
-                                                    props.update();
-                                                }}
-                                            />
+
                                         </>
                                     ) : (
                                         <>
                                             <button
-                                                className="w-auto h-full"
+                                                className="w-fit h-fit shrink-0"
                                                 onClick={() => {
                                                     // open file dialog 
                                                     const input = document.createElement('input');
@@ -448,24 +462,16 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 }}
                                             >
                                                 <img
-                                                    className="w-auto h-full rounded-xl shadow-xl"
+                                                    className="w-24 h-24 rounded-xl shadow-xl"
                                                     src={props.campaign.current.image ?? CampaignIcon}
                                                     alt="Campaign Image"
                                                 />
                                             </button>
-                                            <input
-                                                type="text"
-                                                className="text-3xl text-white font-black focus:outline-none bg-transparent"
-                                                value={props.campaign.current.title}
-                                                onChange={(e) => {
-                                                    props.campaign.current.title = e.target.value;
-                                                    props.update();
-                                                }}
-                                            />
+
                                         </>
                                     )
                                 }
-                                < div className="grow"></div>
+                                <div className="grow"></div>
                                 {
                                     props.campaign.current.calendar ? (
                                         <CalendarComponent

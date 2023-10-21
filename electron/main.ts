@@ -70,7 +70,7 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 function createWindow() {
 
     ipcMain.handle("m-userData", (_event, _arg) => {
-        const path = app.getPath("documents") + "/Dragon's Eye/";
+        const path = app.getPath("userData") + "/Dragon's Eye/";
         if (!fsExtra.existsSync(path)) {
             fsExtra.mkdirSync(path);
         }
