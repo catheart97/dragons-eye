@@ -1,5 +1,6 @@
 import React from "react";
 import { ToolButton } from "./ToolButton";
+import { useForceUpdate } from "../../utility";
 
 export type DialogProps = {}
 
@@ -14,6 +15,7 @@ export type DialogHandle = {
         full?: boolean
     ) => void
     close: () => void
+    forceUpdate: () => void
 }
 
 const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> = (_props, ref) => {
@@ -28,6 +30,8 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
 
     const dialogRef = React.useRef<HTMLDialogElement>(null)
 
+    const forceUpdate = useForceUpdate();
+
     const handle: DialogHandle = {
         open: (children: React.ReactNode, confirm?: {
             success: () => void
@@ -40,12 +44,12 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
 
             dialogRef.current?.showModal()
         },
-
         close: () => {
             setChildren(null)
             setConfirm(null)
             dialogRef.current?.close()
-        }
+        },
+        forceUpdate: forceUpdate
     }
 
     React.useImperativeHandle(ref, () => handle)

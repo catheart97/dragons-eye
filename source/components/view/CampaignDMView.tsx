@@ -21,16 +21,79 @@ import { UIGroup } from "../ui/UIGroup";
 import { NoteList } from "../NoteComponent";
 import { Encounter } from "../../data/Encounter";
 import { DMScreenComponent } from "../DMScreenComponent";
+import { CalendarComponent, createCalendar } from "../CalendarComponent";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
     update: () => void
-    setImage?: (image: string) => void
+    setImage?: (image: string) => void,
+    campaign: React.MutableRefObject<Campaign>
 }) => {
+
+    if (!props.campaign.current.spells) {
+        props.campaign.current.spells = [];
+    }
+    if (!props.campaign.current.monsters) {
+        props.campaign.current.monsters = [];
+    }
+    if (!props.campaign.current.items) {
+        props.campaign.current.items = [];
+    }
+
     return (
-        <DashboardElement title="Compendium">
+        <DashboardElement>
+            <div className="text-xl font-bold">Campaign Compedium</div>
             <TabView
                 className="shadow xl grow bg-neutral-200"
+                tabClassName="overflow-y-scroll h-1/2"
+            >
+                <Tab title="Spells">
+                    <SpellList
+                        allowDelete
+                        allowAdd
+                        searchBar
+                        onUpdateData={(data) => {
+                            props.campaign.current.spells = data;
+                            props.update();
+                        }}
+                        data={props.campaign.current.spells!}
+                        update={props.update}
+                    />
+                </Tab>
+                <Tab title="Monsters">
+                    <StatblockList
+                        allowDelete
+                        allowAdd
+                        searchBar
+                        onUpdateData={(data) => {
+                            props.campaign.current.monsters = data;
+                            props.update();
+                        }}
+                        data={props.campaign.current.monsters!}
+                        update={props.update}
+                        onSelect={(statblock) => {
+                            if (props.setImage) {
+                                props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                            }
+                        }}
+                    />
+                </Tab>
+                <Tab title="Items">
+                    <ItemList
+                        allowDelete
+                        searchBar
+                        onUpdateData={(data) => {
+                            props.campaign.current.items = data;
+                            props.update();
+                        }}
+                        data={props.campaign.current.items!}
+                        update={props.update}
+                    />
+                </Tab>
+            </TabView>
+            <div className="text-xl font-bold">Compendium</div>
+            <TabView
+                className="shadow xl grow bg-neutral-200 h-1/2"
                 tabClassName="overflow-y-scroll"
             >
                 <Tab title="Spells">
@@ -294,309 +357,276 @@ export const CampaignDMView = (props: IDMAppView & {
                         className="basis-10/12 h-full flex flex-col backdrop-blur-lg"
 
                     >
-                        {
-                            props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
-                                <div className="w-full h-full flex flex-col gap-3">
-                                    <div className="h-44 p-4 flex items-center shrink-0 gap-6">
-                                        <button
-                                            className="w-auto h-full"
-                                            onClick={() => {
-                                                // open file dialog 
-                                                const input = document.createElement('input');
-                                                input.type = 'file';
-                                                input.accept = '.png,.jpg,.jpeg,.gif';
-                                                input.onchange = (e: any) => {
-                                                    const file = e.target.files[0];
-                                                    const reader = new FileReader();
-                                                    reader.readAsDataURL(file);
-                                                    reader.onloadend = () => {
-                                                        props.campaign.current.adventures[selectedAdventure].image = reader.result?.toString();
-                                                        props.setImage(props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon);
-                                                        props.update();
-                                                        input.remove();
+                        <div className="w-full h-full flex flex-col gap-3">
+                            <div className="h-44 p-4 flex items-center shrink-0 gap-6">
+                                {
+                                    props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                        <>
+                                            <button
+                                                className="w-auto h-full"
+                                                onClick={() => {
+                                                    // open file dialog 
+                                                    const input = document.createElement('input');
+                                                    input.type = 'file';
+                                                    input.accept = '.png,.jpg,.jpeg,.gif';
+                                                    input.onchange = (e: any) => {
+                                                        const file = e.target.files[0];
+                                                        const reader = new FileReader();
+                                                        reader.readAsDataURL(file);
+                                                        reader.onloadend = () => {
+                                                            props.campaign.current.adventures[selectedAdventure].image = reader.result?.toString();
+                                                            props.setImage(props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon);
+                                                            props.update();
+                                                            input.remove();
+                                                        }
                                                     }
-                                                }
-                                                input.click();
-                                            }}
-                                        >
-                                            <img
-                                                className="w-auto h-full rounded-xl shadow-xl"
-                                                src={props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon}
+                                                    input.click();
+                                                }}
+                                            >
+                                                <img
+                                                    className="w-auto h-full rounded-xl shadow-xl"
+                                                    src={props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon}
+                                                />
+                                            </button>
+                                            <input
+                                                type="text"
+                                                className="text-3xl text-white font-black focus:outline-none bg-transparent"
+                                                value={props.campaign.current.adventures[selectedAdventure].title}
+                                                onChange={(e) => {
+                                                    props.campaign.current.adventures[selectedAdventure].title = e.target.value;
+                                                    props.update();
+                                                }}
                                             />
-                                        </button>
-                                        <input
-                                            type="text"
-                                            className="text-3xl text-white font-black focus:outline-none bg-transparent"
-                                            value={props.campaign.current.adventures[selectedAdventure].title}
-                                            onChange={(e) => {
-                                                props.campaign.current.adventures[selectedAdventure].title = e.target.value;
-                                                props.update();
-                                            }}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                className="w-auto h-full"
+                                                onClick={() => {
+                                                    // open file dialog 
+                                                    const input = document.createElement('input');
+                                                    input.type = 'file';
+                                                    input.accept = '.png,.jpg,.jpeg,.gif';
+                                                    input.onchange = (e: any) => {
+                                                        const file = e.target.files[0];
+                                                        const reader = new FileReader();
+                                                        reader.readAsDataURL(file);
+                                                        reader.onloadend = () => {
+                                                            props.campaign.current.image = reader.result?.toString();
+                                                            props.setImage(props.campaign.current.image ?? CampaignIcon);
+                                                            props.update();
+                                                            input.remove();
+                                                        }
+                                                    }
+                                                    input.click();
+                                                }}
+                                            >
+                                                <img
+                                                    className="w-auto h-full rounded-xl shadow-xl"
+                                                    src={props.campaign.current.image ?? CampaignIcon}
+                                                    alt="Campaign Image"
+                                                />
+                                            </button>
+                                            <input
+                                                type="text"
+                                                className="text-3xl text-white font-black focus:outline-none bg-transparent"
+                                                value={props.campaign.current.title}
+                                                onChange={(e) => {
+                                                    props.campaign.current.title = e.target.value;
+                                                    props.update();
+                                                }}
+                                            />
+                                        </>
+                                    )
+                                }
+                                < div className="grow"></div>
+                                {
+                                    props.campaign.current.calendar ? (
+                                        <CalendarComponent
+                                            campaign={props.campaign}
+                                            update={props.update}
                                         />
-                                        <div className="grow"></div>
+                                    ) : (
                                         <button
                                             className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
                                             onClick={() => {
-                                                props.dialogHandle.current?.open(<>
-                                                    <DMScreenComponent />
-                                                </>, undefined, "Dungeon Master's Screen", true);
-                                            }}
-                                        >
-                                            <span className="msf">map</span>
-                                        </button>
-                                    </div>
-                                    <div className="grow w-full overflow-x-scroll">
-                                        <Dashboard>
-                                            <CompendiumDashboardElement
-                                                update={props.update}
-                                            >
-                                            </CompendiumDashboardElement>
-                                            <DashboardElement>
-                                                <div className="text-xl font-bold">Adventure Notes</div>
-                                                <NoteList
-                                                    data={props.campaign.current.adventures[selectedAdventure].notes}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.adventures[selectedAdventure].notes = data;
+                                                const process = async () => {
+                                                    const res = await createCalendar(props.dialogHandle);
+                                                    if (res) {
+                                                        props.campaign.current.calendar = {
+                                                            stats: res,
+                                                            current: {
+                                                                day: 1,
+                                                                month: 1,
+                                                                year: 1,
+                                                                hours: 0,
+                                                                minutes: 0,
+                                                            }
+                                                        }
                                                         props.update();
-                                                    }}
-                                                    setImage={props.setImage}
-                                                    dialogHandle={props.dialogHandle}
-                                                />
-                                                <div className="text-xl font-bold">Notes</div>
-                                                <NoteList
-                                                    setImage={props.setImage}
-                                                    data={props.campaign.current.notes}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.notes = data;
-                                                        props.update();
-                                                    }}
-                                                    dialogHandle={props.dialogHandle}
-                                                />
-                                            </DashboardElement>
-                                            <DashboardElement>
-                                                <div className="text-xl font-bold">Players</div>
-                                                <PlayerStatblockList
-                                                    data={props.campaign.current.players}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.players = data;
-                                                        props.update();
-                                                    }}
-                                                    update={props.update}
-                                                    onSelect={(statblock) => {
-                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
-                                                    }}
-                                                />
-                                                <div className="text-xl font-bold">NPCs</div>
-                                                <DBStatblockList
-                                                    data={props.campaign.current.npcs}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.npcs = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(statblock) => {
-                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
-                                                    }}
-                                                />
-                                                <div className="text-xl font-bold">Adventure NPCs</div>
-                                                <DBStatblockList
-                                                    data={props.campaign.current.adventures[selectedAdventure].npcs}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.adventures[selectedAdventure].npcs = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(statblock) => {
-                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
-                                                    }}
-                                                />
-                                            </DashboardElement>
-                                            <DashboardElement>
-                                                <div className="text-xl font-bold">Encounters</div>
-                                                <EncounterList
-                                                    data={props.campaign.current.encounters}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.encounters = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(encounter) => {
-                                                        const board = encounter.board;
-                                                        props.loadCampaignBoard(board);
-                                                    }}
-                                                />
-                                                <div className="text-xl font-bold">Adventure Encounters</div>
-                                                <EncounterList
-                                                    data={props.campaign.current.adventures[selectedAdventure].encounters}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.adventures[selectedAdventure].encounters = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(encounter) => {
-                                                        const board = encounter.board;
-                                                        props.loadCampaignBoard(board);
-                                                    }}
-                                                />
-                                            </DashboardElement>
-                                        </Dashboard>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="w-full h-full flex flex-col gap-3">
-                                    <div className="h-44 p-4 flex items-center shrink-0 gap-6">
-                                        <button
-                                            className="w-auto h-full"
-                                            onClick={() => {
-                                                // open file dialog 
-                                                const input = document.createElement('input');
-                                                input.type = 'file';
-                                                input.accept = '.png,.jpg,.jpeg,.gif';
-                                                input.onchange = (e: any) => {
-                                                    const file = e.target.files[0];
-                                                    const reader = new FileReader();
-                                                    reader.readAsDataURL(file);
-                                                    reader.onloadend = () => {
-                                                        props.campaign.current.image = reader.result?.toString();
-                                                        props.setImage(props.campaign.current.image ?? CampaignIcon);
-                                                        props.update();
-                                                        input.remove();
                                                     }
                                                 }
-                                                input.click();
+                                                process();
                                             }}
                                         >
-                                            <img
-                                                className="w-auto h-full rounded-xl shadow-xl"
-                                                src={props.campaign.current.image ?? CampaignIcon}
-                                                alt="Campaign Image"
-                                            />
+                                            <span className="msf">more_time</span>
                                         </button>
-                                        <input
-                                            type="text"
-                                            className="text-3xl text-white font-black focus:outline-none bg-transparent"
-                                            value={props.campaign.current.title}
-                                            onChange={(e) => {
-                                                props.campaign.current.title = e.target.value;
+                                    )
+                                }
+                                <button
+                                    className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
+                                    onClick={() => {
+                                        props.dialogHandle.current?.open(<>
+                                            <DMScreenComponent />
+                                        </>, undefined, "Dungeon Master's Screen", true);
+                                    }}
+                                >
+                                    <span className="msf">map</span>
+                                </button>
+                            </div>
+                            <div className="grow w-full overflow-x-scroll">
+                                <Dashboard>
+                                    <CompendiumDashboardElement
+                                        update={props.update}
+                                        campaign={props.campaign}
+                                    >
+                                    </CompendiumDashboardElement>
+                                    <DashboardElement>
+                                        {
+                                            props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                                <>
+                                                    <div className="text-xl font-bold">Adventure Notes</div>
+                                                    <NoteList
+                                                        data={props.campaign.current.adventures[selectedAdventure].notes}
+                                                        update={props.update}
+                                                        allowAdd
+                                                        allowDelete
+                                                        searchBar
+                                                        onUpdateData={(data) => {
+                                                            props.campaign.current.adventures[selectedAdventure].notes = data;
+                                                            props.update();
+                                                        }}
+                                                        setImage={props.setImage}
+                                                        dialogHandle={props.dialogHandle}
+                                                    />
+                                                </>
+                                            ) : undefined
+                                        }
+
+                                        <div className="text-xl font-bold">Notes</div>
+                                        <NoteList
+                                            setImage={props.setImage}
+                                            data={props.campaign.current.notes}
+                                            update={props.update}
+                                            allowAdd
+                                            allowDelete
+                                            searchBar
+                                            onUpdateData={(data) => {
+                                                props.campaign.current.notes = data;
                                                 props.update();
                                             }}
+                                            dialogHandle={props.dialogHandle}
                                         />
-                                        <div className="grow"></div>
-                                        <button
-                                            className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
-                                            onClick={() => {
-                                                props.dialogHandle.current?.open(<>
-                                                    <DMScreenComponent />
-                                                </>, undefined, "Dungeon Master's Screen", true);
+                                    </DashboardElement>
+                                    <DashboardElement>
+                                        <div className="text-xl font-bold">Players</div>
+                                        <PlayerStatblockList
+                                            data={props.campaign.current.players}
+                                            allowAdd
+                                            allowDelete
+                                            searchBar
+                                            onUpdateData={(data) => {
+                                                props.campaign.current.players = data;
+                                                props.update();
                                             }}
-                                        >
-                                            <span className="msf">map</span>
-                                        </button>
-                                    </div>
-                                    <div className="grow w-full overflow-x-scroll">
-                                        <Dashboard>
-                                            <CompendiumDashboardElement
-                                                update={props.update}
-                                                setImage={props.setImage}
-                                            >
-                                            </CompendiumDashboardElement>
-                                            <DashboardElement title="Notes">
-                                                <NoteList
-                                                    setImage={props.setImage}
-                                                    dialogHandle={props.dialogHandle}
-                                                    data={props.campaign.current.notes}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.notes = data;
-                                                        props.update();
-                                                    }}
-                                                />
-                                            </DashboardElement>
-                                            <DashboardElement>
-                                                <div className="text-xl font-bold">Players</div>
-                                                <PlayerStatblockList
-                                                    data={props.campaign.current.players}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.players = data;
-                                                        props.update();
-                                                    }}
-                                                    update={props.update}
-                                                    onSelect={(statblock) => {
-                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
-                                                    }}
-                                                />
-                                                <div className="text-xl font-bold">NPCs</div>
-                                                <DBStatblockList
-                                                    data={props.campaign.current.npcs}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.npcs = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(statblock) => {
-                                                        props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
-                                                    }}
-                                                />
-                                            </DashboardElement>
-                                            <DashboardElement
-                                                title="Encounters"
-                                            >
-                                                <EncounterList
-                                                    data={props.campaign.current.encounters}
-                                                    update={props.update}
-                                                    allowAdd
-                                                    allowDelete
-                                                    searchBar
-                                                    onUpdateData={(data) => {
-                                                        props.campaign.current.encounters = data;
-                                                        props.update();
-                                                    }}
-                                                    onSelect={(encounter) => {
-                                                        const board = encounter.board;
-                                                        props.loadCampaignBoard(board);
-                                                    }}
-                                                />
-                                            </DashboardElement>
-                                        </Dashboard>
-                                    </div>
-                                </div>
-                            )
-                        }
+                                            update={props.update}
+                                            onSelect={(statblock) => {
+                                                props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                            }}
+                                        />
+                                        {
+                                            props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                                <>
+                                                    <div className="text-xl font-bold">Adventure NPCs</div>
+                                                    <DBStatblockList
+                                                        data={props.campaign.current.adventures[selectedAdventure].npcs}
+                                                        update={props.update}
+                                                        allowAdd
+                                                        allowDelete
+                                                        searchBar
+                                                        onUpdateData={(data) => {
+                                                            props.campaign.current.adventures[selectedAdventure].npcs = data;
+                                                            props.update();
+                                                        }}
+                                                        onSelect={(statblock) => {
+                                                            props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                                        }}
+                                                    />
+                                                </>
+                                            ) : undefined
+                                        }
+                                        <div className="text-xl font-bold">NPCs</div>
+                                        <DBStatblockList
+                                            data={props.campaign.current.npcs}
+                                            update={props.update}
+                                            allowAdd
+                                            allowDelete
+                                            searchBar
+                                            onUpdateData={(data) => {
+                                                props.campaign.current.npcs = data;
+                                                props.update();
+                                            }}
+                                            onSelect={(statblock) => {
+                                                props.setImage(statblock.image != "" ? statblock.image : CharacterIcon);
+                                            }}
+                                        />
+                                    </DashboardElement>
+                                    <DashboardElement>
+                                        <div className="text-xl font-bold">Encounters</div>
+                                        <EncounterList
+                                            data={props.campaign.current.encounters}
+                                            update={props.update}
+                                            allowAdd
+                                            allowDelete
+                                            searchBar
+                                            onUpdateData={(data) => {
+                                                props.campaign.current.encounters = data;
+                                                props.update();
+                                            }}
+                                            onSelect={(encounter) => {
+                                                const board = encounter.board;
+                                                props.loadCampaignBoard(board);
+                                            }}
+                                        />
+                                        {
+                                            props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                                <>
+                                                    <div className="text-xl font-bold">Adventure Encounters</div>
+                                                    <EncounterList
+                                                        data={props.campaign.current.adventures[selectedAdventure].encounters}
+                                                        update={props.update}
+                                                        allowAdd
+                                                        allowDelete
+                                                        searchBar
+                                                        onUpdateData={(data) => {
+                                                            props.campaign.current.adventures[selectedAdventure].encounters = data;
+                                                            props.update();
+                                                        }}
+                                                        onSelect={(encounter) => {
+                                                            const board = encounter.board;
+                                                            props.loadCampaignBoard(board);
+                                                        }}
+                                                    />
+                                                </>
+                                            ) : undefined
+                                        }
+                                    </DashboardElement>
+                                </Dashboard>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div >
             <Dialog ref={props.dialogHandle} />
         </>
     )
