@@ -286,14 +286,14 @@ export const MoonIcon = (props: {
     height?: number
 }) => {
     return (
-        <div className="rounded-full overflow-hidden white relative bg-white" style={{
+        <div className="rounded-full overflow-hidden white relative bg-[#e7e5e4] border-[1px] border-black" style={{
             height: props.height || 16,
             width: props.height || 16,
         }}>
             <div className="bg-black absolute top-0 bottom-0 rounded-full" style={{
                 left: offsetMultiplier(props.phase) * (props.height || 16),
-                width: props.height || 16,
-                height: props.height || 16,
+                width: (props.height || 16) - 2,
+                height: (props.height || 16) - 2,
             }}></div>
         </div>
 

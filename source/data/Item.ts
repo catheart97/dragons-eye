@@ -20,4 +20,5 @@ export type Item = {
     value?: number;
     weight?: number;
     magic?: boolean;
+    image?: string;
 }

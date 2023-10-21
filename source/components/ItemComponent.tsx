@@ -33,7 +33,7 @@ export const NewItemComponent = (props: IAddComponent<Item>) => {
                                 {
                                     Object.values(ItemType).map((type) => {
                                         return (
-                                            <option key={type}>{type2text(type)}</option>
+                                            <option key={type} value={type}>{type2text(type)}</option>
                                         )
                                     })
                                 }
@@ -90,7 +90,7 @@ export const NewItemComponent = (props: IAddComponent<Item>) => {
                             });
                         }}
                     >
-                        <span className="mso">add</span> Add Spell
+                        <span className="mso">add</span> Add Item
                     </button>
                 </div>
             </div>
@@ -111,7 +111,7 @@ const type2text = (type: ItemType) => {
             typeText = "Medium Armor";
             break;
         case ItemType.MeleeWeapon:
-            typeText = "Shield";
+            typeText = "Melee Weapon";
             break;
         case ItemType.Potion:
             typeText = "Potion";
@@ -141,45 +141,91 @@ const type2text = (type: ItemType) => {
     return typeText;
 }
 
+import ItemIcon from "../../resources/placeholders/item.png?base64";
+
 export const ItemComponent = (props: IViewComponent<Item>) => {
     let typeText = type2text(props.data.type);
     const isMagic = props.data.magic ? true : false;
     return (
-        <div
-            className="overflow-hidden"
-        >
-            <div className='flex flex-col gap-2 justify-left items-center w-full p-2'>
-                <div className="flex rounded-xl bg-white w-full overflow-hidden text-center">
-                    <div className="flex flex-col items-center justify-center grow basis-1/3">
-                        <div className="text-xl grow bg-neutral-50 h-2/3 w-full">
-                            {typeText}
-                        </div>
-                        <div className="text-sm grow">Type</div>
-                    </div>
+        <div className="text-3xl h-72 w-full" style={{
+            backgroundImage: props.data.image ? `url(${props.data.image})` : `url(${ItemIcon})`,
+            backgroundPosition: "top",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat"
+        }} >
+            <div className="flex flex-col h-full justify-end w-full p-3 bg-gradient-to-b from-neutral-100/70 to-neutral-100">
+                <div className="flex justify-end gap-2">
+                    {
+                        props.data.image ? (
+                            <button
+                                className="flex items-center justify-center hover:bg-neutral-200 p-2 text-base rounded-xl"
+                                onClick={() => {
+                                    props.data.image = "";
+                                    props.updateData(props.data);
+                                }}
+                            >
+                                <span className="mso">close</span>
+                            </button>
+                        ) : null
+                    }
+
                     <button
-                        className="flex flex-col items-center justify-center grow basis-1/3"
+                        className="flex items-center justify-center hover:bg-neutral-200 p-2 text-base rounded-xl"
+                        onClick={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.onchange = (_e) => {
+                                if (input.files && input.files.length > 0) {
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        if (e.target?.result) {
+                                            props.data.image = e.target.result as string;
+                                            props.updateData(props.data);
+                                            input.remove();
+                                        }
+                                    }
+                                    reader.readAsDataURL(input.files[0]);
+                                }
+                            }
+                            input.click();
+                        }}
                     >
-                        <div className="text-xl grow bg-neutral-50 w-full h-2/3 flex justify-center items-center">{isMagic ? <span className="mso">check</span> : <span className="mso">close</span>}</div>
-                        <div className="text-sm grow">Magical</div>
+                        <span className="mso">image</span>
                     </button>
                 </div>
-                <div className="text-xs">
-                    {props.data.description}
+                <div className='flex flex-col gap-2 justify-left items-center w-full p-2'>
+                    <div className="flex rounded-xl bg-white w-full overflow-hidden text-center">
+                        <div className="flex flex-col items-center justify-center grow basis-1/3">
+                            <div className="text-lg grow bg-neutral-50 h-2/3 w-full">
+                                {typeText}
+                            </div>
+                            <div className="text-sm grow">Type</div>
+                        </div>
+                        <button
+                            className="flex flex-col items-center justify-center grow basis-1/3"
+                        >
+                            <div className="text-xl grow bg-neutral-50 w-full h-2/3 flex justify-center items-center">{isMagic ? <span className="mso">check</span> : <span className="mso">close</span>}</div>
+                            <div className="text-sm grow">Magical</div>
+                        </button>
+                    </div>
+                    <div className="text-xs">
+                        {props.data.description}
+                    </div>
+                    {
+                        props.data.value ? (
+                            <div className="text-xs">
+                                {props.data.value} gp
+                            </div>
+                        ) : null
+                    }
+                    {
+                        props.data.weight ? (
+                            <div className="text-xs">
+                                {props.data.weight} lb.
+                            </div>
+                        ) : null
+                    }
                 </div>
-                {
-                    props.data.value ? (
-                        <div className="text-xs">
-                            {props.data.value} gp
-                        </div>
-                    ) : null
-                }
-                {
-                    props.data.weight ? (
-                        <div className="text-xs">
-                            {props.data.weight} lb.
-                        </div>
-                    ) : null
-                }
             </div>
         </div>
     )

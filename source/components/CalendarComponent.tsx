@@ -490,10 +490,12 @@ export const CalendarComponent = (props: {
 
     const mousePos = React.useRef<{ x: number, y: number }>({ x: 0, y: 0 });
 
+    const weekday = getWeekday(calendar.current, calendar);
+
     return (
         <div className="h-24 w-72 h-24 rounded-full bg-neutral-50/80 flex items-center justify-end  backdrop-blur text-neutral-800">
 
-            <div className="grow flex flex-col justify-center p-4 text-neutral-600 gap-1">
+            <div className="grow flex flex-col justify-center py-4 pl-4 pr-2 text-neutral-600 gap-1">
                 <div className="w-full flex gap-2 justify-end">
                     {
                         editMode ? (
@@ -544,8 +546,11 @@ export const CalendarComponent = (props: {
                 </div>
                 <div className="w-full flex justify-end items-center text-xs gap-3">
                     <div>
+                        {weekday}
                         {
-                            getWeekday(calendar.current, calendar)
+                            props.player ? <></> : (
+                                <>&nbsp;({calendar.stats.week.findIndex((day) => day === weekday) + 1})</>
+                            )
                         }
                     </div>
                     <div>

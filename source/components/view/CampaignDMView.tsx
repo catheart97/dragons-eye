@@ -6,6 +6,7 @@ import { IDMAppView } from "./IAppView";
 import AdventureIcon from "../../../resources/placeholders/adventure.png?base64";
 import CampaignIcon from "../../../resources/placeholders/campaign.png?base64";
 import CharacterIcon from "../../../resources/placeholders/character.png?base64";
+import ItemIcon from "../../../resources/placeholders/item.png?base64";
 
 import React, { useEffect } from "react";
 import { Board, OnePageDungeon, constructFromOnePageDungeon } from "../../data/Board";
@@ -88,6 +89,12 @@ export const CompendiumDashboardElement = (props: IDashboardElement & {
                         }}
                         data={props.campaign.current.items!}
                         update={props.update}
+                        setImage={props.setImage}
+                        onSelect={(item) => {
+                            if (props.setImage) {
+                                props.setImage(item.image ? item.image : ItemIcon);
+                            }
+                        }}
                     />
                 </Tab>
             </TabView>
@@ -137,6 +144,12 @@ export const CompendiumDashboardElement = (props: IDashboardElement & {
                         }}
                         data={Database.getInstance().getItems()}
                         update={props.update}
+                        setImage={props.setImage}
+                        onSelect={(item) => {
+                            if (props.setImage) {
+                                props.setImage(item.image ? item.image : ItemIcon);
+                            }
+                        }}
                     />
                 </Tab>
             </TabView>
@@ -162,6 +175,8 @@ export const CampaignDMView = (props: IDMAppView & {
             props.campaign.current.image ?? CampaignIcon
         )
     )
+
+    const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         window.ipcRenderer.on('r-import-onepagedungeon', (_e, fn) => {
@@ -223,138 +238,149 @@ export const CampaignDMView = (props: IDMAppView & {
                 backgroundPosition: "center"
             }}>
                 <div className="w-full h-full flex">
-                    <div className="basis-2/12 max-w-44 bg-neutral-100/90 shadow h-full flex flex-col gap-2 p-4">
+                    <div className="w-72 bg-neutral-100/90 shadow h-full flex items-center justify-end gap-2 transition-[width] ease-in-out duration-200" style={{
+                        width: sidebarOpen ? "18rem" : "1rem",
+                    }}>
+                        
+                        <div className="grow flex flex-col overflow-hidden h-full p-4">
+                            <img
+                                className="w-full h-auto rounded-xl shadow-xl"
+                                src={props.campaign.current.image ?? CampaignIcon}
+                                alt="Campaign Image"
+                            />
 
-                        <img
-                            className="w-full h-auto rounded-xl shadow-xl"
-                            src={props.campaign.current.image ?? CampaignIcon}
-                            alt="Campaign Image"
-                        />
+                            <div
+                                className="text-xl focus:outline-none bg-transparent mt-4 select-none"
+                            >
+                                {props.campaign.current.title}
+                            </div>
 
-                        <div
-                            className="text-xl focus:outline-none bg-transparent mt-4 select-none"
-                        >
-                            {props.campaign.current.title}
-                        </div>
-
-                        <button
-                            className={[
-                                "w-full py-2 rounded-xl text-start text-orange-600 transition-all duration-200 ease-in-out shrink-0 overflow-hidden hover:text-orange-600",
-                                selectedAdventure == -1 ? "saturate-100" : "saturate-0 hover:saturate-100"
-                            ].join(" ")}
-                            onClick={() => {
-                                setSelectedAdventure(-1);
-                                props.setImage(props.campaign.current.image ?? CampaignIcon)
-                            }}
-                        >
-                            Overview
-                        </button>
-
-                        <div className="flex items-center">
-                            <div className={"text-orange-600 grow " + (selectedAdventure >= 0 ? "saturate-100" : "saturate-0")}>Adventures</div>
-                            <button className="rounded-xl p-2 flex items-center justify-center hover:bg-neutral-200 ease-in-out duration-200 transition-all" onClick={() => {
-                                let name = "New Adventure";
-                                props.dialogHandle.current?.open((
-                                    <div className="w-full flex flex-col">
-                                        <UIGroup title="Name">
-                                            <TextInput
-                                                defaultValue={name}
-                                                onChange={(e) => {
-                                                    name = e.target.value;
-                                                }}
-                                            />
-                                        </UIGroup>
-                                    </div>
-                                ), {
-                                    success: () => {
-                                        props.campaign.current.adventures.push({
-                                            title: name,
-                                            npcs: [],
-                                            encounters: [],
-                                            notes: []
-                                        });
-                                        props.update();
-                                    },
-                                    failure: () => {
-
-                                    }
-                                }, "New Adventure"
-                                )
-                            }}>
-                                <span className="mso">add</span>
+                            <button
+                                className={[
+                                    "w-full py-2 rounded-xl text-start text-orange-600 transition-all duration-200 ease-in-out shrink-0 overflow-hidden hover:text-orange-600",
+                                    selectedAdventure == -1 ? "saturate-100" : "saturate-0 hover:saturate-100"
+                                ].join(" ")}
+                                onClick={() => {
+                                    setSelectedAdventure(-1);
+                                    props.setImage(props.campaign.current.image ?? CampaignIcon)
+                                }}
+                            >
+                                Overview
                             </button>
-                        </div>
-                        <div className="flex flex-col gap-1 w-full grow shrink overflow-y-scroll">
-                            {
-                                props.campaign.current.adventures.map((adventure, i) => {
-                                    return (
-                                        <div
-                                            className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden flex items-end cursor-pointer " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
-                                            key={adventure.title + i}
-                                            style={{
-                                                backgroundImage: "url('" + (adventure.image ?? AdventureIcon) + "')",
-                                                backgroundSize: "cover",
-                                                backgroundPosition: "top"
-                                            }}
-                                            onClick={() => {
-                                                setSelectedAdventure(i);
-                                                props.setImage(adventure.image ?? AdventureIcon);
-                                            }}
-                                        >
-                                            <div className="h-full w-full items-end flex bg-gradient-to-t from-black/80 to-black/20 gap-2">
-                                                <div className="grow p-3 text-start">
-                                                    {adventure.title}
-                                                </div>
-                                                {
-                                                    i != 0 && (
-                                                        <button
-                                                            className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
-                                                            onClick={() => {
-                                                                const temp = props.campaign.current.adventures[i];
-                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i - 1];
-                                                                props.campaign.current.adventures[i - 1] = temp;
-                                                                props.update();
-                                                            }}
-                                                        >
-                                                            <span className="mso">arrow_upward</span>
-                                                        </button>
-                                                    )
-                                                }
-                                                {
-                                                    i != props.campaign.current.adventures.length - 1 && (
-                                                        <button
-                                                            className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
-                                                            onClick={() => {
-                                                                const temp = props.campaign.current.adventures[i];
-                                                                props.campaign.current.adventures[i] = props.campaign.current.adventures[i + 1];
-                                                                props.campaign.current.adventures[i + 1] = temp;
-                                                                props.update();
-                                                            }}
-                                                        >
-                                                            <span className="mso">arrow_downward</span>
-                                                        </button>
-                                                    )
-                                                }
-                                                <button
-                                                    className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
-                                                    onClick={() => {
-                                                        setSelectedAdventure(-1);
-                                                        props.campaign.current.adventures.splice(i, 1);
-                                                        props.update();
+
+                            <div className="flex items-center">
+                                <div className={"text-orange-600 grow " + (selectedAdventure >= 0 ? "saturate-100" : "saturate-0")}>Adventures</div>
+                                <button className="rounded-xl p-2 flex items-center justify-center hover:bg-neutral-200 ease-in-out duration-200 transition-all" onClick={() => {
+                                    let name = "New Adventure";
+                                    props.dialogHandle.current?.open((
+                                        <div className="w-full flex flex-col">
+                                            <UIGroup title="Name">
+                                                <TextInput
+                                                    defaultValue={name}
+                                                    onChange={(e) => {
+                                                        name = e.target.value;
                                                     }}
-                                                >
-                                                    <span className="mso">delete</span>
-                                                </button>
-                                            </div>
+                                                />
+                                            </UIGroup>
                                         </div>
+                                    ), {
+                                        success: () => {
+                                            props.campaign.current.adventures.push({
+                                                title: name,
+                                                npcs: [],
+                                                encounters: [],
+                                                notes: []
+                                            });
+                                            props.update();
+                                        },
+                                        failure: () => {
+
+                                        }
+                                    }, "New Adventure"
                                     )
-                                })
-                            }
+                                }}>
+                                    <span className="mso">add</span>
+                                </button>
+                            </div>
+                            <div className="flex flex-col gap-1 w-full grow shrink overflow-y-scroll">
+                                {
+                                    props.campaign.current.adventures.map((adventure, i) => {
+                                        return (
+                                            <div
+                                                className={"h-32 rounded-xl text-white font-black transition-all duration-200 ease-in-out bg-neutral-200 shadow shrink-0 overflow-hidden flex items-end cursor-pointer " + (selectedAdventure == i ? "saturate-100" : "saturate-0 hover:saturate-100")}
+                                                key={adventure.title + i}
+                                                style={{
+                                                    backgroundImage: "url('" + (adventure.image ?? AdventureIcon) + "')",
+                                                    backgroundSize: "cover",
+                                                    backgroundPosition: "top"
+                                                }}
+                                                onClick={() => {
+                                                    setSelectedAdventure(i);
+                                                    props.setImage(adventure.image ?? AdventureIcon);
+                                                }}
+                                            >
+                                                <div className="h-full w-full items-end flex bg-gradient-to-t from-black/80 to-black/20 gap-2">
+                                                    <div className="grow p-3 text-start">
+                                                        {adventure.title}
+                                                    </div>
+                                                    {
+                                                        i != 0 && (
+                                                            <button
+                                                                className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                                onClick={() => {
+                                                                    const temp = props.campaign.current.adventures[i];
+                                                                    props.campaign.current.adventures[i] = props.campaign.current.adventures[i - 1];
+                                                                    props.campaign.current.adventures[i - 1] = temp;
+                                                                    props.update();
+                                                                }}
+                                                            >
+                                                                <span className="mso">arrow_upward</span>
+                                                            </button>
+                                                        )
+                                                    }
+                                                    {
+                                                        i != props.campaign.current.adventures.length - 1 && (
+                                                            <button
+                                                                className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                                onClick={() => {
+                                                                    const temp = props.campaign.current.adventures[i];
+                                                                    props.campaign.current.adventures[i] = props.campaign.current.adventures[i + 1];
+                                                                    props.campaign.current.adventures[i + 1] = temp;
+                                                                    props.update();
+                                                                }}
+                                                            >
+                                                                <span className="mso">arrow_downward</span>
+                                                            </button>
+                                                        )
+                                                    }
+                                                    <button
+                                                        className="p-2 flex justify-center items-center hover:bg-orange-600 ease-in-out duration-200 transition-all"
+                                                        onClick={() => {
+                                                            setSelectedAdventure(-1);
+                                                            props.campaign.current.adventures.splice(i, 1);
+                                                            props.update();
+                                                        }}
+                                                    >
+                                                        <span className="mso">delete</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
                         </div>
 
+                        <button className="w-4 hover:text-orange-600 h-full flex items-center bg-neutral-800/20">
+                            <span className="mso" onClick={() => {
+                                setSidebarOpen(!sidebarOpen);
+                            }}>{
+                                sidebarOpen ? "chevron_left" : "chevron_right"
+                            }</span>
+                        </button>
                     </div>
                     <div
-                        className="basis-10/12 h-full flex flex-col backdrop-blur-lg"
+                        className="grow h-full flex flex-col backdrop-blur-lg"
 
                     >
                         <div className="w-full h-full flex flex-col gap-3">
@@ -448,7 +474,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                         />
                                     ) : (
                                         <button
-                                            className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
+                                            className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur text-neutral-800"
                                             onClick={() => {
                                                 const process = async () => {
                                                     const res = await createCalendar(props.dialogHandle);
@@ -474,7 +500,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                     )
                                 }
                                 <button
-                                    className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl backdrop-blur"
+                                    className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl text-neutral-800 backdrop-blur"
                                     onClick={() => {
                                         props.dialogHandle.current?.open(<>
                                             <DMScreenComponent />
@@ -489,6 +515,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                     <CompendiumDashboardElement
                                         update={props.update}
                                         campaign={props.campaign}
+                                        setImage={props.setImage}
                                     >
                                     </CompendiumDashboardElement>
                                     <DashboardElement>
