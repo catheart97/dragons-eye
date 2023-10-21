@@ -1,10 +1,10 @@
 import React from "react";
-import { DEAbstractDate, DECalendarStats, DEMonthStats, DEMoon, DESeasonStats, EarthCalendar, MoonIcon, addOneDay, getMoonPhases, getSeason, getSunHours, getWeekday } from "../data/Calendar";
-import { UIGroup } from "./ui/UIGroup";
-import { NumberInput } from "./ui/NumberInput";
-import { DialogHandle } from "./ui/Dialog";
-import { useForceUpdate } from "../utility";
+import { DEAbstractDate, DECalendarStats, DEMonthStats, DEMoon, DESeasonStats, MoonIcon, addOneDay, getMoonPhases, getSeason, getSunHours, getWeekday } from "../data/Calendar";
 import { Campaign } from "../data/Campaign";
+import { useForceUpdate } from "../utility";
+import { DialogHandle } from "./ui/Dialog";
+import { NumberInput } from "./ui/NumberInput";
+import { UIGroup } from "./ui/UIGroup";
 
 export const createCalendar = async (
     dialogHandle: React.MutableRefObject<DialogHandle | null>,
