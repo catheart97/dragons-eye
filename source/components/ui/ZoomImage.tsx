@@ -15,7 +15,7 @@ export const ZoomImage = (
                 }}
             >
                 <TransformComponent>
-                    <img {...props} />
+                    <img {...props} className="rounded-xl max-h-[80vh] max-w-[90vw] m-auto aspect-1" />
                 </TransformComponent>
             </TransformWrapper>
         </div>
