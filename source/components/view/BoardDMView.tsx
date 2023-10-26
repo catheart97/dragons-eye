@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
 import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
 import { DMScreenComponent } from '../DMScreenComponent';
+import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -63,6 +64,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
             new CreateItemDecoratorBoardUtility(board.current),
             new TrashDecoratorBoardUtility(board.current),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
+            new StampBoardUtility(board.current),
             new ConditionBoardUtility(board.current, null),
             new HiddenBoardUtility(board.current),
             new ImportanceRectUtility(props.setImportanceRect),

@@ -25,6 +25,8 @@ import FogSingleTexture from  "../../resources/textures/fog/single.png";
 
 import GrassAltTexture from "../../resources/textures/terrain/grass_alt.png";
 
+const StampTexturePaths = import.meta.glob('../../resources/textures/stamps/*.png');
+
 type TexturePoolData = {
     TerrainTextures: {[key in BoardTerrain]: HTMLImageElement}
     AltTerrainTextures: {[key in BoardTerrain]: HTMLImageElement}
@@ -39,7 +41,8 @@ type TexturePoolData = {
         tunnel: HTMLImageElement
         none: HTMLImageElement,
         single: HTMLImageElement,
-    }
+    },
+    StampTextures: {[key: string]: HTMLImageElement}
 }
 
 export const LoadImage = async (src: string) => {
@@ -78,6 +81,15 @@ export class TexturePool {
             [BoardTerrain.Snow]: await LoadImage(SnowTexture),
         }
 
+        const StampTextures: {[key: string]: HTMLImageElement} = {};
+        for (const path in StampTexturePaths) {
+            const key = path.match(/\/(\w+)\.png$/)?.[1];
+            if (key) {
+                StampTextures[key] = await LoadImage(((await StampTexturePaths[path]()) as any).default as string);
+            }
+        }
+
+
         this._texturePool = {
             TerrainTextures,
             AltTerrainTextures: {
@@ -95,7 +107,8 @@ export class TexturePool {
                 tunnel: await LoadImage(FogTunnelTexture),
                 none: await LoadImage(FogNoneTexture),
                 single: await LoadImage(FogSingleTexture),
-            }
+            },
+            StampTextures
         }
     
         return this._texturePool;

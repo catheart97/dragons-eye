@@ -187,7 +187,8 @@ const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
     )
 }
 
-import CharacterIcon from "../../resources/placeholders/character.png"
+import CharacterIcon from "../../resources/placeholders/character.png?base64"
+import Markdown from "marked-react";
 
 export const RawStatblockComponent = (props: {
     createMode?: boolean,
@@ -309,7 +310,7 @@ export const RawStatblockComponent = (props: {
 
             {/* Description */}
             {
-                editMode || statblock.description.length > 0 ? (
+                editMode ? (
                     <>
                         <UIGroup title="Description" className="text-orange-600">
                         </UIGroup>
@@ -325,7 +326,17 @@ export const RawStatblockComponent = (props: {
                             />
                         </div>
                     </>
-                ) : null
+                ) : (
+                    statblock.description.length > 0 ? (
+                        <>
+                            <UIGroup title="Description" className="text-orange-600">
+                            </UIGroup>
+                            <div className="prose w-full p-1 pl-3">
+                                <Markdown>{statblock.description}</Markdown>
+                            </div>
+                        </>
+                    ) : null
+                )
             }
 
             {

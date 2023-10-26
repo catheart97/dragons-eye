@@ -1,18 +1,16 @@
 import React from "react";
 import { Encounter } from "../data/Encounter";
 import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
-import { constructDefaultBoard } from "../data/Board";
 
 import EncounterIcon from "../../resources/placeholders/encounter.png?base64"
 import { UIGroup } from "./ui/UIGroup";
 import { NumberInput } from "./ui/NumberInput";
+import Markdown from "marked-react";
+import { constructDefaultBoard } from "../data/Board";
 
 export const NewEncounterComponent = (props: IAddComponent<Encounter>) => {
     const titleInput = React.useRef<HTMLInputElement>(null);
     const descriptionInput = React.useRef<HTMLTextAreaElement>(null);
-
-    const widthInput = React.useRef<HTMLInputElement>(null);
-    const heightInput = React.useRef<HTMLInputElement>(null);
 
     const [image, setImage] = React.useState<string | undefined>(undefined);
     return (
@@ -45,23 +43,6 @@ export const NewEncounterComponent = (props: IAddComponent<Encounter>) => {
                     </div>
                 </div>
 
-                <UIGroup title="Width">
-                    <NumberInput
-                        elemRef={widthInput}
-                        defaultValue={10}
-                        min={1}
-                        max={100}
-                    />
-                </UIGroup>
-                <UIGroup title="Height">
-                    <NumberInput
-                        elemRef={heightInput}
-                        defaultValue={10}
-                        min={1}
-                        max={100}
-                    />
-                </UIGroup>
-
                 <div className="flex justify-between p-2">
                     <button
                         className="flex justify-center hover:bg-neutral-100 rounded-xl items-center gap-2 p-2 px-4"
@@ -90,11 +71,7 @@ export const NewEncounterComponent = (props: IAddComponent<Encounter>) => {
                             props.onSubmit({
                                 name: titleInput.current?.value ?? "",
                                 description: descriptionInput.current?.value ?? "",
-                                image: "",
-                                board: constructDefaultBoard(
-                                    widthInput.current!.valueAsNumber,
-                                    heightInput.current!.valueAsNumber
-                                )
+                                image: ""
                             });
                         }}
                     >
@@ -108,6 +85,9 @@ export const NewEncounterComponent = (props: IAddComponent<Encounter>) => {
 }
 
 export const EncounterComponent = (props: IViewComponent<Encounter>) => {
+
+    const [editMode, setEditMode] = React.useState<boolean>(false);
+
     return (
         <div
             style={{
@@ -117,7 +97,7 @@ export const EncounterComponent = (props: IViewComponent<Encounter>) => {
             }}
             className="w-full h-full"
         >
-            <div className="bg-gradient-to-t from-black/80 to-black/20 flex flex-col justify-end p-3 items-start w-full">
+            <div className="bg-gradient-to-t from-black/90 to-black/60 flex flex-col justify-end p-3 items-start w-full">
                 <input
                     className="text-2xl text-white w-full bg-transparent focus:outline-none"
                     value={props.data.name}
@@ -127,35 +107,116 @@ export const EncounterComponent = (props: IViewComponent<Encounter>) => {
                     }}
                 >
                 </input>
-                <textarea
-                    className="text-white bg-transparent focus:outline-none w-full"
-                    value={props.data.description}
-                    onChange={(e) => {
-                        props.data.description = e.target.value;
-                        props.updateData(props.data);
-                    }}
-                />
-                <button
-                    onClick={() => {
-                        // file dialog to open image 
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = '.png,.jpg,.jpeg,.gif';
-                        input.onchange = (e: any) => {
-                            const file = e.target.files[0];
-                            const reader = new FileReader();
-                            reader.readAsDataURL(file);
-                            reader.onloadend = () => {
-                                props.data.image = reader.result as string;
+                {
+                    editMode ? (
+                        <textarea
+                            className="text-white bg-transparent focus:outline-none w-full"
+                            value={props.data.description}
+                            onChange={(e) => {
+                                props.data.description = e.target.value;
                                 props.updateData(props.data);
-                                input.remove();
-                            }
+                            }}
+                        />
+                    ) : (
+                        <div className="prose text-white">
+                            <Markdown>{props.data.description}</Markdown>
+                        </div>
+                    )
+                }
+                <div className="flex justify-between w-full">
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                // file dialog to open image 
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = '.png,.jpg,.jpeg,.gif';
+                                input.onchange = (e: any) => {
+                                    const file = e.target.files[0];
+                                    const reader = new FileReader();
+                                    reader.readAsDataURL(file);
+                                    reader.onloadend = () => {
+                                        props.data.image = reader.result as string;
+                                        props.updateData(props.data);
+                                        input.remove();
+                                    }
+                                }
+                                input.click();
+                            }}
+                        >
+                            <span className="mso text-white">image</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setEditMode(!editMode);
+                            }}
+                        >
+                            <span className="mso text-white">edit</span>
+                        </button>
+                    </div>
+
+                    <div className="flex gap-2">
+                        {
+                            props.data.board ? (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            props.data.board = undefined;
+                                            props.updateData(props.data);
+                                        }}
+                                    >
+                                        <span className="mso text-white">delete</span>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            props.openBoard!(props.data.board!);
+                                        }}
+                                    >
+                                        <span className="mso text-white">swords</span>
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        let w = 1;
+                                        let h = 1;
+
+                                        props.dialogHandle!.current!.open(
+                                            <>
+                                                <UIGroup title="Width">
+                                                    <NumberInput
+                                                        onChange={(e) => {
+                                                            w = e.target.valueAsNumber;
+                                                        }}
+                                                    />
+                                                </UIGroup>
+                                                <UIGroup title="Height">
+                                                    <NumberInput
+                                                        onChange={(e) => {
+                                                            h = e.target.valueAsNumber;
+                                                        }}
+                                                    />
+                                                </UIGroup>
+                                            </>,
+                                            {
+                                                success: () => {
+                                                    props.data.board = constructDefaultBoard(w, h);
+                                                    props.updateData(props.data);
+                                                },
+                                                failure() {
+
+                                                },
+                                            },
+                                            "Add Battlemap", false
+                                        )
+                                    }}
+                                >
+                                    <span className="mso text-white">add</span>
+                                </button>
+                            )
                         }
-                        input.click();
-                    }}
-                >
-                    <span className="mso text-white">image</span>
-                </button>
+                    </div>
+                </div>
             </div>
         </div>
     )

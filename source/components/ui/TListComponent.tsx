@@ -1,5 +1,6 @@
 import React from "react"
 import { DialogHandle } from "./Dialog"
+import { Board } from "../../data/Board"
 
 export interface IAddComponent<T> {
     onSubmit: (data: T) => void
@@ -10,6 +11,7 @@ export interface IViewComponent<T> {
     updateData: (data: T) => void
     setImage?: (image: string) => void
     dialogHandle?: React.RefObject<DialogHandle>
+    openBoard?: (board: Board) => void
 }
 
 export interface ITListElementProps<T> {
@@ -21,6 +23,7 @@ export interface ITListElementProps<T> {
     dialogHandle?: React.RefObject<DialogHandle>
     data: T
     alwaysExpanded?: boolean
+    openBoard?: (board: Board) => void
 }
 
 export const TListElementComponent = <T extends {
@@ -85,6 +88,7 @@ export const TListElementComponent = <T extends {
                         updateData={props.onUpdateRequest}
                         setImage={props.setImage}
                         dialogHandle={props.dialogHandle}
+                        openBoard={props.openBoard}
                     ></props.viewComponent>
                 ) : null
             }
@@ -104,6 +108,7 @@ export interface ITListComponentProps<T> {
     update: () => void
     alwaysExpanded?: boolean
     className?: string
+    openBoard?: (board: Board) => void
 }
 
 export const TListComponent = <T extends { name: string }>(props: ITListComponentProps<T> & {
@@ -188,6 +193,7 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
                                 setImage={props.setImage}
                                 dialogHandle={props.dialogHandle}
                                 alwaysExpanded={props.alwaysExpanded}
+                                openBoard={props.openBoard}
                             ></TListElementComponent>
                         )
                     })

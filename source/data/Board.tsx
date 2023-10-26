@@ -1,4 +1,5 @@
 import { Item } from "./Item";
+import { Stamp } from "./Stamp";
 import { CreatureCondition, CreatureSize, PlayerStatblock, Statblock } from "./Statblock";
 
 export type BoardPosition = {
@@ -64,11 +65,18 @@ export type InitiaitveData = {
 export type Board = {
     width: number,
     height: number,
+    
     terrain: Array<BoardTerrain>
+
     conditions: { [key: number]: BoardCondition }
+    
     decorators: { [key: number]: BoardDecorator }
     decoratorCounter: number
+
+    stamps?: Array<Stamp>
+    
     hidden?: { [key: number]: boolean }
+    
     initiative?: InitiaitveData[]
     initiativeIndex?: number
 }
@@ -216,10 +224,15 @@ export const CreatureSizeDimension: { [key in CreatureSize]: number } = {
 }
 
 export interface IBoardUtility {
+
+    onMouseDown?: (e: React.MouseEvent<HTMLCanvasElement>) => void
+    onMouseUp?: (e: React.MouseEvent<HTMLCanvasElement>) => void
+    onMouseMove?: (e: React.MouseEvent<HTMLCanvasElement>) => void
+
     onShapeClick?: (position: BoardPosition) => void
     onShapeRelease?: (position: BoardPosition) => void
     onShapeHover?: (position: BoardPosition) => void
-    customComponent?: () => JSX.Element
+    customComponent?: (zoom?: number) => JSX.Element
     onMount?: () => void
 
     icon: () => JSX.Element

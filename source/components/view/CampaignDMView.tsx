@@ -372,11 +372,11 @@ export const CampaignDMView = (props: IDMAppView & {
                         </div>
 
                         <button className="w-4 hover:text-orange-600 h-full flex items-center bg-neutral-800/20" onClick={() => {
-                                setSidebarOpen(!sidebarOpen);
-                            }}>
+                            setSidebarOpen(!sidebarOpen);
+                        }}>
                             <span className="mso" >{
-                                    sidebarOpen ? "chevron_left" : "chevron_right"
-                                }</span>
+                                sidebarOpen ? "chevron_left" : "chevron_right"
+                            }</span>
                         </button>
                     </div>
                     <div
@@ -626,8 +626,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.campaign.current.encounters = data;
                                                 props.update();
                                             }}
-                                            onSelect={(encounter) => {
-                                                const board = encounter.board;
+                                            dialogHandle={props.dialogHandle}
+                                            openBoard={(board) => {
                                                 props.loadCampaignBoard(board);
                                             }}
                                         />
@@ -645,8 +645,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                                             props.campaign.current.adventures[selectedAdventure].encounters = data;
                                                             props.update();
                                                         }}
-                                                        onSelect={(encounter) => {
-                                                            const board = encounter.board;
+                                                        dialogHandle={props.dialogHandle}
+                                                        openBoard={(board) => {
                                                             props.loadCampaignBoard(board);
                                                         }}
                                                     />

@@ -350,6 +350,27 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
     }
 }
 
+const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean) => {
+    if (!board.stamps) return;
+
+    for (const stamp of board.stamps) {
+        const ctx = canvas.getContext('2d')!;
+        const texturePool = TexturePool.getInstance().get();
+        if (!texturePool) {
+            return;
+        }
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(
+            texturePool.StampTextures[stamp.image],
+            stamp.position.x,
+            stamp.position.y,
+            stamp.width,
+            stamp.height
+        );
+        ctx.imageSmoothingEnabled = false;
+    }
+}
+
 const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean) => {
     const width = canvas.width;
     const height = canvas.height;
@@ -368,6 +389,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
 
     // draw scene
     forEachTile(drawTerrain);
+    drawStamps(canvas, board, playerView);
     if (playerView) {
         forEachTile(drawDecorator);
         forEachTile(drawCondition);
@@ -568,9 +590,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                 }}
                                 ref={canvasRef}
                                 onMouseDown={(e) => {
-
                                     renderUI();
-
                                     let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
                                     let y = (e.clientY - (canvasRef.current!.getBoundingClientRect().top * zoom));
                                     x = Math.max(Math.min(Math.ceil(x / (CanvasBaseSize * zoom)), props.board.width), 0);
@@ -579,6 +599,9 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                         props.utility.onShapeClick({ x: x - 1, y: y - 1 })
                                         console.log({ x, y })
                                         renderUI();
+                                    }
+                                    if (props.utility && props.utility.onMouseDown) {
+                                        props.utility.onMouseDown(e);
                                     }
                                 }}
                                 onMouseUp={(e) => {
@@ -590,6 +613,9 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                         props.utility.onShapeRelease({ x: x - 1, y: y - 1 })
                                         renderUI();
                                     }
+                                    if (props.utility && props.utility.onMouseUp) {
+                                        props.utility.onMouseUp(e);
+                                    }
                                 }}
                                 onMouseMove={(e) => {
                                     let x = (e.clientX - (canvasRef.current!.getBoundingClientRect().left * zoom));
@@ -600,13 +626,16 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                         props.utility.onShapeHover({ x: x - 1, y: y - 1 })
                                         renderUI();
                                     }
+                                    if (props.utility && props.utility.onMouseMove) {
+                                        props.utility.onMouseMove(e);
+                                    }
                                 }}
                                 className="bg-white"
                             ></canvas>
                             <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
                                 {
                                     props.utility && props.utility.customComponent ? (
-                                        props.utility.customComponent()
+                                        props.utility.customComponent(zoom)
                                     ) : (
                                         <></>
                                     )
