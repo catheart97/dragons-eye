@@ -316,7 +316,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 }}
                                                 onClick={() => {
                                                     setSelectedAdventure(i);
-                                                    props.setImage(adventure.image ?? AdventureIcon);
+                                                    // props.setImage(adventure.image ?? AdventureIcon);
                                                 }}
                                             >
                                                 <div className="h-full w-full items-end flex bg-gradient-to-t from-black/80 to-black/20 gap-2">
@@ -410,32 +410,48 @@ export const CampaignDMView = (props: IDMAppView & {
                                 {
                                     props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                         <>
-                                            <button
-                                                className="w-fit h-fit shrink-0"
-                                                onClick={() => {
-                                                    // open file dialog 
-                                                    const input = document.createElement('input');
-                                                    input.type = 'file';
-                                                    input.accept = '.png,.jpg,.jpeg,.gif';
-                                                    input.onchange = (e: any) => {
-                                                        const file = e.target.files[0];
-                                                        const reader = new FileReader();
-                                                        reader.readAsDataURL(file);
-                                                        reader.onloadend = () => {
-                                                            props.campaign.current.adventures[selectedAdventure].image = reader.result?.toString();
-                                                            props.setImage(props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon);
-                                                            props.update();
-                                                            input.remove();
-                                                        }
-                                                    }
-                                                    input.click();
-                                                }}
+                                            <div
+                                                className="w-fit h-fit shrink-0 relative rounded-xl shadow-xl overflow-hidden"
                                             >
                                                 <img
-                                                    className="w-24 h-24 rounded-xl shadow-xl"
+                                                    className="w-24 h-24"
                                                     src={props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon}
                                                 />
-                                            </button>
+
+                                                <div className="bottom-0 h-8 left-0 right-0 flex absolute">
+                                                    <button
+                                                        className="h-full w-full bg-neutral-800/80 opacity-0 hover:opacity-100 transition-all duration-200 ease-in-out text-white flex items-center justify-center"
+                                                        onClick={() => {
+                                                            props.setImage(props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon)
+                                                        }}
+                                                    >
+                                                        <span className="mso">visibility</span>
+                                                    </button>
+                                                    <button
+                                                        className="h-full w-full bg-neutral-800/80 opacity-0 hover:opacity-100 transition-all duration-200 ease-in-out text-white flex items-center justify-center"
+                                                        onClick={() => {
+                                                            // open file dialog 
+                                                            const input = document.createElement('input');
+                                                            input.type = 'file';
+                                                            input.accept = '.png,.jpg,.jpeg,.gif';
+                                                            input.onchange = (e: any) => {
+                                                                const file = e.target.files[0];
+                                                                const reader = new FileReader();
+                                                                reader.readAsDataURL(file);
+                                                                reader.onloadend = () => {
+                                                                    props.campaign.current.adventures[selectedAdventure].image = reader.result?.toString();
+                                                                    props.setImage(props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon);
+                                                                    props.update();
+                                                                    input.remove();
+                                                                }
+                                                            }
+                                                            input.click();
+                                                        }}
+                                                    >
+                                                        <span className="mso">edit</span>
+                                                    </button>
+                                                </div>
+                                            </div>
 
                                         </>
                                     ) : (
