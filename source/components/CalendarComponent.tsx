@@ -5,6 +5,7 @@ import { useForceUpdate } from "../utility";
 import { DialogHandle } from "./ui/Dialog";
 import { NumberInput } from "./ui/NumberInput";
 import { UIGroup } from "./ui/UIGroup";
+import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
 
 export const createCalendar = async (
     dialogHandle: React.MutableRefObject<DialogHandle | null>,
@@ -535,11 +536,106 @@ export const CalendarComponent = (props: {
                                 />
                             </div>
                         ) : (
-                            <>
-                                <div>{calendar.current.day}</div>
-                                <div className="font-bold">{calendar.stats.months[calendar.current.month - 1].name}</div>
-                                <div>{calendar.current.year}</div>
-                            </>
+                            props.player ? (
+                                <>
+                                    <div>{calendar.current.day}</div>
+                                    <div className="font-bold">{calendar.stats.months[calendar.current.month - 1].name}</div>
+                                    <div>{calendar.current.year}</div>
+                                </>
+                            ) : (
+                                <>
+                                    <Tooltip
+                                        className="flex gap-2"
+                                        strategy="absolute"
+                                    >
+                                        <TooltipTarget>
+                                            <div>{calendar.current.day}</div>
+                                            <div className="font-bold">{calendar.stats.months[calendar.current.month - 1].name}</div>
+                                            <div>{calendar.current.year}</div>
+                                        </TooltipTarget>
+                                        <TooltipContent>
+                                            <div className="flex gap-2 h-fit w-fit">
+                                                <div className="flex flex-col gap-1 w-max">
+                                                    <div className="font-black uppercase">
+                                                        Months
+                                                    </div>
+                                                    <ol start={1} className="w-fit flex flex-col gap-1">
+                                                        {
+                                                            calendar.stats.months.map((month, i) => (
+                                                                <li key={i} className="whitespace-nowrap flex gap-2">
+                                                                    <div className="w-4 text-end">
+                                                                        {i + 1}.
+                                                                    </div>
+                                                                    <div className="grow">
+                                                                        {month.name} ({month.days})
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ol>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="font-black uppercase">
+                                                        Seasons
+                                                    </div>
+                                                    <ol start={1} className="w-fit flex flex-col gap-1">
+                                                        {
+                                                            calendar.stats.seasons.map((season, i) => (
+                                                                <li key={i} className="whitespace-nowrap flex gap-2">
+                                                                    <div className="w-4 text-end">
+                                                                        {i + 1}.
+                                                                    </div>
+                                                                    <div className="grow">
+                                                                        {season.name} ({season.start.day}.{season.start.month}) ({season.sunHoursPerDay}h)
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ol>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="font-black uppercase">
+                                                        Moons
+                                                    </div>
+                                                    <ol start={1} className="w-fit flex flex-col gap-1">
+                                                        {
+                                                            calendar.stats.moons.map((moon, i) => (
+                                                                <li key={i} className="whitespace-nowrap flex gap-2">
+                                                                    <div className="w-4 text-end">
+                                                                        {i + 1}.
+                                                                    </div>
+                                                                    <div className="grow">
+                                                                        {moon.name} ({moon.cycle})
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ol>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="font-black uppercase">
+                                                        Weekday
+                                                    </div>
+                                                    <ol start={1} className="w-fit flex flex-col gap-1">
+                                                        {
+                                                            calendar.stats.week.map((day, i) => (
+                                                                <li key={i} className="whitespace-nowrap flex gap-2">
+                                                                    <div className="w-4 text-end">
+                                                                        {i + 1}.
+                                                                    </div>
+                                                                    <div className="grow">
+                                                                        {day}
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        }
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            )
                         )
                     }
 

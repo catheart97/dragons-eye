@@ -21,7 +21,6 @@ import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
 import { NoteList } from "../NoteComponent";
 import { Encounter } from "../../data/Encounter";
-import { DMScreenComponent } from "../DMScreenComponent";
 import { CalendarComponent, createCalendar } from "../CalendarComponent";
 
 
@@ -406,7 +405,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                 }}
                             />
 
-                            <div className="h-26 w-full overflow-x-scroll px-4 p-2 flex items-center shrink-0 gap-6">
+                            <div className="h-26 w-full px-4 p-2 flex items-center shrink-0 gap-6">
                                 {
                                     props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                         <>
@@ -521,16 +520,6 @@ export const CampaignDMView = (props: IDMAppView & {
                                         </button>
                                     )
                                 }
-                                <button
-                                    className="w-24 h-24 rounded-full bg-neutral-50/60 flex items-center justify-center text-5xl text-neutral-800 backdrop-blur"
-                                    onClick={() => {
-                                        props.dialogHandle.current?.open(<>
-                                            <DMScreenComponent />
-                                        </>, undefined, "Dungeon Master's Screen", true);
-                                    }}
-                                >
-                                    <span className="msf">map</span>
-                                </button>
                             </div>
                             <div className="grow w-full overflow-x-scroll">
                                 <Dashboard>
@@ -574,6 +563,19 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.campaign.current.notes = data;
                                                 props.update();
                                             }}
+                                            dialogHandle={props.dialogHandle}
+                                        />
+                                        <div className="text-xl font-bold">Database General Notes</div>
+                                        <NoteList
+                                            data={Database.getInstance().getNotes()}
+                                            onUpdateData={(data) => {
+                                                Database.getInstance().updateNotes(data)
+                                                props.update();
+                                            }}
+                                            update={props.update}
+                                            allowAdd
+                                            allowDelete
+                                            // alwaysExpanded
                                             dialogHandle={props.dialogHandle}
                                         />
                                     </DashboardElement>
