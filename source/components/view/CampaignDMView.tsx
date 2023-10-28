@@ -11,18 +11,17 @@ import ItemIcon from "../../../resources/placeholders/item.png?base64";
 import React, { useEffect } from "react";
 import { Board, OnePageDungeon, constructFromOnePageDungeon } from "../../data/Board";
 import { Database } from "../../data/Database";
+import { Encounter } from "../../data/Encounter";
+import { CalendarComponent, createCalendar } from "../CalendarComponent";
 import { EncounterList } from "../EncounterComponent";
 import { ItemList } from "../ItemComponent";
+import { NoteComponent, NoteList } from "../NoteComponent";
 import { SpellList } from "../SpellComponent";
 import { DBStatblockList, PlayerStatblockList, StatblockList } from "../StatblockComponent";
 import { Dashboard, DashboardElement, IDashboardElement } from "../ui/Dashboard";
 import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
-import { NoteComponent, NoteList } from "../NoteComponent";
-import { Encounter } from "../../data/Encounter";
-import { CalendarComponent, createCalendar } from "../CalendarComponent";
-import { Note } from "../../data/Note";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
