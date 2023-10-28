@@ -8,6 +8,7 @@ import { ZoomImage } from "./ui/ZoomImage";
 
 export const NoteComponent = (props: IViewComponent<Note> & {
     editMode?: boolean,
+    hideTitle?: boolean,
 }) => {
 
     const forceUpdate = useForceUpdate();
@@ -16,16 +17,22 @@ export const NoteComponent = (props: IViewComponent<Note> & {
     return (
         <div className="flex flex-col justify-end p-3 items-start w-full gap-2">
             <div className="flex w-full items-center">
-                <input
-                    className="text-2xl w-full bg-transparent focus:outline-none grow"
-                    defaultValue={props.data.name}
-                    placeholder="Title"
-                    onChange={(e) => {
-                        props.data.name = e.target.value;
-                        props.updateData(props.data);
-                    }}
-                >
-                </input>
+                {
+                    props.hideTitle ? (
+                        <div className="text-xl font-bold grow -ml-3">{props.data.name}</div>
+                    ) : (
+                        <input
+                            className="text-2xl w-full bg-transparent focus:outline-none grow"
+                            defaultValue={props.data.name}
+                            placeholder="Title"
+                            onChange={(e) => {
+                                props.data.name = e.target.value;
+                                props.updateData(props.data);
+                            }}
+                        >
+                        </input>
+                    )
+                }
                 {
                     !props.editMode ? (
                         <button

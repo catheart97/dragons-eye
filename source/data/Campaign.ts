@@ -19,7 +19,8 @@ export type Campaign = {
     notes: Note[],
     spells?: Spell[],
     items?: Item[],
-    monsters?: Statblock[]
+    monsters?: Statblock[],
+    quickNote?: Note 
 }
 
 export const EmptyCampaign: Campaign = {

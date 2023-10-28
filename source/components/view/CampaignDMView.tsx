@@ -19,9 +19,10 @@ import { Dashboard, DashboardElement, IDashboardElement } from "../ui/Dashboard"
 import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
-import { NoteList } from "../NoteComponent";
+import { NoteComponent, NoteList } from "../NoteComponent";
 import { Encounter } from "../../data/Encounter";
 import { CalendarComponent, createCalendar } from "../CalendarComponent";
+import { Note } from "../../data/Note";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
@@ -530,6 +531,18 @@ export const CampaignDMView = (props: IDMAppView & {
                                     >
                                     </CompendiumDashboardElement>
                                     <DashboardElement>
+                                        <NoteComponent 
+                                            hideTitle
+                                            data={props.campaign.current.quickNote ?? {
+                                                name: "Quick Note",
+                                                description: "",
+                                                images: [],
+                                            }}
+                                            updateData={(data) => {
+                                                props.campaign.current.quickNote = data;
+                                                props.update();
+                                            }}
+                                        ></NoteComponent>
                                         {
                                             props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                                 <>
