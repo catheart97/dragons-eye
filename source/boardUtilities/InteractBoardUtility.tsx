@@ -153,7 +153,7 @@ export class InteractBoardUtility implements IBoardUtility {
                     {
                         decorator.type == BoardDecoratorType.Creature ? (
                             <>
-                                <div className="text-lg">{(decorator.attachment as BoardCreature).statblock.name}</div>
+                                <div className="text-lg">{(decorator.attachment as BoardCreature).statblock.name} <small>{decorator.key}</small></div>
                                 {CreatureAttitude[(decorator.attachment as BoardCreature).attitude]}
                             </>
                         ) : <></>

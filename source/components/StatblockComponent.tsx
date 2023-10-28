@@ -327,7 +327,7 @@ export const RawStatblockComponent = (props: {
                         </div>
                     </>
                 ) : (
-                    statblock.description.length > 0 ? (
+                    statblock.description && statblock.description.length > 0 ? (
                         <>
                             <UIGroup title="Description" className="text-orange-600">
                             </UIGroup>

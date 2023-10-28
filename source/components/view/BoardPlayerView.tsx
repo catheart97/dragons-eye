@@ -36,7 +36,7 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
 
     return (
         props.open ? (
-            <div className="text-2xl bg-green-500 h-screen relative grow basis-2" style={{
+            <div className="text-2xl bg-green-500 h-screen relative grow basis-2 overflow-hidden" style={{
                 minWidth: "50vw",
                 maxWidth: "50vw",
                 width: "50vw",
@@ -74,8 +74,11 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                                             className={"w-36 min-w-36 shrink-0 max-w-36 transition-all duration-300 ease-in-out p-2 " + (props.board.current.initiativeIndex == i ? "h-36" : "h-12 text-sm")}
                                             key={v.id}
                                         >
-                                            <div className="h-full w-full bg-neutral-50/80 rounded-xl shadow p-2 flex items-center">
+                                            <div className="h-full w-full bg-neutral-50/80 rounded-xl shadow p-2 flex items-center flex flex-col justify-center gap-2">
                                                 {attachment.statblock.name}
+                                                <small className={
+                                                    props.board.current.initiativeIndex == i ? "" : "hidden"
+                                                }>{decorator.key}</small>
                                             </div>
                                         </div>
                                     )
