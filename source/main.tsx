@@ -12,10 +12,18 @@ import { TexturePool } from './data/TexturePool';
 import { setupEnvironment } from './data/Environment';
 import { App } from './App';
 
+import WinCSS from "./win.index.css?raw"
+
 const init = async () => {
   await TexturePool.getInstance().constructTexturePool();
   await setupEnvironment();
   await Database.setup();
+  const os = await window.ipcRenderer.invoke("m-os") as string;
+  if (os == "win32") {
+    const style = document.createElement("style");
+    style.innerHTML = WinCSS;
+    document.head.appendChild(style);
+  }
 }
 
 window.ipcRenderer.on('r-import-compendium', (_e, fn) => {

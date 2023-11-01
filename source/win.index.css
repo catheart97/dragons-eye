@@ -1,0 +1,24 @@
+/* style scroll bars (as electron only chrome relevant) it should autohide */
+/* total width */
+::-webkit-scrollbar {
+    background-color: #ffffff00;
+    width: 8px;
+    height: 8px;
+}
+
+/* background of the scrollbar except button or resizer */
+::-webkit-scrollbar-track {
+    background-color: #ffffff00;
+}
+
+/* scrollbar itself */
+::-webkit-scrollbar-thumb {
+    background-color: #babac0;
+    border-radius: 8px;
+    border: 2px solid #ffffff00;
+}
+
+/* set button(top and bottom of the scrollbar) */
+::-webkit-scrollbar-button {
+    display: none;
+}

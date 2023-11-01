@@ -77,6 +77,10 @@ function createWindow() {
         return path;
     });
 
+    ipcMain.handle("m-os", (_event, _arg) => {
+        return process.platform;
+    });
+
     win = new BrowserWindow({
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
