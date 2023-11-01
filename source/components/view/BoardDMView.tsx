@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { ConditionBoardUtility } from '../../boardUtilities/ConditionBoardUtility';
 import { CreateCreatureDecoratorBoardUtility } from '../../boardUtilities/CreateCreatureDecoratorBoardUtility';
-import { MoveDecoratorBoardUtility } from '../../boardUtilities/MoveDecoratorBoardUtility';
 import { SpellBoardUtility } from '../../boardUtilities/SpellBoardUtility';
 import { TerrainBoardUtility } from '../../boardUtilities/TerrainBoardUtility';
 import { TrashDecoratorBoardUtility } from '../../boardUtilities/TrashDecoratorBoardUtility';
@@ -22,6 +21,8 @@ import { IDMAppView } from './IAppView';
 import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
 import { DMScreenComponent } from '../DMScreenComponent';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
+import { CampaignContext } from '../../data/Campaign';
+import { Adventure } from '../../data/Adventure';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -36,6 +37,9 @@ export type BoardBoardDMViewHandle = {
 const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle, BoardDMViewProps> = (props, ref) => {
     const board = props.board;
     const boardComponentRef = React.useRef<BoardComponentHandle>(null);
+
+    const campaign = React.useContext(CampaignContext);
+    const adventure = React.useRef<Adventure | null>(null);
 
     const renderUI = () => {
         boardComponentRef.current!.update();
@@ -52,17 +56,37 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
 
     React.useEffect(() => {
         renderUI()
+        if (campaign != null) {
+            campaign.current.adventures.forEach((a) => {
+                a.encounters.forEach((e) => {
+                    console.log(e.name);
+                    if (e.board === board.current) {
+                        adventure.current = a;
+                    }
+                })
+            })
+        }
     }, [])
 
     const setupUtilities = () => {
+
+        const interactUtility = new InteractBoardUtility(board.current);
+
         utilities.current = [
-            new InteractBoardUtility(board.current),
-            new MoveDecoratorBoardUtility(board.current),
-            new InitiaitveBoardUtility(board.current),
-            new SpellBoardUtility(),
-            new CreateCreatureDecoratorBoardUtility(board.current),
-            new CreateItemDecoratorBoardUtility(board.current),
+            interactUtility,
             new TrashDecoratorBoardUtility(board.current),
+            new InitiaitveBoardUtility(board.current, interactUtility),
+            new SpellBoardUtility(),
+            new CreateCreatureDecoratorBoardUtility(
+                board.current,
+                campaign || undefined,
+                adventure.current || undefined
+            ),
+            new CreateItemDecoratorBoardUtility(
+                board.current,
+                campaign || undefined,
+                adventure.current || undefined
+            ),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new StampBoardUtility(board.current),
             new ConditionBoardUtility(board.current, null),
@@ -78,6 +102,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
     const [currentUtility, setCurrentUtility] = React.useState<number>(0);
     const utilities = React.useRef<Array<IBoardUtility>>([]);
     React.useEffect(setupUtilities, [board.current]);
+
     return (
         <>
             <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{

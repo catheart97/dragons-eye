@@ -1,4 +1,5 @@
 import { BoardPosition, IBoardUtility, Board } from "../data/Board"
+import { updateInitiativeOnChange } from "./InitiativeBoardUtility";
 
 export class TrashDecoratorBoardUtility implements IBoardUtility {
     board: Board;
@@ -21,8 +22,9 @@ export class TrashDecoratorBoardUtility implements IBoardUtility {
     onShapeRelease(position: BoardPosition) {
         const idxTo = position.x + position.y * this.board.width;
         delete this.board.decorators[idxTo];
-        this.mouseDown = false;
 
+        updateInitiativeOnChange(this.board);
+        this.mouseDown = false;
         this.forceUpdate?.call(this);
     }
 

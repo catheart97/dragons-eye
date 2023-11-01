@@ -116,26 +116,31 @@ const ActionEditorComponent = (props: {
     )
 }
 
-interface EnumEditorProps<T> {
+export interface EnumEditorProps<T> {
     enumObj: object
     title: string,
     process: (v: T) => void,
     editMode: boolean,
     data: T[],
     update: () => void
+    hideTitle?: boolean
 }
 
 
-const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
+export const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
     const damageSelectRef = React.useRef<HTMLSelectElement>(null);
     return (
         <>
-            <UIGroup title={props.title} className="text-orange-600" />
+            {
+                !props.hideTitle ? (
+                    <UIGroup title={props.title} className="text-orange-600" />
+                ) : null
+            }
 
             <div className="flex flex-col gap-1 w-full">
                 {
                     props.editMode ? (
-                        <div className="flex rounded-xl overflow-hidden bg-neutral-100 pl-2">
+                        <div className={"flex rounded-xl overflow-hidden bg-neutral-100 " + (!props.hideTitle ? "pl-2" : "")}>
                             <select
                                 className="grow focus:outline-none bg-transparent"
                                 ref={damageSelectRef}
@@ -166,7 +171,7 @@ const EnumEditorComponent = <T extends unknown>(props: EnumEditorProps<T>) => {
                     props.data.map((v, i) => {
                         return (
                             <div className="flex rounded-xl overflow-hidden" key={i}>
-                                <div className="grow flex items-center pl-3">
+                                <div className={"grow flex items-center " + (!props.hideTitle ? "pl-3" : "pl-1")}>
                                     {v as unknown as string}
                                 </div>
                                 <button
@@ -222,7 +227,7 @@ export const RawStatblockComponent = (props: {
 
     return (
         <div className={"flex flex-col rounded-xl bg-neutral-100 gap-2 pointer-events-auto pb-3 " + (props.createMode ? "bg-white" : "")}>
-            <div className="text-3xl h-56 w-full" style={{
+            <div className="text-3xl h-56 w-full rounded-t-xl overflow-hidden" style={{
                 backgroundImage: props.statblock.image != "" ? `url(${props.statblock.image})` : `url(${CharacterIcon})`,
                 backgroundPosition: "top",
                 backgroundSize: "cover",

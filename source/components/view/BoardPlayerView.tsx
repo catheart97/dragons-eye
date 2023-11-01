@@ -1,9 +1,10 @@
 import React from "react";
 // import { WindowComponent, WindowComponentHandle } from "../ui/WindowComponent";
-import { Board, BoardCreature, BoardDecorator } from "../../data/Board";
+import { Board, BoardCreature, BoardDecorator, CreatureAttitude } from "../../data/Board";
 import { BoardComponent, BoardComponentHandle } from "../BoardComponent";
 import { Rect } from "../../Rect";
 import { IPlayerAppView } from "./IAppView";
+import Marquee from "react-fast-marquee";
 
 export type BoardPlayerViewProps = {
     board: React.MutableRefObject<Board>;
@@ -69,16 +70,28 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                                     if (decorator == null) return null;
                                     const attachment = decorator.attachment as BoardCreature;
 
+                                    let background = "bg-neutral-50/80";
+                                    if (attachment.attitude == CreatureAttitude.Player) {
+                                        background = "bg-green-100/80";
+                                    } else if (attachment.attitude == CreatureAttitude.Enemy) {
+                                        background = "bg-red-100/80";
+                                    } else {
+                                        background = "bg-purple-100/80";
+                                    }
+
+
                                     return (
                                         <div
                                             className={"w-36 min-w-36 shrink-0 max-w-36 transition-all duration-300 ease-in-out p-2 " + (props.board.current.initiativeIndex == i ? "h-36" : "h-12 text-sm")}
                                             key={v.id}
                                         >
-                                            <div className="h-full w-full bg-neutral-50/80 rounded-xl shadow p-2 flex items-center flex flex-col justify-center gap-2">
-                                                {attachment.statblock.name}
+                                            <div className={"h-full w-full rounded-xl shadow p-2 flex items-center flex flex-col justify-center gap-2 " + background}>
+                                                <Marquee>
+                                                    {attachment.statblock.name} &nbsp; &nbsp; &nbsp;
+                                                </Marquee>
                                                 <small className={
                                                     props.board.current.initiativeIndex == i ? "" : "hidden"
-                                                }>{decorator.key}</small>
+                                                }>ID: {decorator.key}</small>
                                             </div>
                                         </div>
                                     )

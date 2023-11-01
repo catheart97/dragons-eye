@@ -4,13 +4,18 @@ import { TextInput } from "../components/ui/TextInput";
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
+import { Adventure } from "../data/Adventure";
 import { Board, BoardDecoratorType, BoardItemType, BoardPosition, IBoardUtility, ItemData, ItemTypeIcons } from "../data/Board";
+import { Campaign } from "../data/Campaign";
 import { Database } from "../data/Database";
 
 export class CreateItemDecoratorBoardUtility implements IBoardUtility {
     board: Board;
     position: BoardPosition | null = null;
     downPosition: BoardPosition | null = null;
+
+    campaign?: React.MutableRefObject<Campaign>
+    adventure?: Adventure
 
     itemType: BoardItemType = BoardItemType.Door;
 
@@ -33,8 +38,10 @@ export class CreateItemDecoratorBoardUtility implements IBoardUtility {
 
     forceUpdate: (() => void) | null = null;
 
-    constructor(board: Board) {
+    constructor(board: Board, campaign?: React.MutableRefObject<Campaign>, adventure?: Adventure) {
         this.board = board;
+        this.campaign = campaign;
+        this.adventure = adventure;
     }
 
     onShapeClick(position: BoardPosition) {
@@ -226,6 +233,28 @@ export class CreateItemDecoratorBoardUtility implements IBoardUtility {
                                         }}
                                     />
                                 </Tab>
+                                {
+                                    this.campaign && this.campaign.current.items ? (
+                                        <Tab title="Campaign">
+                                            <ItemList
+                                                data={this.campaign.current.items}
+                                                update={() => {
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                onSelect={(item) => {
+                                                    this.itemBuffer.push(item);
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                searchBar
+                                                allowDelete
+                                                onUpdateData={(data) => {
+                                                    this.campaign!.current.items = data;
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                            />
+                                        </Tab>
+                                    ) : undefined
+                                }
                             </TabView>
 
                             <div className="flex flex-col grow h-0 rounded-xl bg-white p-2 mt-4">

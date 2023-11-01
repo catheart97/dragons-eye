@@ -1,24 +1,97 @@
-import { Stat, Statblock } from "../data/Statblock";
-import { RawStatblockComponent } from "../components/StatblockComponent";
+import { CreatureCondition, Stat, Statblock } from "../data/Statblock";
+import { EnumEditorComponent, RawStatblockComponent } from "../components/StatblockComponent";
 import { NumberInput } from "../components/ui/NumberInput";
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
 import { Board, BoardPosition, IBoardUtility, BoardDecorator, BoardDecoratorType, BoardCreature, CreatureAttitude, InitiaitveData } from "../data/Board";
+import { InteractBoardUtility } from "./InteractBoardUtility";
+
+export const updateInitiativeOnChange = (board: Board) => {
+    // todo: verify that the initiative list is still valid by 
+    // checking if the decorators are still on the board
+    // or if new decorators have been added or removed and auto roll for them
+
+    
+    if (board.initiative == undefined) return;
+    
+    const activeKey = board.initiative[board.initiativeIndex!].id;
+
+    // add decorators that are not on the initiative list
+    for (const key in board.decorators) {
+        if (board.decorators[key].type == BoardDecoratorType.Creature) {
+            const attachment = board.decorators[key].attachment as BoardCreature;
+            if (attachment.attitude != CreatureAttitude.Player) {
+                let found = false;
+                for (const i of board.initiative) {
+                    if (i.id == board.decorators[key].key) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    const statblock = attachment.statblock as Statblock
+                    board.initiative.push({
+                        id: board.decorators[key].key,
+                        initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
+                        conditions: []
+                    });
+                }
+            }
+        }
+    }
+
+    // delete initiatives that are no longer on the board
+    board.initiative = board.initiative.filter((v) => {
+        let found = false;
+        for (const key in board.decorators) {
+            if (board.decorators[key].key == v.id) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    });
+
+    // sort initiatives
+    board.initiative.sort((a, b) => {
+        return b.initiative - a.initiative;
+    });
+
+    // find the index of the active key
+    let index = 0;
+    for (const i of board.initiative) {
+        if (i.id == activeKey) {
+            break;
+        }
+        index++;
+    }
+    board.initiativeIndex = index;
+}
 
 export class InitiaitveBoardUtility implements IBoardUtility {
 
     board: Board;
     forceUpdate: (() => void) | null = null;
 
-    constructor(board: Board) {
+    initiatives: InitiaitveData[] = [];
+
+    constructor(board: Board, private interactBoardUtility: InteractBoardUtility) {
         this.board = board;
     }
 
-    onShapeClick?: ((position: BoardPosition) => void) | undefined;
-    onShapeRelease?: ((position: BoardPosition) => void) | undefined;
-    onShapeHover?: ((position: BoardPosition) => void) | undefined;
-    customComponent?: (() => JSX.Element) | undefined;
+    onShapeClick(position: BoardPosition) {
+        this.interactBoardUtility.onShapeClick(position);
+    }
+    onShapeRelease(position: BoardPosition) {
+        this.interactBoardUtility.onShapeRelease(position);
+    }
+    onShapeHover(position: BoardPosition) {
+        this.interactBoardUtility.onShapeHover(position);
+    }
+    customComponent() {
+        return this.interactBoardUtility.customComponent();
+    }
 
     icon() {
         return <span className="mso text-xl">swords</span>;
@@ -30,54 +103,12 @@ export class InitiaitveBoardUtility implements IBoardUtility {
         )
     }
 
-    initiatives: InitiaitveData[] = [];
     onMount() {
         this.initiatives = [];
     }
 
     userInterface() {
         if (this.board.initiative != undefined) {
-            // todo: verify that the initiative list is still valid by 
-            // checking if the decorators are still on the board
-            // or if new decorators have been added or removed and auto roll for them
-
-            for (const key in this.board.decorators) {
-                if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
-                    const attachment = this.board.decorators[key].attachment as BoardCreature;
-                    if (attachment.attitude != CreatureAttitude.Player) {
-                        let found = false;
-                        for (const i of this.board.initiative) {
-                            if (i.id == this.board.decorators[key].key) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            const statblock = attachment.statblock as Statblock
-                            this.board.initiative.push({
-                                id: this.board.decorators[key].key,
-                                initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
-                                conditions: []
-                            });
-                        }
-                    }
-                }
-            }
-
-            // delete initiatives that are no longer on the board
-            this.initiatives = this.initiatives.filter((v) => {
-                for (const i of this.board.initiative!) {
-                    if (i.id == v.id) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            // sort initiatives
-            this.board.initiative.sort((a, b) => {
-                return b.initiative - a.initiative;
-            });
 
             return (
                 <UIContainer>
@@ -100,25 +131,50 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                     const attachment = decorator.attachment as BoardCreature;
                                     const statblock = attachment.statblock as Statblock;
 
+                                    const conditionEdit = (
+                                        <div className="p-2">
+                                            <EnumEditorComponent
+                                                hideTitle
+                                                enumObj={CreatureCondition}
+                                                title="Conditions"
+                                                process={(condition) => {
+                                                    v.conditions.push(condition);
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                                editMode={true}
+                                                data={v.conditions}
+                                                update={() => {
+                                                    this.forceUpdate?.call(this);
+                                                }}
+                                            />
+                                        </div>
+                                    )
+
                                     if (this.board.initiativeIndex == i) {
                                         return (
-                                            <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-white" key={"p" + i}>
-                                                <RawStatblockComponent
-                                                    uniqueKey={decorator.key}
-                                                    updateStatblock={(s) => {
-                                                        attachment.statblock = s;
-                                                        this.forceUpdate?.call(this);
-                                                    }}
-                                                    statblock={statblock}
-                                                    player={attachment.attitude == CreatureAttitude.Player}
-                                                />
+                                            <div className="w-full rounded-xl border-2 border-orange-600 bg-white" key={"p" + i}>
+                                                <div className="p-2">
+                                                    <RawStatblockComponent
+                                                        uniqueKey={decorator.key}
+                                                        updateStatblock={(s) => {
+                                                            attachment.statblock = s;
+                                                            this.forceUpdate?.call(this);
+                                                        }}
+                                                        statblock={statblock}
+                                                        player={attachment.attitude == CreatureAttitude.Player}
+                                                    />
+                                                </div>
+                                                <div className="pl-2">
+                                                    <UIGroup title="Conditions" className="text-orange-600" />
+                                                    {conditionEdit}
+                                                </div>
                                             </div>
                                         )
                                     } else {
                                         return (
-                                            <div className="w-full p-2 pl-2 pr-2 rounded-xl bg-neutral-50" key={i}>
-                                                <div className="flex justify-between items-end">
-                                                    <div className="">{statblock.name}</div>
+                                            <div className="w-full rounded-xl bg-neutral-50 opacity-[90%]" key={i}>
+                                                <div className="text-xl p-2">{statblock.name}</div>
+                                                <div className="flex justify-between items-end p-2">
                                                     <div className="text-xs">Attitude: {attachment.attitude}</div>
                                                     <div className="text-xs">
                                                         {
@@ -138,7 +194,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                                     attachment.attitude == CreatureAttitude.Player ? (
                                                         null
                                                     ) : (
-                                                        <div className="w-full flex h-4 rounded-full overflow-hidden">
+                                                        <div className="w-full p-2 flex h-6 rounded-full overflow-hidden">
                                                             <div
                                                                 className="bg-green-500"
                                                                 style={{
@@ -163,6 +219,13 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                                         </div>
                                                     )
                                                 }
+
+                                                <div className="flex flex-col text-xs w-full items-end">
+                                                    <div className="text-xs px-2">Conditions</div>
+                                                    <div className="w-full">
+                                                        {conditionEdit}
+                                                    </div>
+                                                </div>
                                             </div>
                                         )
                                     }

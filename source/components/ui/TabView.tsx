@@ -11,7 +11,7 @@ export const Tab = (_props: ITab) => {
 
 export type TabViewProps = {
     defaultIndex?: number
-    children: React.ReactElement<ITab | undefined>[]
+    children: Array<React.ReactElement<ITab> | undefined>
     className?: string
     tabClassName?: string
     tabStyle?: React.CSSProperties
@@ -37,8 +37,8 @@ export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, Tab
                 <div
                     className=" absolute bg-white transition-all duration-200"
                     style={{
-                        left: activeIndex / props.children.length * 100 + "%",
-                        width: 1 / props.children.length * 100 + "%",
+                        left: activeIndex / tabs.length * 100 + "%",
+                        width: 1 / tabs.length * 100 + "%",
                         top: 0,
                         bottom: 0
                     }}
@@ -53,10 +53,10 @@ export const TabViewRenderer : React.ForwardRefRenderFunction<TabViewHandle, Tab
                                 onClick={() => setActiveIndex(i)}
                                 className={"overflow-hidden absolute " + (i == activeIndex ? "text-neutral-800" : "text-neutral-50")}
                                 style={{
-                                    left: i / props.children.length * 100 + "%",
+                                    left: i / tabs.length * 100 + "%",
                                     top: 0,
                                     bottom: 0,
-                                    width: 1 / props.children.length * 100 + "%"
+                                    width: 1 / tabs.length * 100 + "%"
                                 }}
                             >
                                 {v.props.title}

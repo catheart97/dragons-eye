@@ -7,9 +7,10 @@ import { Switch } from "../components/ui/Switch";
 import { Database } from "../data/Database";
 import { Tab, TabView } from "../components/ui/TabView";
 import { UIContainer } from "../components/ui/UIContainer";
-import { CampaignContext } from "../data/Campaign";
+import { Campaign } from "../data/Campaign";
 import React from "react";
 import { Adventure } from "../data/Adventure";
+import { updateInitiativeOnChange } from "./InitiativeBoardUtility";
 
 export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
     board: Board;
@@ -35,9 +36,14 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
 
     mouseDown: boolean = false;
 
+    campaign?: React.MutableRefObject<Campaign> = undefined;
+    adventure?: Adventure = undefined;
+
     forceUpdate: (() => void) | null = null;
 
-    constructor(board: Board) {
+    constructor(board: Board, campaign?: React.MutableRefObject<Campaign>, adventure?: Adventure) {
+        this.campaign = campaign;
+        this.adventure = adventure;
         this.board = board;
     }
 
@@ -89,8 +95,8 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                     monsters.push(statblock as Statblock)
                     db.commit();
                 }
-
             }
+            updateInitiativeOnChange(this.board);
         }
         this.mouseDown = false;
 
@@ -107,19 +113,6 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
     }
 
     userInterface() {
-
-        const campaign = React.useContext(CampaignContext);
-        let adventure: Adventure | null = null;
-        if (campaign != null) {
-            campaign.current.adventures.forEach((a) => {
-                a.encounters.forEach((e) => {
-                    console.log(e.name);
-                    if (e.board === this.board) {
-                        adventure = a;
-                    }
-                })
-            })
-        }
 
         return (
             <UIContainer className="grow flex flex-col">
@@ -172,11 +165,11 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                         />
                     </Tab>
                     {
-                        campaign != null ? (
+                        this.campaign != null ? (
                             <Tab title="Campaign">
                                 <div className="text-xl font-bold p-2">Players</div>
                                 <PlayerStatblockList
-                                    data={campaign.current.players}
+                                    data={this.campaign.current.players}
                                     update={() => {
                                         this.forceUpdate?.call(this);
                                     }}
@@ -188,11 +181,11 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                                     searchBar
                                 />
                                 {
-                                    adventure != null ? (
+                                    this.adventure != null ? (
                                         <>
                                             <div className="text-xl font-bold p-2">Adventure NPCs</div>
                                             <StatblockList
-                                                data={(adventure as Adventure).npcs}
+                                                data={this.adventure.npcs}
                                                 update={() => {
                                                     this.forceUpdate?.call(this);
                                                 }}
@@ -208,7 +201,7 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                                 }
                                 <div className="text-xl font-bold p-2">NPCs</div>
                                 <StatblockList
-                                    data={campaign.current.npcs}
+                                    data={this.campaign.current.npcs}
                                     update={() => {
                                         this.forceUpdate?.call(this);
                                     }}
@@ -220,7 +213,7 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                                     searchBar
                                 />
                             </Tab>
-                        ) : <></>
+                        ) : undefined
                     }
                 </TabView>
                 <UIGroup title="Attitude">

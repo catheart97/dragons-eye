@@ -2,7 +2,7 @@
   "name": "dragons-eye",
   "private": true,
   "author": "Ronja Schnur (catheart97)",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "scripts": {
     "dev": "vite",
     "predev": "license-report > license.json",
@@ -24,6 +24,7 @@
     "marked-react": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-fast-marquee": "^1.6.2",
     "react-grid-layout": "^1.4.2",
     "react-icons": "^4.11.0",
     "react-popper": "^2.3.0",
