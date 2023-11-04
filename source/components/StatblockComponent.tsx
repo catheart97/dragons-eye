@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
 import { UIGroup } from "./ui/UIGroup";
 import { ToolButton } from "./ui/ToolButton";
 import { Database } from "../data/Database";
-import { SpellComponent } from "./SpellComponent";
+import { SpellList } from "./SpellComponent";
 import { IAddComponent, ITListComponentProps, IViewComponent, TListComponent } from "./ui/TListComponent";
 import { Tab, TabView, TabViewHandle } from "./ui/TabView";
 
@@ -846,7 +846,14 @@ export const RawStatblockComponent = (props: {
                                                 </div>
                                             ) : null
                                         }
-                                        {
+                                        <SpellList
+                                            data={statblock.spells}
+                                            searchBar={false}
+                                            update={() => {
+                                                update();
+                                            }}
+                                        />
+                                        {/* {
                                             statblock.spells.map((v) => {
                                                 return (
                                                     <SpellComponent
@@ -856,7 +863,7 @@ export const RawStatblockComponent = (props: {
                                                     />
                                                 )
                                             })
-                                        }
+                                        } */}
                                     </div>
                                 </>
                             ) : null

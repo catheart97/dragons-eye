@@ -120,38 +120,40 @@ export const TListComponent = <T extends { name: string }>(props: ITListComponen
     return (
         <div className="flex flex-col w-full p-2 gap-2">
             {
-                <div className="flex rounded-xl shadow items-center m-2">
-                    <span className="mso p-2">search</span>
-                    <input
-                        className="grow h-full"
-                        type="text"
-                        onChange={(e) => {
-                            setFilter(e.target.value);
-                        }}
-                    />
-                    {
-                        filter != "" && (
-                            <button
-                                onClick={() => {
-                                    setFilter("");
-                                }}
-                            >
-                                <span className="mso p-2">close</span>
-                            </button>
-                        )
-                    }
-                    {
-                        props.newComponent ? (
-                            <button
-                                onClick={() => {
-                                    setExpanded(!expanded);
-                                }}
-                            >
-                                <span className="mso p-2">add</span>
-                            </button>
-                        ) : null
-                    }
-                </div>
+                props.searchBar == undefined || props.searchBar ? (
+                    <div className="flex rounded-xl shadow items-center m-2">
+                        <span className="mso p-2">search</span>
+                        <input
+                            className="grow h-full"
+                            type="text"
+                            onChange={(e) => {
+                                setFilter(e.target.value);
+                            }}
+                        />
+                        {
+                            filter != "" && (
+                                <button
+                                    onClick={() => {
+                                        setFilter("");
+                                    }}
+                                >
+                                    <span className="mso p-2">close</span>
+                                </button>
+                            )
+                        }
+                        {
+                            props.newComponent ? (
+                                <button
+                                    onClick={() => {
+                                        setExpanded(!expanded);
+                                    }}
+                                >
+                                    <span className="mso p-2">add</span>
+                                </button>
+                            ) : null
+                        }
+                    </div>
+                ) : null
             }
             <div className="px-2 w-full">
                 {
