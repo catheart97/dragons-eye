@@ -28,6 +28,7 @@ export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
     importanceRect: Rect | null;
     setImportanceRect: (rect: Rect | null) => void;
+    playerViewOpen: React.MutableRefObject<boolean>;
 } & IDMAppView
 
 export type BoardBoardDMViewHandle = {
@@ -105,8 +106,9 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
 
     return (
         <>
-            <div className='w-full grow relative  h-full flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
-                minWidth: "50vw!important"
+            <div className='h-full grow relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+                minWidth: "50vw!important",
+                width: props.playerViewOpen.current ? "50vw" : "100vw",
             }}>
                 <BoardComponent
                     ref={boardComponentRef}

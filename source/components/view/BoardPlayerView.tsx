@@ -37,7 +37,7 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
 
     return (
         props.open ? (
-            <div className="text-2xl bg-green-500 h-full relative grow basis-2 overflow-hidden" style={{
+            <div className="text-2xl bg-green-500 h-full relative w-1/2 overflow-hidden" style={{
                 minWidth: "50vw",
                 maxWidth: "50vw",
                 width: "50vw",

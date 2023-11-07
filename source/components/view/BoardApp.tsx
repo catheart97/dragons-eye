@@ -40,7 +40,6 @@ const BoardApp = (props: IAppView & {
 
     return (
         <div className="flex flex-col w-full h-screen min-h-screen max-h-screen overflow-hidden">
-
             <div
                 style={{
                     height: props.isMac ? 42 : 0,
@@ -62,7 +61,7 @@ const BoardApp = (props: IAppView & {
                 </button>
             </div>
             <div className={
-                "flex grow relative h-0"
+                "flex w-full grow h-0"
             }>
                 <BoardDMView
                     dialogHandle={props.dialogHandle}
@@ -70,6 +69,7 @@ const BoardApp = (props: IAppView & {
                     update={update}
                     importanceRect={importanceRect}
                     setImportanceRect={setImportanceRect}
+                    playerViewOpen={props.playerViewOpen}
                 />
                 <BoardPlayerView
                     open={props.playerViewOpen.current}
