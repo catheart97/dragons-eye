@@ -1,8 +1,9 @@
 import { DialogHandle } from "../ui/Dialog"
 
 export interface IAppView {
-    playerViewOpen: boolean
+    playerViewOpen: React.MutableRefObject<boolean>
     dialogHandle: React.MutableRefObject<DialogHandle | null>
+    isMac: boolean
 }
 
 export interface IPlayerAppView {

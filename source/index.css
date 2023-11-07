@@ -9,4 +9,11 @@
         margin: 0;
         background-color: red;
     }
+    /* mac drag area */
+    .mac {
+        -webkit-app-region: drag;
+        /* mac system font */
+        font-family: -apple-system, BlinkMacSystemFont;
+        font-weight: 600;
+    }
 }

@@ -65,7 +65,7 @@ export const NoteComponent = (props: IViewComponent<Note> & {
                         }}
                     />
                 ) : (
-                    <div className="prose">
+                    <div className="prose overflow-x-scroll w-full prose-table:w-full">
                         <Markdown>{props.data.description}</Markdown>
                     </div>
                 )

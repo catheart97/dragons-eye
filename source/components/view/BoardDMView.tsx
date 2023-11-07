@@ -105,7 +105,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
 
     return (
         <>
-            <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+            <div className='w-full grow relative  h-full flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
                 minWidth: "50vw!important"
             }}>
                 <BoardComponent

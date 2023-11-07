@@ -230,7 +230,7 @@ export const CampaignDMView = (props: IDMAppView & {
 
     return (
         <>
-            <div className='w-full grow h-screen min-h-screen max-h-screen overflow-hidden relative flex basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+            <div className='w-full grow relative flex basis-1 border-r-4 border-orange-600 grow basis-2' style={{
                 minWidth: "50vw!important",
                 backgroundImage: "url('" + (bgImage) + "')",
                 backgroundSize: "cover",

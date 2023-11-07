@@ -9,7 +9,7 @@ import { IAppView } from './IAppView';
 const BoardApp = (props: IAppView & {
     board: React.MutableRefObject<Board>
 }) => {
-    
+
     const playerView = React.useRef<BoardPlayerViewHandle>(null);
 
     const [importanceRect, setImportanceRect] = React.useState<Rect | null>(null);
@@ -39,23 +39,46 @@ const BoardApp = (props: IAppView & {
     }, [props.playerViewOpen]);
 
     return (
-        <div className={
-            "flex"
-        }>
-            <BoardDMView
-                dialogHandle={props.dialogHandle}
-                board={props.board}
-                update={update}
-                importanceRect={importanceRect}
-                setImportanceRect={setImportanceRect}
-            />
-            <BoardPlayerView
-                open={props.playerViewOpen}
-                ref={playerView}
-                board={props.board}
-                update={update}
-                importanceRect={importanceRect}
-            />
+        <div className="flex flex-col h-screen min-h-screen max-h-screen overflow-hidden">
+
+            <div
+                style={{
+                    height: props.isMac ? 42 : 0,
+                    width: "100%",
+                }}
+                className={"flex justify-end items-center px-2 overflow-hidden transition-[height,border] duration-300 ease-in-out bg-black text-white " + (props.isMac ? "border-b-4 border-orange-600" : "")}
+            >
+                <div className="mac h-full grow flex justify-center items-center text-sm">
+                    Dragon's Eye
+                </div>
+                <button
+                    className=" h-full flex items-center"
+                    onClick={() => {
+                        props.playerViewOpen.current = !props.playerViewOpen.current;
+                        forceUpdate();
+                    }}
+                >
+                    <span className="mso flex text-xl">{props.playerViewOpen.current ? "right_panel_close" : "right_panel_open"}</span>
+                </button>
+            </div>
+            <div className={
+                "flex grow"
+            }>
+                <BoardDMView
+                    dialogHandle={props.dialogHandle}
+                    board={props.board}
+                    update={update}
+                    importanceRect={importanceRect}
+                    setImportanceRect={setImportanceRect}
+                />
+                <BoardPlayerView
+                    open={props.playerViewOpen.current}
+                    ref={playerView}
+                    board={props.board}
+                    update={update}
+                    importanceRect={importanceRect}
+                />
+            </div>
         </div>
     )
 }

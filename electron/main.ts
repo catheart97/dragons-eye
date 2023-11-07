@@ -86,6 +86,8 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
             sandbox: false
         },
+        // remove title bar if mac 
+        titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default'
     })
 
     win.maximize()
@@ -376,6 +378,13 @@ function createWindow() {
             }
         }
     })
+
+    win.on("enter-full-screen", () => {
+        win?.webContents.send('r-full-screen', true);
+    });
+    win.on("leave-full-screen", () => {
+        win?.webContents.send('r-full-screen', false);
+    });
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common

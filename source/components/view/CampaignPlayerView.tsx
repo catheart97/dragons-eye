@@ -12,7 +12,7 @@ export const CampaignPlayerView = (props: IPlayerAppView & {
 
     return (
         props.open ? (
-            <div className="text-2xl bg-black h-screen grow basis-2" style={{
+            <div className="text-2xl bg-black grow basis-2" style={{
                 minWidth: "50vw",
                 maxWidth: "50vw",
                 width: "50vw",

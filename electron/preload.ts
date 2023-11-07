@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import fsExtra from 'fs-extra'
 
+import Logo from "./logo"
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('fsExtra', fsExtra)
 contextBridge.exposeInMainWorld('ipcRenderer', withPrototype(ipcRenderer))
@@ -52,6 +54,8 @@ const safeDOM = {
   },
 }
 
+console.log(Logo)
+
 /**
  * https://tobiasahlin.com/spinkit
  * https://connoratherton.com/loaders
@@ -67,12 +71,47 @@ function useLoading() {
   75% { transform: perspective(100px) rotateX(0) rotateY(180deg); }
   100% { transform: perspective(100px) rotateX(0) rotateY(0); }
 }
+
+@-webkit-keyframes rotate-center {
+  0% {
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
+  }
+  50% {
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg);
+  }
+  100% {
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg);
+  }
+}
+@keyframes rotate-center {
+  0% {
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
+  }
+  50% {
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg);
+  }
+  100% {
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg);
+  }
+}
+
+
 .${className} > div {
   animation-fill-mode: both;
-  width: 50px;
-  height: 50px;
-  background: #fff;
-  animation: square-spin 3s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
+  width: 100px;
+  height: 100px;
+  background-image: ${Logo};
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  animation: rotate-center 1s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
+  animation-direction: alternate-reverse;
+  border-radius: 50%;
 }
 .app-loading-wrap {
   position: fixed;
@@ -83,7 +122,7 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #AAAAAA;
+  background: #ea580c;
   z-index: 9;
 }
     `

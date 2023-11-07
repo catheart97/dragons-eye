@@ -14,7 +14,9 @@ enum AppMode {
     Board
 }
 
-export const App = () => {
+export const App = (props: {
+    isMac: boolean
+}) => {
 
     const forceUpdate = useForceUpdate();
 
@@ -147,8 +149,9 @@ export const App = () => {
             >
                 <BoardApp
                     board={board}
-                    playerViewOpen={playerViewOpen.current}
+                    playerViewOpen={playerViewOpen}
                     dialogHandle={dialogHandle}
+                    isMac={props.isMac}
                 />
             </CampaignContext.Provider>
         ) : (
@@ -160,8 +163,9 @@ export const App = () => {
                         <div className="h-full w-full relative">
                             <BoardApp
                                 board={campaignBoard as React.MutableRefObject<Board>}
-                                playerViewOpen={playerViewOpen.current}
+                                playerViewOpen={playerViewOpen}
                                 dialogHandle={dialogHandle}
+                                isMac={props.isMac}
                             />
                             <button
                                 className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:bg-orange-600 hover:text-white  transition-all duration-200 ease-in-out text-xl"
@@ -177,7 +181,8 @@ export const App = () => {
                             campaign={campaign}
                             loadCampaignBoard={loadCampaignBoard}
                             dialogHandle={dialogHandle}
-                            playerViewOpen={playerViewOpen.current}
+                            playerViewOpen={playerViewOpen}
+                            isMac={props.isMac}
                         />
                     )
                 }

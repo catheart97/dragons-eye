@@ -14,11 +14,12 @@ import { App } from './App';
 
 import WinCSS from "./win.index.css?raw"
 
+let os : string;
 const init = async () => {
   await TexturePool.getInstance().constructTexturePool();
   await setupEnvironment();
   await Database.setup();
-  const os = await window.ipcRenderer.invoke("m-os") as string;
+  os = await window.ipcRenderer.invoke("m-os") as string;
   if (os == "win32") {
     const style = document.createElement("style");
     style.innerHTML = WinCSS;
@@ -44,10 +45,29 @@ window.ipcRenderer.on('r-export-database', (_e, fn) => {
   console.log("Database exported to", fn);
 })
 
+const AppWrapper = () => {
+  const [isMac, setIsMac] = React.useState<boolean>(os == "darwin");
+  const initialized = React.useRef<boolean>(false);
+
+  React.useEffect(() => {
+    if (initialized.current) {
+      return;
+    }
+    initialized.current = true;
+    window.ipcRenderer.on('r-full-screen', (_e, full) => {
+      setIsMac(full ? false : os == "darwin");
+    })
+  }, [])
+
+  return (
+    <App isMac={isMac} />
+  )
+}
+
 init().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <App />
+      <AppWrapper />
     </React.StrictMode>,
   )
 
