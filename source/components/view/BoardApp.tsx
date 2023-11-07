@@ -39,14 +39,14 @@ const BoardApp = (props: IAppView & {
     }, [props.playerViewOpen]);
 
     return (
-        <div className="flex flex-col h-screen min-h-screen max-h-screen overflow-hidden">
+        <div className="flex flex-col w-full h-screen min-h-screen max-h-screen overflow-hidden">
 
             <div
                 style={{
                     height: props.isMac ? 42 : 0,
                     width: "100%",
                 }}
-                className={"flex justify-end items-center px-2 overflow-hidden transition-[height,border] duration-300 ease-in-out bg-black text-white " + (props.isMac ? "border-b-4 border-orange-600" : "")}
+                className={"flex justify-end items-center px-2 shrink-0 grow-0 overflow-hidden transition-[height,border] duration-300 ease-in-out bg-black text-white " + (props.isMac ? "border-b-4 border-orange-600" : "")}
             >
                 <div className="mac h-full grow flex justify-center items-center text-sm">
                     Dragon's Eye
@@ -62,7 +62,7 @@ const BoardApp = (props: IAppView & {
                 </button>
             </div>
             <div className={
-                "flex grow"
+                "flex grow relative h-0"
             }>
                 <BoardDMView
                     dialogHandle={props.dialogHandle}

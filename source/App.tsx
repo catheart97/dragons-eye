@@ -168,7 +168,7 @@ export const App = (props: {
                                 isMac={props.isMac}
                             />
                             <button
-                                className="absolute top-4 left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:bg-orange-600 hover:text-white  transition-all duration-200 ease-in-out text-xl"
+                                className={"absolute left-4 h-12 w-12 rounded-full bg-white z-[2000] flex justify-center items-center shadow-md hover:bg-orange-600 hover:text-white  transition-all duration-200 ease-in-out text-xl " + (props.isMac ? "top-14" : "top-4")}
                                 onClick={() => {
                                     loadCampaignBoard(null);
                                 }}

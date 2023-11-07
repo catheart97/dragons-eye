@@ -29,17 +29,17 @@ export const EmptyCampaign: Campaign = {
         {
             title: "Adventure",
             npcs: [],
-            encounters: [
-                {
-                    name: "Encounter",
-                    description: "Encounter Description",
-                    board: constructDefaultBoard(10, 10)
-                }
-            ],
+            encounters: [],
             notes: []
         }
     ],
-    encounters: [],
+    encounters: [
+        {
+            name: "Encounter",
+            description: "Encounter Description",
+            board: constructDefaultBoard(10, 10)
+        }
+    ],
     players: [],
     npcs: [],
     notes: []
