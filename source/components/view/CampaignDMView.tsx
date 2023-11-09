@@ -162,6 +162,7 @@ export const CampaignDMView = (props: IDMAppView & {
     setImage: (image: string) => void
 }) => {
     const [selectedAdventure, setSelectedAdventure] = React.useState<number>(-1);
+    const selectedRef = React.useRef<number>(selectedAdventure);
 
     useEffect(() => {
         props.setImage(props.campaign.current.image ?? CampaignIcon);
@@ -174,6 +175,19 @@ export const CampaignDMView = (props: IDMAppView & {
             props.campaign.current.image ?? CampaignIcon
         )
     )
+
+    const addEncounter = (encounter: Encounter) => {
+        if (selectedRef.current >= 0) {
+            props.campaign.current.adventures[selectedRef.current].encounters.push(encounter);
+        } else {
+            props.campaign.current.encounters.push(encounter);
+        }
+        props.update();
+    }
+
+    React.useEffect(() => {
+        selectedRef.current = selectedAdventure;
+    }, [selectedAdventure])
 
     const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(false);
 
@@ -210,13 +224,8 @@ export const CampaignDMView = (props: IDMAppView & {
                             description: encounterDescription,
                             board: newBoard
                         }
-
-                        if (selectedAdventure >= 0) {
-                            props.campaign.current.adventures[selectedAdventure].encounters.push(encounter);
-                        } else {
-                            props.campaign.current.encounters.push(encounter);
-                        }
-                        props.update();
+                        console.log();
+                        addEncounter(encounter);
                     },
                     failure() { }
                 }, "Import Dungeon")

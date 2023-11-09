@@ -54,8 +54,6 @@ const safeDOM = {
   },
 }
 
-console.log(Logo)
-
 /**
  * https://tobiasahlin.com/spinkit
  * https://connoratherton.com/loaders
