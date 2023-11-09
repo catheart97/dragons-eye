@@ -41,7 +41,7 @@ export const CampaignApp = (props: IAppView & {
                 </button>
             </div>
 
-            <div className="flex grow">
+            <div className="flex grow h-0">
                 <CampaignDMView
                     loadCampaignBoard={props.loadCampaignBoard}
                     campaign={props.campaign}
