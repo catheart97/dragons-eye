@@ -9,6 +9,7 @@ import Marquee from "react-fast-marquee";
 export type BoardPlayerViewProps = {
     board: React.MutableRefObject<Board>;
     importanceRect: Rect | null;
+    initiaitveEnabled: boolean;
 } & IPlayerAppView
 
 export type BoardPlayerViewHandle = {
@@ -49,7 +50,7 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                     importanceRect={props.importanceRect}
                 />
                 {
-                    props.board.current.initiative ? (
+                    props.initiaitveEnabled && props.board.current.initiative ? (
                         <div className="absolute bottom-0 p-3 pointer-events-none flex items-end z-[60] justify-start top-0 right-0 overflow-hidden transition-all duration-200 ease-in-out"
                             style={{
                                 left: -props.board.current.initiativeIndex! * 9 + "rem"

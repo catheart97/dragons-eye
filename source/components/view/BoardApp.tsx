@@ -14,6 +14,8 @@ const BoardApp = (props: IAppView & {
 
     const [importanceRect, setImportanceRect] = React.useState<Rect | null>(null);
 
+    const [initiativeEnabled, setInitiativeEnabled] = React.useState<boolean>(true);
+
     const forceUpdate = useForceUpdate();
     const update = () => {
         forceUpdate();
@@ -51,7 +53,16 @@ const BoardApp = (props: IAppView & {
                     Dragon's Eye
                 </div>
                 <button
-                    className=" h-full flex items-center"
+                    className=" h-full flex items-center px-2"
+                    onClick={() => {
+                        setInitiativeEnabled(!initiativeEnabled);
+                        forceUpdate();
+                    }}
+                >
+                    <span className={"mso flex text-xl " + (initiativeEnabled ? "msf" : "mso")}>swords</span>
+                </button>
+                <button
+                    className=" h-full flex items-center pl-2"
                     onClick={() => {
                         props.playerViewOpen.current = !props.playerViewOpen.current;
                         forceUpdate();
@@ -77,6 +88,7 @@ const BoardApp = (props: IAppView & {
                     board={props.board}
                     update={update}
                     importanceRect={importanceRect}
+                    initiaitveEnabled={initiativeEnabled}
                 />
             </div>
         </div>
