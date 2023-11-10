@@ -244,6 +244,24 @@ export const RawStatblockComponent = (props: {
                             }}
                             className="bg-transparent focus:outline-none w-full"
                         />
+                        {
+                            !props.player ? (
+                                <div
+                                    className="flex gap-2"
+                                >
+                                    CR:
+                                    <input
+                                        type="number"
+                                        defaultValue={statblock.challengeRating}
+                                        onChange={(e) => {
+                                            statblock.challengeRating = e.target.valueAsNumber;
+                                            update()
+                                        }}
+                                        className="bg-transparent focus:outline-none w-full"
+                                    />
+                                </div>
+                            ) : null
+                        }
                         <div className="text-xs flex">
                             {
                                 props.uniqueKey > 0 && (

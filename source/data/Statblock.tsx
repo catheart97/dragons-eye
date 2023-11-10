@@ -88,7 +88,6 @@ export type StatblockAction = {
 }
 
 export type Statblock = PlayerStatblock & {
-    
     armorClass: number;
     speed: {
         walk: number;
@@ -200,6 +199,6 @@ export const constructDefaultStatblock = (): Statblock => {
         description: "",
         alignment: "",
         image: "",
-        type: CreatureType.Humanoid
+        type: CreatureType.Humanoid,
     }
 }
