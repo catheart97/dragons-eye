@@ -80,6 +80,8 @@ const BoardApp = (props: IAppView & {
                     update={update}
                     importanceRect={importanceRect}
                     setImportanceRect={setImportanceRect}
+                    setInitiativeEnabled={setInitiativeEnabled}
+                    initiativeEnabled={initiativeEnabled}
                     playerViewOpen={props.playerViewOpen}
                 />
                 <BoardPlayerView

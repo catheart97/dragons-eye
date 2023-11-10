@@ -29,6 +29,8 @@ export type BoardDMViewProps = {
     importanceRect: Rect | null;
     setImportanceRect: (rect: Rect | null) => void;
     playerViewOpen: React.MutableRefObject<boolean>;
+    setInitiativeEnabled: (enabled: boolean) => void;
+    initiativeEnabled: boolean;
 } & IDMAppView
 
 export type BoardBoardDMViewHandle = {
@@ -105,66 +107,73 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
     React.useEffect(setupUtilities, [board.current]);
 
     return (
-        <>
-            <div className='h-full grow relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
-                minWidth: "50vw!important",
-                width: props.playerViewOpen.current ? "50vw" : "100vw",
-            }}>
-                <BoardComponent
-                    ref={boardComponentRef}
-                    board={board.current}
-                    utility={utilities.current[currentUtility]}
-                    importanceRect={props.importanceRect}
-                    setImportanceRect={props.setImportanceRect}
-                />
-                <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
-                    {
-                        utilities.current[currentUtility] != undefined ? (
-                            utilities.current[currentUtility]!.userInterface()
-                        ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
-                    }
+        <div className='h-full grow relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+            minWidth: "50vw!important",
+            width: props.playerViewOpen.current ? "50vw" : "100vw",
+        }}>
+            <BoardComponent
+                ref={boardComponentRef}
+                board={board.current}
+                utility={utilities.current[currentUtility]}
+                importanceRect={props.importanceRect}
+                setImportanceRect={props.setImportanceRect}
+            />
+            <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
+                {
+                    utilities.current[currentUtility] != undefined ? (
+                        utilities.current[currentUtility]!.userInterface()
+                    ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
+                }
 
-                    <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-start pointer-events-auto shadow-2xl shadow-black'>
-                        {
-                            utilities.current.map((v, i) => {
-                                return (
-                                    <Tooltip
-                                        key={i}
-                                        strategy='fixed'
-                                    >
-                                        <TooltipTarget>
-                                            <ToolButton
-                                                onClick={() => {
-                                                    setCurrentUtility(i);
-                                                    utilities.current[i].onMount?.call(utilities.current[i]);
-                                                }}
-                                                active={currentUtility === i}
-                                            >
-                                                {v.icon()}
-                                            </ToolButton>
-                                        </TooltipTarget>
-                                        <TooltipContent>
-                                            {v.description()}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                )
-                            })
-                        }
-                        <ToolButton
-                            onClick={() => {
-                                props.dialogHandle.current?.open(<>
-                                    <DMScreenComponent />
-                                </>, undefined, "Dungeon Master's Screen", true);
-                            }}
-                            active={false}
-                        >
-                            <span className='msf'>map</span>
-                        </ToolButton>
-                    </div>
+                <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-start pointer-events-auto shadow-2xl shadow-black'>
+                    {
+                        utilities.current.map((v, i) => {
+                            return (
+                                <Tooltip
+                                    key={i}
+                                    strategy='fixed'
+                                >
+                                    <TooltipTarget>
+                                        <ToolButton
+                                            onClick={() => {
+                                                setCurrentUtility(i);
+                                                utilities.current[i].onMount?.call(utilities.current[i]);
+                                            }}
+                                            active={currentUtility === i}
+                                        >
+                                            {v.icon()}
+                                        </ToolButton>
+                                    </TooltipTarget>
+                                    <TooltipContent>
+                                        {v.description()}
+                                    </TooltipContent>
+                                </Tooltip>
+                            )
+                        })
+                    }
+                    {/* <ToolButton
+                        onClick={() => {
+                            props.dialogHandle.current?.open(<>
+                                <DMScreenComponent />
+                            </>, undefined, "Dungeon Master's Screen", true);
+                        }}
+                        active={false}
+                    >
+                        <span className='msf'>map</span>
+                    </ToolButton> */}
+                    <ToolButton
+                        active={false}
+                        onClick={() => {
+                            props.setInitiativeEnabled(!props.initiativeEnabled);
+                            props.update();
+                        }}
+                    >
+                        <span className={"mso flex " + (props.initiativeEnabled ? "msf" : "mso")}>swords</span>
+                    </ToolButton>
                 </div>
             </div>
             <Dialog ref={props.dialogHandle} />
-        </>
+        </div>
     )
 }
 
