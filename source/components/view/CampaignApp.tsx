@@ -31,7 +31,7 @@ export const CampaignApp = (props: IAppView & {
                     {props.campaign.current!.title} - Dragon's Eye
                 </div>
                 <button
-                    className=" h-full flex items-center"
+                    className=" h-full flex items-center pl-2"
                     onClick={() => {
                         props.playerViewOpen.current = !props.playerViewOpen.current;
                         forceUpdate();
@@ -41,7 +41,7 @@ export const CampaignApp = (props: IAppView & {
                 </button>
             </div>
 
-            <div className="flex grow">
+            <div className="flex grow h-0">
                 <CampaignDMView
                     loadCampaignBoard={props.loadCampaignBoard}
                     campaign={props.campaign}

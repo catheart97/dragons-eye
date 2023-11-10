@@ -933,7 +933,7 @@ export const RawStatblockComponent = (props: {
 
                         {/* Languages */}
                         {
-                            editMode || statblock.languages.length > 0 ? (
+                            editMode || statblock.languages && statblock.languages.length > 0 ? (
                                 <>
                                     <UIGroup title="Languages" className="text-orange-600">
                                     </UIGroup>
@@ -955,7 +955,7 @@ export const RawStatblockComponent = (props: {
 
                         {/* Skills */}
                         {
-                            editMode || statblock.skills.length > 0 ? (
+                            editMode || statblock.skills && statblock.skills.length > 0 ? (
                                 <>
 
                                     <UIGroup title="Skills" className="text-orange-600">
