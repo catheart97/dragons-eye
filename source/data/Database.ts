@@ -428,10 +428,10 @@ export class Database {
                         },
                         speed: {
                             walk: monster.speed.match(/\d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
-                            swim: monster.speed.match(/\swim d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
-                            fly: monster.speed.match(/\sfly d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
-                            burrow: monster.speed.match(/\sburrow d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
-                            climb: monster.speed.match(/\sclimb d+/g) ? parseInt(monster.speed.match(/\d+/g)![0]) : 0,
+                            swim: monster.speed.match(/swim [0-9]+/g) ? parseInt(monster.speed.match(/swim [0-9]+/g)![0].split(" ")[1]) : 0,
+                            fly: monster.speed.match(/fly [0-9]+/g) ? parseInt(monster.speed.match(/fly [0-9]+/g)![0].split(" ")[1]) : 0,
+                            burrow: monster.speed.match(/burow [0-9]+/g) ? parseInt(monster.speed.match(/burow [0-9]+/g)![0].split(" ")[1]) : 0,
+                            climb: monster.speed.match(/climb [0-9]+/g) ? parseInt(monster.speed.match(/climb [0-9]+/g)![0].split(" ")[1]) : 0,
                         },
                         skills: monster.skill ? (
                             typeof monster.skill === "string" ? (

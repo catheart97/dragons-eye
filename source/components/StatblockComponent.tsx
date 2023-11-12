@@ -1,5 +1,5 @@
 import React from "react";
-import { CreatureSize, DamageType, PlayerStatblock, Stat, Statblock, constructDefaultStatblock, CreatureCondition, StatblockAction } from "../data/Statblock";
+import { CreatureSize, DamageType, PlayerStatblock, Stat, Statblock, constructDefaultStatblock, CreatureCondition, StatblockAction, SpeedStat } from "../data/Statblock";
 import { useForceUpdate } from "../utility";
 import { Tooltip, TooltipContent, TooltipTarget } from "./ui/Tooltip";
 import { UIGroup } from "./ui/UIGroup";
@@ -676,6 +676,36 @@ export const RawStatblockComponent = (props: {
                                                         (statblock.savingThrows![v as keyof typeof Stat]).toFixed(0)}
                                                     onChange={(e) => {
                                                         statblock.savingThrows![v as keyof typeof Stat] = e.target.valueAsNumber;
+                                                        update()
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-full bg-neutral-50 p-1 text-xs">
+                                                {v.substring(0, 3).toUpperCase()}
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+
+                        <UIGroup title="Speed" className="text-orange-600">
+                        </UIGroup>
+                        <div className="rounded-xl overflow-hidden flex shadow mx-3">
+                            {
+                                Object.keys(statblock.speed).map((v, i) => {
+                                    return (
+                                        <div
+                                            className="flex flex-col grow items-stretch text-center"
+                                            key={i}
+                                        >
+                                            <div className="w-full bg-neutral-100 p-1">
+                                                <input
+                                                    type="number"
+                                                    className="text-xs w-6 text-center bg-transparent"
+                                                    defaultValue={statblock.speed![v as keyof SpeedStat]}
+                                                    onChange={(e) => {
+                                                        statblock.speed![v as keyof SpeedStat] = e.target.valueAsNumber;
                                                         update()
                                                     }}
                                                 />

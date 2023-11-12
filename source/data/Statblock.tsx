@@ -87,15 +87,17 @@ export type StatblockAction = {
     description: string;
 }
 
+export type SpeedStat = {
+    walk: number;
+    fly: number;
+    swim: number;
+    burrow: number;
+    climb: number;
+}
+
 export type Statblock = PlayerStatblock & {
     armorClass: number;
-    speed: {
-        walk: number;
-        fly: number;
-        swim: number;
-        burrow: number;
-        climb: number;
-    }
+    speed: SpeedStat;
 
     hitPoints: {
         current: number;

@@ -31,6 +31,19 @@ export enum BoardItemType {
     Item
 }
 
+export enum MarkerType {
+    Circle,
+    Square
+}
+
+export type BoardMarker = {
+    type: MarkerType,
+    color: string,
+    width: number,
+    height: number,
+    position: BoardPosition
+}
+
 export type DoorData = "locked" | "unlocked";
 export type TrapData = {
     armed: boolean,
@@ -77,6 +90,8 @@ export type Board = {
     
     hidden?: { [key: number]: boolean }
     
+    markers?: Array<BoardMarker>
+
     initiative?: InitiaitveData[]
     initiativeIndex?: number
 }

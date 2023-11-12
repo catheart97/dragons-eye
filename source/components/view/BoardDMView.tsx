@@ -19,7 +19,6 @@ import { Dialog } from '../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
 import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
-import { DMScreenComponent } from '../DMScreenComponent';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
 import { CampaignContext } from '../../data/Campaign';
 import { Adventure } from '../../data/Adventure';

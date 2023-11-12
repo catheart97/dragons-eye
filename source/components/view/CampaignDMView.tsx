@@ -239,13 +239,13 @@ export const CampaignDMView = (props: IDMAppView & {
 
     return (
         <>
-            <div className='w-full grow relative flex basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+            <div className='grow flex basis-1 border-r-4 border-orange-600 basis-2' style={{
                 minWidth: "50vw!important",
                 backgroundImage: "url('" + (bgImage) + "')",
                 backgroundSize: "cover",
                 backgroundPosition: "center"
             }}>
-                <div className="w-full h-full flex">
+                <div className="w-full relative h-full flex">
                     <div className="w-72 bg-neutral-100/90 shadow h-full flex items-center justify-end gap-2 transition-[width] ease-in-out duration-200" style={{
                         width: sidebarOpen ? "18rem" : "1rem",
                     }}>
@@ -550,6 +550,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 props.campaign.current.quickNote = data;
                                                 props.update();
                                             }}
+                                            dialogHandle={props.dialogHandle}
                                         ></NoteComponent>
                                         {
                                             props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
@@ -697,9 +698,9 @@ export const CampaignDMView = (props: IDMAppView & {
                             </div>
                         </div>
                     </div>
+                    <Dialog ref={props.dialogHandle} />
                 </div>
             </div >
-            <Dialog ref={props.dialogHandle} />
         </>
     )
 }

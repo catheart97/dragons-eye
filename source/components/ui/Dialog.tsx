@@ -28,8 +28,6 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
     const [title, setTitle] = React.useState<string>("")
     const [full, setFull] = React.useState(false);
 
-    const dialogRef = React.useRef<HTMLDialogElement>(null)
-
     const forceUpdate = useForceUpdate();
 
     const handle: DialogHandle = {
@@ -41,23 +39,26 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
             setConfirm(confirm || null)
             setTitle(title || "")
             setFull(full ?? false);
-
-            dialogRef.current?.showModal()
         },
         close: () => {
             setChildren(null)
             setConfirm(null)
-            dialogRef.current?.close()
         },
         forceUpdate: forceUpdate
     }
 
     React.useImperativeHandle(ref, () => handle)
 
+    const containerRef = React.useRef<HTMLDivElement>(null)
+
     return (
-        <>
-            <div className={"pointer-events-none fixed top-0 bottom-0 right-0 left-0 bg-black/20 transition-opacity duration-200 ease-in-out " + (children ? "opacity-100" : "opacity-0")}>&nbsp;</div>
-            <dialog className={(full ? "h-full w-full" : "w-96 h-96") + " bg-neutral-50 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 " + (children ? "" : "hidden")} ref={dialogRef}>
+        <div 
+            className={"absolute left-0 right-0 bottom-0 top-0 pointer-events-none bg-black/20 transition-opacity duration-200 flex justify-center items-center ease-in-out p-3 " + (children ? "opacity-100" : "opacity-0")}
+            ref={containerRef}
+        >
+            <div 
+                className={(full ? "h-full" : "w-96 h-96") + " max-w-full bg-neutral-50 m-0 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 transition-opacity " + (children ? "pointer-events-auto opacity-100" : "opacity-0")} 
+            >
                 <div className="flex items-center select-none w-full justify-between">
                     <div className="text-3xl">{title}</div>
                     <button className="focus:outline-none transition-all hover:scale-110 active:scale-100 duration-200 ease-in" onClick={() => {
@@ -96,8 +97,8 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
                         </div>
                     ) : null
                 }
-            </dialog>
-        </>
+            </div>
+        </div>
     )
 
 }
