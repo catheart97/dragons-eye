@@ -8,6 +8,7 @@ import { IAppView } from './IAppView';
 
 const BoardApp = (props: IAppView & {
     board: React.MutableRefObject<Board>
+    back?: () => void
 }) => {
 
     const playerView = React.useRef<BoardPlayerViewHandle>(null);
@@ -52,24 +53,6 @@ const BoardApp = (props: IAppView & {
                 <div className="mac h-full grow flex justify-center items-center text-sm">
                     Dragon's Eye
                 </div>
-                <button
-                    className=" h-full flex items-center px-2"
-                    onClick={() => {
-                        setInitiativeEnabled(!initiativeEnabled);
-                        forceUpdate();
-                    }}
-                >
-                    <span className={"mso flex text-xl " + (initiativeEnabled ? "msf" : "mso")}>swords</span>
-                </button>
-                <button
-                    className=" h-full flex items-center pl-2"
-                    onClick={() => {
-                        props.playerViewOpen.current = !props.playerViewOpen.current;
-                        forceUpdate();
-                    }}
-                >
-                    <span className="mso flex text-xl">{props.playerViewOpen.current ? "right_panel_close" : "right_panel_open"}</span>
-                </button>
             </div>
             <div className={
                 "flex w-full grow h-0"
@@ -83,6 +66,8 @@ const BoardApp = (props: IAppView & {
                     setInitiativeEnabled={setInitiativeEnabled}
                     initiativeEnabled={initiativeEnabled}
                     playerViewOpen={props.playerViewOpen}
+                    isMac={props.isMac}
+                    back={props.back}
                 />
                 <BoardPlayerView
                     open={props.playerViewOpen.current}

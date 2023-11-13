@@ -75,7 +75,7 @@ export class ImportanceRectUtility implements IBoardUtility {
 
     description() {
         return (
-            <>Mark an important area (WIP).</>
+            <>Mark an important area.</>
         )
     }
 }

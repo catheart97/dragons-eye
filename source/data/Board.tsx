@@ -254,7 +254,10 @@ export interface IBoardUtility {
     description: () => JSX.Element
 
     forceUpdate: (() => void) | null
-    userInterface: () => JSX.Element
+    userInterface: (
+        setInitiativeEnabled?: (enabled: boolean) => void,
+        initiativeEnabled?: boolean
+    ) => JSX.Element
 }
 
 export const constructRandomBoard = (width: number, height: number): Board => {

@@ -16,4 +16,8 @@
         font-family: -apple-system, BlinkMacSystemFont;
         font-weight: 600;
     }
+
+    .invisible-scroll::-webkit-scrollbar {
+        display: none;
+    }
 }

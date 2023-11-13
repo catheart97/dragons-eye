@@ -55,6 +55,9 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
         <div 
             className={"absolute left-0 right-0 bottom-0 top-0 pointer-events-none bg-black/20 transition-opacity duration-200 flex justify-center items-center ease-in-out p-3 " + (children ? "opacity-100" : "opacity-0")}
             ref={containerRef}
+            style={{
+                zIndex: 9999999999
+            }}
         >
             <div 
                 className={(full ? "h-full" : "w-96 h-96") + " max-w-full bg-neutral-50 m-0 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 transition-opacity " + (children ? "pointer-events-auto opacity-100" : "opacity-0")} 

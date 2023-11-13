@@ -22,6 +22,7 @@ import { Dashboard, DashboardElement, IDashboardElement } from "../ui/Dashboard"
 import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
+import { NavigationComponent } from "../ui/NavigationComponent";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
@@ -160,6 +161,7 @@ export const CampaignDMView = (props: IDMAppView & {
     campaign: React.MutableRefObject<Campaign>
     loadCampaignBoard: (board: Board) => void
     setImage: (image: string) => void
+    playerViewOpen: React.MutableRefObject<boolean>
 }) => {
     const [selectedAdventure, setSelectedAdventure] = React.useState<number>(-1);
     const selectedRef = React.useRef<number>(selectedAdventure);
@@ -393,26 +395,35 @@ export const CampaignDMView = (props: IDMAppView & {
                     >
                         <div className="w-full h-full flex flex-col gap-1">
 
-                            <input
-                                type="text"
-                                className="bg-neutral-800/20 text-3xl text-white font-black focus:outline-none w-full h-16 p-4"
-                                value={
-                                    props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
-                                        props.campaign.current.adventures[selectedAdventure].title
-                                    ) : (
-                                        props.campaign.current.title
-                                    )
-                                }
-                                onChange={(e) => {
-                                    if (props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1) {
-                                        props.campaign.current.adventures[selectedAdventure].title = e.target.value;
-                                        props.update();
-                                    } else {
-                                        props.campaign.current.title = e.target.value;
-                                        props.update();
+                            <div className="flex justify-between bg-neutral-800/20 items-center">
+                                <input
+                                    type="text"
+                                    className="text-xl text-white font-black focus:outline-none grow h-9 bg-transparent p-4"
+                                    value={
+                                        props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
+                                            props.campaign.current.adventures[selectedAdventure].title
+                                        ) : (
+                                            props.campaign.current.title
+                                        )
                                     }
-                                }}
-                            />
+                                    onChange={(e) => {
+                                        if (props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1) {
+                                            props.campaign.current.adventures[selectedAdventure].title = e.target.value;
+                                            props.update();
+                                        } else {
+                                            props.campaign.current.title = e.target.value;
+                                            props.update();
+                                        }
+                                    }}
+                                />
+                                <NavigationComponent
+                                    className="text-white"
+                                    update={props.update}
+                                    playerViewOpen={props.playerViewOpen}
+                                >
+                                    
+                                </NavigationComponent>
+                            </div>
 
                             <div className="h-26 w-full px-4 p-2 flex items-center shrink-0 gap-6">
                                 {
@@ -539,7 +550,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                     >
                                     </CompendiumDashboardElement>
                                     <DashboardElement>
-                                        <NoteComponent 
+                                        <NoteComponent
                                             hideTitle
                                             data={props.campaign.current.quickNote ?? {
                                                 name: "Quick Note",

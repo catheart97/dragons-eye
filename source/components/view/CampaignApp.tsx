@@ -30,15 +30,6 @@ export const CampaignApp = (props: IAppView & {
                 <div className="mac h-full grow flex justify-center items-center text-sm">
                     {props.campaign.current!.title} - Dragon's Eye
                 </div>
-                <button
-                    className=" h-full flex items-center pl-2"
-                    onClick={() => {
-                        props.playerViewOpen.current = !props.playerViewOpen.current;
-                        forceUpdate();
-                    }}
-                >
-                    <span className="mso flex text-xl">{props.playerViewOpen.current ? "right_panel_close" : "right_panel_open"}</span>
-                </button>
             </div>
 
             <div className="flex grow h-0">
@@ -48,6 +39,7 @@ export const CampaignApp = (props: IAppView & {
                     dialogHandle={props.dialogHandle}
                     update={update}
                     setImage={setImage}
+                    playerViewOpen={props.playerViewOpen}
                 />
                 <CampaignPlayerView
                     open={props.playerViewOpen.current}

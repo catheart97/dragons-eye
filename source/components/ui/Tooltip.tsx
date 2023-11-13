@@ -57,7 +57,7 @@ export const Tooltip = (props: {
             </div>
 
             <div className={[
-                "z-[9999999] shadow bg-neutral-200 transition-all duration-300 ease-in-out p-2 m-1 text-sm pointer-events-none rounded-xl",
+                "z-[9999999] shadow bg-neutral-200 text-black transition-all duration-300 ease-in-out p-2 m-1 text-sm pointer-events-none rounded-xl",
                 animationState
             ].join(" ")}
                 ref={setPopperElement as any}

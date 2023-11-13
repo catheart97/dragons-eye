@@ -18,10 +18,12 @@ import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility'
 import { Dialog } from '../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
-import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
+import { SettingsBoardUtility } from '../../boardUtilities/SettingsBoardUtility';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
 import { CampaignContext } from '../../data/Campaign';
 import { Adventure } from '../../data/Adventure';
+import { NavigationComponent } from '../ui/NavigationComponent';
+import { DMScreenComponent } from '../DMScreenComponent';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -30,10 +32,19 @@ export type BoardDMViewProps = {
     playerViewOpen: React.MutableRefObject<boolean>;
     setInitiativeEnabled: (enabled: boolean) => void;
     initiativeEnabled: boolean;
+    isMac: boolean;
+    back?: () => void
 } & IDMAppView
 
 export type BoardBoardDMViewHandle = {
     update: () => void
+}
+
+const DividerComponent = () => {
+    return (
+        <div className='w-[1px] bg-orange-600 h-full border-orange-600'>&nbsp;
+        </div>
+    )
 }
 
 const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle, BoardDMViewProps> = (props, ref) => {
@@ -77,8 +88,10 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
         utilities.current = [
             interactUtility,
             new TrashDecoratorBoardUtility(board.current),
+            null,
             new InitiaitveBoardUtility(board.current, interactUtility),
             new SpellBoardUtility(),
+            null,
             new CreateCreatureDecoratorBoardUtility(
                 board.current,
                 campaign || undefined,
@@ -90,67 +103,63 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                 adventure.current || undefined
             ),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
-            new StampBoardUtility(board.current),
             new ConditionBoardUtility(board.current, null),
+            new StampBoardUtility(board.current),
+            null,
             new HiddenBoardUtility(board.current),
             new ImportanceRectUtility(props.setImportanceRect),
-            new SizeBoardUtility(board.current)
+            null,
+            new SettingsBoardUtility(board.current) // needs to be last !!!
         ];
         utilities.current.forEach(element => {
-            element.forceUpdate = renderUI;
+            if (element != null) {
+                element.forceUpdate = renderUI;
+            }
         });
+
     }
 
     const [currentUtility, setCurrentUtility] = React.useState<number>(0);
-    const utilities = React.useRef<Array<IBoardUtility>>([]);
+    const utilities = React.useRef<Array<IBoardUtility | null>>([]);
     React.useEffect(setupUtilities, [board.current]);
 
     return (
-        <div className='h-full grow relative flex justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
+        <div className='h-full grow relative flex flex-col justify-center items-center basis-1 border-r-4 border-orange-600 grow basis-2' style={{
             minWidth: "50vw!important",
             width: props.playerViewOpen.current ? "50vw" : "100vw",
         }}>
-            <BoardComponent
-                ref={boardComponentRef}
-                board={board.current}
-                utility={utilities.current[currentUtility]}
-                importanceRect={props.importanceRect}
-                setImportanceRect={props.setImportanceRect}
-            />
-            <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-end top-0'>
-                {
-                    utilities.current[currentUtility] != undefined ? (
-                        utilities.current[currentUtility]!.userInterface()
-                    ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-end' />
-                }
-
-                <div className='rounded-xl bg-neutral-50 w-fit flex flex-row flex-wrap justify-start pointer-events-auto shadow-2xl shadow-black'>
+            <div className='absolute left-0 right-0 top-0 h-20' style={{
+                zIndex: 999998
+            }}>
+                <NavigationComponent
+                    playerViewOpen={props.playerViewOpen}
+                    update={props.update}
+                    className='text-white'
+                    back={props.back}
+                >
                     {
-                        utilities.current.map((v, i) => {
-                            return (
-                                <Tooltip
-                                    key={i}
-                                    strategy='fixed'
-                                >
-                                    <TooltipTarget>
-                                        <ToolButton
-                                            onClick={() => {
-                                                setCurrentUtility(i);
-                                                utilities.current[i].onMount?.call(utilities.current[i]);
-                                            }}
-                                            active={currentUtility === i}
-                                        >
-                                            {v.icon()}
-                                        </ToolButton>
-                                    </TooltipTarget>
-                                    <TooltipContent>
-                                        {v.description()}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )
+                        utilities.current.slice(0, utilities.current.length - 2).map((v, i) => {
+                            if (v != null) {
+                                return (
+                                    <ToolButton
+                                        onClick={() => {
+                                            setCurrentUtility(i);
+                                            utilities.current[i]!.onMount?.call(utilities.current[i]);
+                                        }}
+                                        active={currentUtility === i}
+                                    >
+                                        {v.icon()}
+                                    </ToolButton>
+                                )
+                            } else {
+                                return (
+                                    <DividerComponent key={i} />
+                                )
+                            }
                         })
                     }
-                    {/* <ToolButton
+                    <DividerComponent />
+                    <ToolButton
                         onClick={() => {
                             props.dialogHandle.current?.open(<>
                                 <DMScreenComponent />
@@ -159,17 +168,40 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                         active={false}
                     >
                         <span className='msf'>map</span>
-                    </ToolButton> */}
-                    <ToolButton
-                        active={false}
-                        onClick={() => {
-                            props.setInitiativeEnabled(!props.initiativeEnabled);
-                            props.update();
-                        }}
-                    >
-                        <span className={"mso flex " + (props.initiativeEnabled ? "msf" : "mso")}>swords</span>
                     </ToolButton>
-                </div>
+                    <DividerComponent />
+                    {
+                        utilities.current.length > 0 ? (
+                            <ToolButton
+                                onClick={() => {
+                                    const i = utilities.current.length - 1;
+                                    setCurrentUtility(i);
+                                    utilities.current[i]!.onMount?.call(utilities.current[i]);
+                                }}
+                                active={currentUtility === utilities.current.length - 1}
+                            >
+                                {utilities.current[utilities.current.length - 1]!.icon()}
+                            </ToolButton>
+                        ) : null
+                    }
+                </NavigationComponent>
+            </div>
+            <BoardComponent
+                ref={boardComponentRef}
+                board={board.current}
+                utility={utilities.current[currentUtility]!}
+                importanceRect={props.importanceRect}
+                setImportanceRect={props.setImportanceRect}
+            />
+            <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-start top-12'>
+                {
+                    utilities.current[currentUtility] != undefined ? (
+                        utilities.current[currentUtility]!.userInterface(
+                            props.setInitiativeEnabled,
+                            props.initiativeEnabled
+                        )
+                    ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-start' />
+                }
             </div>
             <Dialog ref={props.dialogHandle} />
         </div>

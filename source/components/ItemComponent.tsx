@@ -147,13 +147,13 @@ export const ItemComponent = (props: IViewComponent<Item>) => {
     let typeText = type2text(props.data.type);
     const isMagic = props.data.magic ? true : false;
     return (
-        <div className="text-3xl h-72 w-full" style={{
+        <div className="text-3xl h-72 overflow-y-scroll w-full" style={{
             backgroundImage: props.data.image ? `url(${props.data.image})` : `url(${ItemIcon})`,
             backgroundPosition: "top",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat"
         }} >
-            <div className="flex flex-col h-full justify-end w-full p-3 bg-gradient-to-b from-neutral-100/70 to-neutral-100">
+            <div className="flex flex-col h-fit justify-end w-full p-3 bg-gradient-to-b from-neutral-100/70 to-neutral-100">
                 <div className="flex justify-end gap-2">
                     {
                         props.data.image ? (

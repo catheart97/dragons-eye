@@ -356,8 +356,12 @@ function createWindow() {
         win?.webContents.reload();
     });
 
+    let fullscreen = false;
+
     ipcMain.on("m-ready", (_event, _arg) => {
         if (fn != null) win!.webContents.send('r-open-file', fn);
+
+        win!.webContents.send('r-full-screen', fullscreen);
     });
 
     win.webContents.setWindowOpenHandler((_arg: HandlerDetails) => {
@@ -382,9 +386,11 @@ function createWindow() {
 
     win.on("enter-full-screen", () => {
         win?.webContents.send('r-full-screen', true);
+        fullscreen = true;
     });
     win.on("leave-full-screen", () => {
         win?.webContents.send('r-full-screen', false);
+        fullscreen = false;
     });
 }
 

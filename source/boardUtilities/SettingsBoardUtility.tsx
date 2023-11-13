@@ -1,10 +1,11 @@
 import { NumberInput } from "../components/ui/NumberInput";
+import { Switch } from "../components/ui/Switch";
 import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
 import { Board, IBoardUtility, constructDefaultBoard } from "../data/Board";
 
 
-export class SizeBoardUtility implements IBoardUtility {
+export class SettingsBoardUtility implements IBoardUtility {
 
     private width: number = 20;
     private height: number = 20;
@@ -17,7 +18,7 @@ export class SizeBoardUtility implements IBoardUtility {
     }
 
     icon() {
-        return <span className="mso">resize</span>
+        return <span className="mso">settings</span>
     }
 
     description() {
@@ -26,9 +27,25 @@ export class SizeBoardUtility implements IBoardUtility {
 
     forceUpdate: (() => void) | null = null;
 
-    userInterface() {
+    userInterface(
+        setInitiativeEnabled?: (enabled: boolean) => void,
+        initiativeEnabled?: boolean
+    ) {
         return (
             <UIContainer>
+                <UIGroup className="text-orange-600 uppercase" title="Show Initiative on Player View"/>
+                <div className="flex justify-end p-2 w-full">
+                    <Switch 
+                        defaultValue={initiativeEnabled}
+                        onChange={(_e) => {
+                            setInitiativeEnabled?.(!initiativeEnabled);
+                            this.forceUpdate?.call(this);
+                        }} 
+                    />
+                </div>
+
+
+                <UIGroup className="text-orange-600 uppercase" title="Resize"/>
                 <UIGroup title="width">
                     <NumberInput
                         defaultValue={this.width}
@@ -49,9 +66,9 @@ export class SizeBoardUtility implements IBoardUtility {
                         }}
                     />
                 </UIGroup>
-                <div className="flex justify-end">
+                <div className="flex justify-end w-full pt-3">
                     <button
-                        className="px-2 p-1 bg-orange-600 text-white"
+                        className="px-2 p-1 bg-orange-600 text-white w-full"
                         onClick={() => {
                             const newboard = constructDefaultBoard(this.width, this.height);
 
