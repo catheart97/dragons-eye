@@ -16,7 +16,6 @@ import { ImportanceRectUtility } from '../../boardUtilities/ImportanceRectBoardU
 import { InitiaitveBoardUtility } from '../../boardUtilities/InitiativeBoardUtility';
 import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility';
 import { Dialog } from '../ui/Dialog';
-import { Tooltip, TooltipContent, TooltipTarget } from '../ui/Tooltip';
 import { IDMAppView } from './IAppView';
 import { SettingsBoardUtility } from '../../boardUtilities/SettingsBoardUtility';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
