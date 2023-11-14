@@ -153,7 +153,7 @@ export const ItemComponent = (props: IViewComponent<Item>) => {
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat"
         }} >
-            <div className="flex flex-col h-fit justify-end w-full p-3 bg-gradient-to-b from-neutral-100/70 to-neutral-100">
+            <div className="flex flex-col h-fit min-h-full justify-end w-full p-3 bg-gradient-to-b from-neutral-100/70 to-neutral-100">
                 <div className="flex justify-end gap-2">
                     {
                         props.data.image ? (

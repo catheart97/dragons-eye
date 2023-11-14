@@ -94,6 +94,7 @@ export class HiddenBoardUtility implements IBoardUtility {
                         this.forceUpdate ? this.forceUpdate() : null;
                     }}
                     active={this.targetCondition == false}
+                    className="grow"
                 >
                     <div className='w-4 h-4 border-2 border-dashed border-black bg-white flex items-center justify-center text-xs' >
                     </div>
@@ -104,6 +105,7 @@ export class HiddenBoardUtility implements IBoardUtility {
                         this.forceUpdate ? this.forceUpdate() : null;
                     }}
                     active={this.targetCondition == true}
+                    className="grow"
                 >
                     <div className='w-4 h-4 border-2 border-dashed border-black bg-white flex items-center justify-center text-xs text-black' >
                         <span className="msf">visibility_off</span>

@@ -1,3 +1,4 @@
+import { PlayerViewSettings } from "../components/view/IAppView";
 import { Item } from "./Item";
 import { Stamp } from "./Stamp";
 import { CreatureCondition, CreatureSize, PlayerStatblock, Statblock } from "./Statblock";
@@ -255,8 +256,7 @@ export interface IBoardUtility {
 
     forceUpdate: (() => void) | null
     userInterface: (
-        setInitiativeEnabled?: (enabled: boolean) => void,
-        initiativeEnabled?: boolean
+        playerSettings: React.MutableRefObject<PlayerViewSettings>
     ) => JSX.Element
 }
 

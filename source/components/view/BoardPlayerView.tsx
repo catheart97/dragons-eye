@@ -2,14 +2,12 @@ import React from "react";
 // import { WindowComponent, WindowComponentHandle } from "../ui/WindowComponent";
 import { Board, BoardCreature, BoardDecorator, CreatureAttitude } from "../../data/Board";
 import { BoardComponent, BoardComponentHandle } from "../BoardComponent";
-import { Rect } from "../../Rect";
-import { IPlayerAppView } from "./IAppView";
+import { IPlayerAppView, PlayerViewSettings } from "./IAppView";
 import Marquee from "react-fast-marquee";
 
 export type BoardPlayerViewProps = {
     board: React.MutableRefObject<Board>;
-    importanceRect: Rect | null;
-    initiaitveEnabled: boolean;
+    playerSettings: React.MutableRefObject<PlayerViewSettings>;
 } & IPlayerAppView
 
 export type BoardPlayerViewHandle = {
@@ -47,10 +45,10 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                     ref={boardComponentRef}
                     board={props.board.current}
                     playerView
-                    importanceRect={props.importanceRect}
+                    playerSettings={props.playerSettings}
                 />
                 {
-                    props.initiaitveEnabled && props.board.current.initiative ? (
+                    props.playerSettings.current.initiativeEnabled && props.board.current.initiative ? (
                         <div className="absolute bottom-0 p-3 pointer-events-none flex items-end z-[60] justify-start top-0 right-0 overflow-hidden transition-all duration-200 ease-in-out"
                             style={{
                                 left: -props.board.current.initiativeIndex! * 9 + "rem"

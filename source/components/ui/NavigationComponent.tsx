@@ -1,14 +1,18 @@
+import { DividerComponent } from "../view/BoardDMView"
+import { PlayerViewSettings } from "../view/IAppView"
 import { ToolButton } from "./ToolButton"
 
 export const NavigationComponent = (props: {
     back?: () => void
-    children: React.ReactNode
+    children?: React.ReactNode
     className?: string
     playerViewOpen: React.MutableRefObject<boolean>
+    playerSettings: React.MutableRefObject<PlayerViewSettings>
+    boardMode?: boolean
     update: () => void
 }) => {
     return (
-        <div className={" flex items-center  gap-2 pl-2 " + props.className}>
+        <div className={"flex items-center gap-0 pl-2 " + props.className}>
             {
                 props.back ? (
                     <ToolButton
@@ -28,6 +32,38 @@ export const NavigationComponent = (props: {
                     {props.children}
                 </div>
             </div>
+            {
+                props.children ? (
+                    <DividerComponent />
+                ) : null
+            }
+            {
+                props.boardMode ? (
+                    <>
+                        <ToolButton
+                            active={props.playerSettings.current.initiativeEnabled}
+                            onClick={() => {
+                                props.playerSettings.current.initiativeEnabled = !props.playerSettings.current.initiativeEnabled;
+                                props.update();
+                            }}
+                        >
+                            <span className="mso text-xl">swords</span>
+                        </ToolButton>
+                    </>
+                ) : (
+                    <>
+                        <ToolButton
+                            active={props.playerSettings.current.showDatetime}
+                            onClick={() => {
+                                props.playerSettings.current.showDatetime = !props.playerSettings.current.showDatetime;
+                                props.update();
+                            }}
+                        >
+                            <span className="mso text-xl">schedule</span>
+                        </ToolButton>
+                    </>
+                )
+            }
             <ToolButton
                 active={false}
                 onClick={() => {

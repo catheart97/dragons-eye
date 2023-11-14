@@ -4,7 +4,7 @@ import { BoardPlayerView, BoardPlayerViewHandle } from './BoardPlayerView';
 import { Board, OnePageDungeon, constructFromOnePageDungeon } from '../../data/Board';
 import { useForceUpdate } from '../../utility';
 import { Rect } from '../../Rect';
-import { IAppView } from './IAppView';
+import { IAppView, PlayerViewSettings } from './IAppView';
 
 const BoardApp = (props: IAppView & {
     board: React.MutableRefObject<Board>
@@ -13,9 +13,11 @@ const BoardApp = (props: IAppView & {
 
     const playerView = React.useRef<BoardPlayerViewHandle>(null);
 
-    const [importanceRect, setImportanceRect] = React.useState<Rect | null>(null);
-
-    const [initiativeEnabled, setInitiativeEnabled] = React.useState<boolean>(true);
+    const playerSettings = React.useRef<PlayerViewSettings>({
+        initiativeEnabled: true,
+        showDatetime: true,
+        importanceRect: null
+    });
 
     const forceUpdate = useForceUpdate();
     const update = () => {
@@ -61,12 +63,9 @@ const BoardApp = (props: IAppView & {
                     dialogHandle={props.dialogHandle}
                     board={props.board}
                     update={update}
-                    importanceRect={importanceRect}
-                    setImportanceRect={setImportanceRect}
-                    setInitiativeEnabled={setInitiativeEnabled}
-                    initiativeEnabled={initiativeEnabled}
                     playerViewOpen={props.playerViewOpen}
                     isMac={props.isMac}
+                    playerSettings={playerSettings}
                     back={props.back}
                 />
                 <BoardPlayerView
@@ -74,8 +73,7 @@ const BoardApp = (props: IAppView & {
                     ref={playerView}
                     board={props.board}
                     update={update}
-                    importanceRect={importanceRect}
-                    initiaitveEnabled={initiativeEnabled}
+                    playerSettings={playerSettings}
                 />
             </div>
         </div>

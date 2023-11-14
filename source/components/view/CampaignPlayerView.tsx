@@ -27,7 +27,7 @@ export const CampaignPlayerView = (props: IPlayerAppView & {
                         alt="Campaign Image"
                     />
                     {
-                        campaign?.current.calendar ? (
+                        props.playerSettings.current.showDatetime && campaign?.current.calendar ? (
                             <div className="pointer-events-none text-base">
                                 <CalendarComponent
                                     player

@@ -9,7 +9,6 @@ import { Board, BoardTerrain, IBoardUtility } from '../../data/Board';
 import { BoardComponent, BoardComponentHandle } from '../BoardComponent';
 import { ToolButton } from '../ui/ToolButton';
 
-import { Rect } from '../../Rect';
 import { CreateItemDecoratorBoardUtility } from '../../boardUtilities/CreateItemDecoratorBoardUtility';
 import { HiddenBoardUtility } from '../../boardUtilities/HiddenBoardUtility';
 import { ImportanceRectUtility } from '../../boardUtilities/ImportanceRectBoardUtility';
@@ -17,7 +16,7 @@ import { InitiaitveBoardUtility } from '../../boardUtilities/InitiativeBoardUtil
 import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility';
 import { Dialog } from '../ui/Dialog';
 import { IDMAppView } from './IAppView';
-import { SettingsBoardUtility } from '../../boardUtilities/SettingsBoardUtility';
+import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
 import { CampaignContext } from '../../data/Campaign';
 import { Adventure } from '../../data/Adventure';
@@ -26,11 +25,7 @@ import { DMScreenComponent } from '../DMScreenComponent';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
-    importanceRect: Rect | null;
-    setImportanceRect: (rect: Rect | null) => void;
     playerViewOpen: React.MutableRefObject<boolean>;
-    setInitiativeEnabled: (enabled: boolean) => void;
-    initiativeEnabled: boolean;
     isMac: boolean;
     back?: () => void
 } & IDMAppView
@@ -39,9 +34,9 @@ export type BoardBoardDMViewHandle = {
     update: () => void
 }
 
-const DividerComponent = () => {
+export const DividerComponent = () => {
     return (
-        <div className='w-[1px] bg-orange-600 h-full border-orange-600'>&nbsp;
+        <div className='w-[1px] mx-1 bg-orange-600 h-full border-orange-600'>&nbsp;
         </div>
     )
 }
@@ -106,9 +101,9 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
             new StampBoardUtility(board.current),
             null,
             new HiddenBoardUtility(board.current),
-            new ImportanceRectUtility(props.setImportanceRect),
+            new ImportanceRectUtility(props.playerSettings),
             null,
-            new SettingsBoardUtility(board.current) // needs to be last !!!
+            new SizeBoardUtility(board.current) // needs to be last !!!
         ];
         utilities.current.forEach(element => {
             if (element != null) {
@@ -127,7 +122,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
             minWidth: "50vw!important",
             width: props.playerViewOpen.current ? "50vw" : "100vw",
         }}>
-            <div className='absolute left-0 right-0 top-0 h-20' style={{
+            <div className='absolute left-0 right-0 top-0 h-fit' style={{
                 zIndex: 999998
             }}>
                 <NavigationComponent
@@ -135,12 +130,15 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                     update={props.update}
                     className='text-white'
                     back={props.back}
+                    playerSettings={props.playerSettings}
+                    boardMode
                 >
                     {
                         utilities.current.slice(0, utilities.current.length - 2).map((v, i) => {
                             if (v != null) {
                                 return (
                                     <ToolButton
+                                        key={i}
                                         onClick={() => {
                                             setCurrentUtility(i);
                                             utilities.current[i]!.onMount?.call(utilities.current[i]);
@@ -189,15 +187,16 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                 ref={boardComponentRef}
                 board={board.current}
                 utility={utilities.current[currentUtility]!}
-                importanceRect={props.importanceRect}
-                setImportanceRect={props.setImportanceRect}
+                playerSettings={props.playerSettings}
+                update={props.update}
             />
-            <div className='absolute right-0 bottom-0 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-start top-12'>
+            <div className='absolute right-0 bottom-2/3 w-full p-3 pointer-events-none flex flex-col items-end gap-1 z-[60] justify-start top-12' style={{
+                zoom: 0.75
+            }}>
                 {
                     utilities.current[currentUtility] != undefined ? (
                         utilities.current[currentUtility]!.userInterface(
-                            props.setInitiativeEnabled,
-                            props.initiativeEnabled
+                            props.playerSettings
                         )
                     ) : <div className='rounded-xl bg-neutral-200 w-full flex flex-row flex-wrap justify-start' />
                 }

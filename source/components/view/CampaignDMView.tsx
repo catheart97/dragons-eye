@@ -420,9 +420,8 @@ export const CampaignDMView = (props: IDMAppView & {
                                     className="text-white"
                                     update={props.update}
                                     playerViewOpen={props.playerViewOpen}
-                                >
-                                    
-                                </NavigationComponent>
+                                    playerSettings={props.playerSettings}
+                                ></NavigationComponent>
                             </div>
 
                             <div className="h-26 w-full px-4 p-2 flex items-center shrink-0 gap-6">

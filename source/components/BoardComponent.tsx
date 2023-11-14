@@ -5,6 +5,7 @@ import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, Can
 import { CreatureSize } from "../data/Statblock";
 import { TexturePool } from "../data/TexturePool";
 import { useForceUpdate } from "../utility";
+import { PlayerViewSettings } from "./view/IAppView";
 
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
@@ -418,9 +419,9 @@ export type BoardComponentProps = {
     board: Board,
     playerView?: boolean,
     utility?: IBoardUtility,
-    importanceRect: Rect | null
-    setImportanceRect?: (rect: Rect | null) => void
+    playerSettings: React.MutableRefObject<PlayerViewSettings>
     children?: React.ReactNode
+    update?: () => void
 }
 
 export type BoardComponentHandle = {
@@ -469,14 +470,15 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
     React.useEffect(() => {
         
         // adjust zoom and scroll positions to importanceRect
-        if (props.playerView && canvasRef.current && props.importanceRect) {
+        if (props.playerView && canvasRef.current && props.playerSettings.current.importanceRect) {
             console.log("called");
+            const rect = props.playerSettings.current.importanceRect;
 
             const importanceCanvas : Rect = {
-                x: props.importanceRect.x * CanvasBaseSize,
-                y: props.importanceRect.y * CanvasBaseSize,
-                width: props.importanceRect.width * CanvasBaseSize,
-                height: props.importanceRect.height * CanvasBaseSize
+                x: rect.x * CanvasBaseSize,
+                y: rect.y * CanvasBaseSize,
+                width: rect.width * CanvasBaseSize,
+                height: rect.height * CanvasBaseSize
             }
 
             const viewportWidth = canvasRef.current.clientWidth;
@@ -488,9 +490,11 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
             console.log(z);
             setZoom(z);
             
+            props.update?.call(props);
+            
             console.log(viewportWidth, viewportHeight);
         }
-    }, [props.importanceRect])
+    }, [props.playerSettings.current.importanceRect])
 
     const [zoom, setZoom] = React.useState<number>(.2);
 
@@ -645,10 +649,10 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                                         ref={rectRef}
                                         className="pointer-events-none absolute border-4 border-orange-600"
                                         style={{
-                                            left: props.importanceRect ? (props.importanceRect.x * CanvasBaseSize + 'px') : "0px",
-                                            top: props.importanceRect ? (props.importanceRect.y * CanvasBaseSize + 'px') : "0px",
-                                            width: props.importanceRect ? (props.importanceRect.width * CanvasBaseSize + 'px') : (props.board.width * CanvasBaseSize + 'px'),
-                                            height: props.importanceRect ? props.importanceRect.height * CanvasBaseSize + 'px' : (props.board.height * CanvasBaseSize + 'px'),
+                                            left: props.playerSettings.current.importanceRect ? (props.playerSettings.current.importanceRect.x * CanvasBaseSize + 'px') : "0px",
+                                            top: props.playerSettings.current.importanceRect ? (props.playerSettings.current.importanceRect.y * CanvasBaseSize + 'px') : "0px",
+                                            width: props.playerSettings.current.importanceRect ? (props.playerSettings.current.importanceRect.width * CanvasBaseSize + 'px') : (props.board.width * CanvasBaseSize + 'px'),
+                                            height: props.playerSettings.current.importanceRect ? props.playerSettings.current.importanceRect.height * CanvasBaseSize + 'px' : (props.board.height * CanvasBaseSize + 'px'),
                                         }}
                                     ></div>
                                 }

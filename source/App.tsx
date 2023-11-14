@@ -21,7 +21,7 @@ export const App = (props: {
     const forceUpdate = useForceUpdate();
 
     // mode and data depending on mode
-    const mode = React.useRef<AppMode>(AppMode.Campaign);
+    const mode = React.useRef<AppMode>(AppMode.Board);
     const playerViewOpen = React.useRef<boolean>(false);
     
     const board = React.useRef<Board>(constructDefaultBoard(15, 15));

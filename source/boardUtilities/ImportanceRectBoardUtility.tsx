@@ -1,6 +1,7 @@
 import { BoardPosition, IBoardUtility } from "../data/Board"
 import { CanvasBaseSize } from "../components/BoardComponent"
 import { Rect } from "../Rect"
+import { PlayerViewSettings } from "../components/view/IAppView"
 
 /**
  * The goal is that the importance rect is always the core view of the player view.
@@ -9,12 +10,9 @@ export class ImportanceRectUtility implements IBoardUtility {
     private downTile: BoardPosition | null = null
     private hoverTile: BoardPosition | null = null
 
-    private setImportanceRect: (rect: Rect | null) => void;
-
     forceUpdate: (() => void) | null = null;
 
-    constructor(setImportanceRect: (rect: Rect | null) => void) {
-        this.setImportanceRect = setImportanceRect;
+    constructor(private playerSettings: React.MutableRefObject<PlayerViewSettings>) {
     }
 
     icon() {
@@ -30,12 +28,12 @@ export class ImportanceRectUtility implements IBoardUtility {
     }
 
     onShapeRelease(position: BoardPosition) {
-        this.setImportanceRect({
+        this.playerSettings.current.importanceRect = {
             x: Math.min(position.x, this.downTile!.x),
             y: Math.min(position.y, this.downTile!.y),
             width: Math.abs(position.x - this.downTile!.x) + 1,
             height: Math.abs(position.y - this.downTile!.y) + 1
-        });
+        }
         this.downTile = null;
         this.forceUpdate?.call(this);
     }

@@ -6,6 +6,7 @@ import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
 import { Board, BoardPosition, IBoardUtility, BoardDecorator, BoardDecoratorType, BoardCreature, CreatureAttitude, InitiaitveData } from "../data/Board";
 import { InteractBoardUtility } from "./InteractBoardUtility";
+import { FullWidthButton } from "../components/ui/FullWidthButton";
 
 export const updateInitiativeOnChange = (board: Board) => {
     // todo: verify that the initiative list is still valid by 
@@ -287,6 +288,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                         return (
                                             <UIGroup title={attachment.statblock.name} key={i}>
                                                 <NumberInput
+                                                    className="w-20"
                                                     onChange={(e) => {
                                                         for (const i of this.initiatives) {
                                                             if (i.id == v.key) {
@@ -305,7 +307,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                         )
                                     })
                                 }
-                                <ToolButton
+                                <FullWidthButton
                                     onClick={() => {
                                         // roll initiative for npcs and monsters
                                         for (const key in this.board.decorators) {
@@ -331,14 +333,13 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                         this.board.initiativeIndex = 0;
                                         this.forceUpdate?.call(this);
                                     }}
-                                    active={false}
                                 >
                                     <span className="mso text-xl">swords</span> Fight
-                                </ToolButton>
+                                </FullWidthButton>
                             </>
                         ) : (
-                            <div className="p-2">
-                                No players found on the board.
+                            <div className="p-4">
+                                No players found on the board. Place at least one player on the board to use initiative tracking.
                             </div>
                         )
                     }

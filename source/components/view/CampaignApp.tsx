@@ -4,12 +4,18 @@ import { Campaign } from "../../data/Campaign";
 import { useForceUpdate } from "../../utility";
 import { CampaignDMView } from "./CampaignDMView";
 import { CampaignPlayerView } from "./CampaignPlayerView";
-import { IAppView } from "./IAppView";
+import { IAppView, PlayerViewSettings } from "./IAppView";
 
 export const CampaignApp = (props: IAppView & {
     campaign: React.MutableRefObject<Campaign>
     loadCampaignBoard: (board: Board) => void
 }) => {
+
+    const playerSettings = React.useRef<PlayerViewSettings>({
+        initiativeEnabled: false,
+        showDatetime: false,
+        importanceRect: null
+    });
 
     const [image, setImage] = React.useState<string>("");
     const forceUpdate = useForceUpdate();
@@ -40,11 +46,13 @@ export const CampaignApp = (props: IAppView & {
                     update={update}
                     setImage={setImage}
                     playerViewOpen={props.playerViewOpen}
+                    playerSettings={playerSettings}
                 />
                 <CampaignPlayerView
                     open={props.playerViewOpen.current}
                     update={update}
                     image={image}
+                    playerSettings={playerSettings}
                 />
             </div>
         </div>

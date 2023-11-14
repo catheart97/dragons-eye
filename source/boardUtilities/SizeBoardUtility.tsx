@@ -1,11 +1,13 @@
+import { FullWidthButton } from "../components/ui/FullWidthButton";
 import { NumberInput } from "../components/ui/NumberInput";
 import { Switch } from "../components/ui/Switch";
 import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
+import { PlayerViewSettings } from "../components/view/IAppView";
 import { Board, IBoardUtility, constructDefaultBoard } from "../data/Board";
 
 
-export class SettingsBoardUtility implements IBoardUtility {
+export class SizeBoardUtility implements IBoardUtility {
 
     private width: number = 20;
     private height: number = 20;
@@ -18,7 +20,7 @@ export class SettingsBoardUtility implements IBoardUtility {
     }
 
     icon() {
-        return <span className="mso">settings</span>
+        return <span className="mso">aspect_ratio</span>
     }
 
     description() {
@@ -28,26 +30,13 @@ export class SettingsBoardUtility implements IBoardUtility {
     forceUpdate: (() => void) | null = null;
 
     userInterface(
-        setInitiativeEnabled?: (enabled: boolean) => void,
-        initiativeEnabled?: boolean
     ) {
         return (
             <UIContainer>
-                <UIGroup className="text-orange-600 uppercase" title="Show Initiative on Player View"/>
-                <div className="flex justify-end p-2 w-full">
-                    <Switch 
-                        defaultValue={initiativeEnabled}
-                        onChange={(_e) => {
-                            setInitiativeEnabled?.(!initiativeEnabled);
-                            this.forceUpdate?.call(this);
-                        }} 
-                    />
-                </div>
-
-
                 <UIGroup className="text-orange-600 uppercase" title="Resize"/>
                 <UIGroup title="width">
                     <NumberInput
+                        className="w-20"
                         defaultValue={this.width}
                         min={2}
                         max={200}
@@ -58,6 +47,7 @@ export class SettingsBoardUtility implements IBoardUtility {
                 </UIGroup>
                 <UIGroup title="height">
                     <NumberInput
+                        className="w-20"
                         defaultValue={this.height}
                         min={2}
                         max={200}
@@ -67,8 +57,7 @@ export class SettingsBoardUtility implements IBoardUtility {
                     />
                 </UIGroup>
                 <div className="flex justify-end w-full pt-3">
-                    <button
-                        className="px-2 p-1 bg-orange-600 text-white w-full"
+                    <FullWidthButton
                         onClick={() => {
                             const newboard = constructDefaultBoard(this.width, this.height);
 
@@ -107,7 +96,7 @@ export class SettingsBoardUtility implements IBoardUtility {
                         }}
                     >
                         <span className="mso">check</span>
-                    </button>
+                    </FullWidthButton>
                 </div>
             </UIContainer>
         )
