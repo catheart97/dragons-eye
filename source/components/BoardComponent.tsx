@@ -7,13 +7,15 @@ import { TexturePool } from "../data/TexturePool";
 import { useForceUpdate } from "../utility";
 import { PlayerViewSettings } from "./view/IAppView";
 
+import Prando from "prando";
+
 const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-type BoardCallback = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean) => void;
+type BoardCallback = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean, rng: Prando) => void;
 
-const drawTerrain: BoardCallback = (canvas, board, position, _playerView) => {
+const drawTerrain: BoardCallback = (canvas, board, position, _playerView, rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -25,7 +27,7 @@ const drawTerrain: BoardCallback = (canvas, board, position, _playerView) => {
     }
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
-        Math.random() > 0.95 ?
+        rng.next() > 0.95 ?
             texturePool.AltTerrainTextures[terrain] :
             texturePool.TerrainTextures[terrain],
         position.x * CanvasBaseSize + LineWidth / 2,
@@ -37,7 +39,7 @@ const drawTerrain: BoardCallback = (canvas, board, position, _playerView) => {
 
 }
 
-const drawCondition: BoardCallback = (canvas, board, position, _playerView) => {
+const drawCondition: BoardCallback = (canvas, board, position, _playerView, rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -67,7 +69,7 @@ const drawCondition: BoardCallback = (canvas, board, position, _playerView) => {
     }
 }
 
-const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
+const drawDecorator: BoardCallback = (canvas, board, position, playerView, rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -136,6 +138,14 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
                 attachment.statblock.name.charAt(0).toUpperCase() + attachment.statblock.name.charAt(1).toLowerCase(),
                 x * CanvasBaseSize + CanvasBaseSize / 2,
                 y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 8
+            )
+            
+            height = 16 * modifier * scale;
+            ctx.font = `${height - 2}px Fira Sans`;
+            ctx.fillText(
+                "~" + decorator.key.toString() + "~",
+                x * CanvasBaseSize + CanvasBaseSize / 2,
+                y * CanvasBaseSize + CanvasBaseSize / 2 - 2 * height / 3
             )
         } else {
             ctx.textAlign = 'left';
@@ -232,7 +242,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView) => {
     }
 }
 
-const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
+const drawHidden: BoardCallback = (canvas, board, position, playerView, rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -351,7 +361,7 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView) => {
     }
 }
 
-const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean) => {
+const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean, rng : Prando) => {
     if (!board.stamps) return;
 
     for (const stamp of board.stamps) {
@@ -373,6 +383,9 @@ const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolea
 }
 
 const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean) => {
+
+    // set random seed to 42 
+    const rng = new Prando(42);
     const width = canvas.width;
     const height = canvas.height;
     const ctx = canvas.getContext('2d')!;
@@ -382,7 +395,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
     const forEachTile = (callback: BoardCallback) => {
         for (let i = 0; i < board.height; i++) {
             for (let j = 0; j < board.width; j++) {
-                callback(canvas, board, { x: j, y: i }, playerView);
+                callback(canvas, board, { x: j, y: i }, playerView, rng);
             }
         }
     }
@@ -390,7 +403,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
 
     // draw scene
     forEachTile(drawTerrain);
-    drawStamps(canvas, board, playerView);
+    drawStamps(canvas, board, playerView, rng);
     if (playerView) {
         forEachTile(drawDecorator);
         forEachTile(drawCondition);
