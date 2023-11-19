@@ -20,6 +20,7 @@ import { CampaignContext } from '../../data/Campaign';
 import { Adventure } from '../../data/Adventure';
 import { NavigationComponent } from '../ui/NavigationComponent';
 import { DMScreenComponent } from '../DMScreenComponent';
+import { MarkerBoardUtility } from '../../boardUtilities/MarkerBoardUtility';
 
 export type BoardDMViewProps = {
     board: React.MutableRefObject<Board>;
@@ -96,6 +97,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
             ),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
             new StampBoardUtility(board.current),
+            new MarkerBoardUtility(board.current),
             null,
             new HiddenBoardUtility(board.current),
             new ImportanceRectUtility(props.playerSettings),

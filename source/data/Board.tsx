@@ -108,7 +108,12 @@ export type BoardLayer = {
     decorators: { [key: number]: BoardDecorator }
     hidden: { [key: number]: boolean }
     stamps: Array<Stamp>
-    drawLayer?: string // base 64 encoded image for drawing
+    markers?: BoardMarker[]
+}
+
+export const MarkerTypeIcons : {[key in BoardMarkerType] : JSX.Element} = {
+    [BoardMarkerType.Circle]: <span className="msf">circle</span>,
+    [BoardMarkerType.Square]: <span className="msf">stop</span>
 }
 
 export enum SpellShape {

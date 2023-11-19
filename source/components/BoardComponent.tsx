@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Rect } from "../Rect";
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, BoardLayer, BoardTerrain, CanvasCreatureTypeIcons, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, BoardLayer, BoardMarkerType, BoardTerrain, CanvasCreatureTypeIcons, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
 import { CreatureSize } from "../data/Statblock";
 import { TexturePool } from "../data/TexturePool";
 import { useForceUpdate } from "../utility";
@@ -250,6 +250,49 @@ const drawHidden: BoardCallback = (canvas, w, _h, board, position, playerView, _
     }
 }
 
+const drawMarkers = (canvas: HTMLCanvasElement, w: number, h: number, board: BoardLayer, _playerView: boolean, _rng : Prando) => {
+
+    const markers = board.markers;
+    if (!markers) return;
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.imageSmoothingEnabled = false;
+
+    for (const marker of markers) {
+        if (marker.type == BoardMarkerType.Square) {
+            ctx.fillStyle = marker.color;
+            ctx.globalAlpha = .8;
+            ctx.fillRect(
+                marker.position.x * CanvasBaseSize + LineWidth / 2,
+                marker.position.y * CanvasBaseSize + LineWidth / 2,
+                marker.width * CanvasBaseSize - LineWidth,
+                marker.height * CanvasBaseSize - LineWidth
+            );
+            ctx.globalAlpha = 1;
+        } else if (marker.type == BoardMarkerType.Circle) {
+            ctx.fillStyle = marker.color;
+            ctx.globalAlpha = .8;
+            ctx.beginPath();
+
+            const centerX = marker.position.x + marker.width / 2;
+            const centerY = marker.position.y + marker.height / 2;
+
+            ctx.ellipse(
+                centerX * CanvasBaseSize,
+                centerY * CanvasBaseSize,
+                marker.width * CanvasBaseSize / 2 - LineWidth,
+                marker.height * CanvasBaseSize / 2 - LineWidth,
+                0,
+                0,
+                2 * Math.PI
+            )
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+}
+
 const drawStamps = (canvas: HTMLCanvasElement, board: BoardLayer, _playerView: boolean, _rng : Prando) => {
     if (!board.stamps) return;
 
@@ -294,6 +337,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
         const layer = board.layers[i];
 
         forEachTile(drawTerrain, layer);
+        drawMarkers(canvas, board.width, board.height, layer, playerView, rng);
         drawStamps(canvas, layer, playerView, rng);
         forEachTile(drawDecorator, layer);
         forEachTile(drawHidden, layer);
