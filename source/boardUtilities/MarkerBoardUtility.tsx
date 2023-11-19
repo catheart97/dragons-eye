@@ -32,21 +32,6 @@ export class MarkerBoardUtility implements IBoardUtility {
         return <span className="mso text-xl">palette</span>;
     }
 
-    private setBoardCondition(position: BoardPosition, condition: boolean) {
-        if (condition) {
-            if (!this.board.layers[this.board.activeLayer].hidden) {
-                this.board.layers[this.board.activeLayer].hidden = {}
-            }
-            this.board.layers[this.board.activeLayer].hidden[position.x + position.y * this.board.width] = condition;
-        } else {
-            if (!this.board.layers[this.board.activeLayer].hidden) {
-                this.board.layers[this.board.activeLayer].hidden = {}
-            } else {
-                delete this.board.layers[this.board.activeLayer].hidden[position.x + position.y * this.board.width];
-            }
-        }
-    }
-
     onShapeHover(position: BoardPosition) {
         this.hoverTile = position;
     }

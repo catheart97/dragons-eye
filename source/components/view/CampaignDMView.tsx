@@ -506,13 +506,18 @@ export const CampaignDMView = (props: IDMAppView & {
                                         </>
                                     )
                                 }
-                                
-                                <JournalComponent 
-                                    campaign={props.campaign}
-                                    update={props.update}
-                                    dialogHandle={props.dialogHandle}
-                                    className="grow"
-                                />
+
+                                {
+                                    !(props.playerViewOpen.current && sidebarOpen) ? (
+                                        <JournalComponent
+                                            campaign={props.campaign}
+                                            update={props.update}
+                                            dialogHandle={props.dialogHandle}
+                                            className="grow"
+                                        />
+                                    ) : <div className="grow"></div>
+                                }
+
                                 {
                                     props.campaign.current.calendar ? (
                                         <CalendarComponent

@@ -250,7 +250,7 @@ const drawHidden: BoardCallback = (canvas, w, _h, board, position, playerView, _
     }
 }
 
-const drawMarkers = (canvas: HTMLCanvasElement, w: number, h: number, board: BoardLayer, _playerView: boolean, _rng : Prando) => {
+const drawMarkers = (canvas: HTMLCanvasElement, _w: number, _h: number, board: BoardLayer, _playerView: boolean, _rng : Prando) => {
 
     const markers = board.markers;
     if (!markers) return;

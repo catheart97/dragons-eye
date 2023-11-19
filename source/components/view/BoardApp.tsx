@@ -56,7 +56,10 @@ const BoardApp = (props: IAppView & {
                 </div>
             </div>
             <div className={
-                "flex w-full grow h-0"
+                [
+                    "grid grid-rows-1 h-full",
+                    props.playerViewOpen.current ? "grid-cols-2" : "grid-cols-1"
+                ].join(" ")
             }>
                 <BoardDMView
                     dialogHandle={props.dialogHandle}

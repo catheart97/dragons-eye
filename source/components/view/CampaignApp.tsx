@@ -38,7 +38,12 @@ export const CampaignApp = (props: IAppView & {
                 </div>
             </div>
 
-            <div className="flex grow h-0">
+            <div className={
+                [
+                    "grid grid-rows-1 h-full",
+                    props.playerViewOpen.current ? "grid-cols-2" : "grid-cols-1"
+                ].join(" ")
+            }>
                 <CampaignDMView
                     loadCampaignBoard={props.loadCampaignBoard}
                     campaign={props.campaign}
