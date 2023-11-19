@@ -643,11 +643,7 @@ export const CalendarComponent = (props: {
                 <div className="w-full flex justify-end items-center text-xs gap-3">
                     <div>
                         {weekday}
-                        {
-                            props.player ? <></> : (
-                                <>&nbsp;({calendar.stats.week.findIndex((day) => day === weekday) + 1})</>
-                            )
-                        }
+                        <>&nbsp;({calendar.stats.week.findIndex((day) => day === weekday) + 1})</>
                     </div>
                     <div>
                         {

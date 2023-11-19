@@ -7,6 +7,7 @@ import { Note } from "./Note"
 import { DECalendar } from "./Calendar"
 import { Spell } from "./Spell"
 import { Item } from "./Item"
+import { Journal } from "./Journal"
 
 export type Campaign = {
     calendar?: DECalendar,
@@ -21,6 +22,7 @@ export type Campaign = {
     items?: Item[],
     monsters?: Statblock[],
     quickNote?: Note 
+    journal?: Journal
 }
 
 export const EmptyCampaign: Campaign = {

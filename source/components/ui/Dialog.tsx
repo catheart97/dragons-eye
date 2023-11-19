@@ -60,7 +60,7 @@ const DialogRenderer: React.ForwardRefRenderFunction<DialogHandle, DialogProps> 
             }}
         >
             <div 
-                className={(full ? "h-full" : "w-96 h-96") + " max-w-full bg-neutral-50 m-0 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 transition-opacity " + (children ? "pointer-events-auto opacity-100" : "opacity-0")} 
+                className={(full ? "h-full w-full" : "w-96 h-96") + " max-w-full bg-neutral-50 m-0 focus:outline-none rounded-xl shadow-2xl shadow-black flex flex-col p-3 items-start gap-2 transition-opacity " + (children ? "pointer-events-auto opacity-100" : "opacity-0")} 
             >
                 <div className="flex items-center select-none w-full justify-between">
                     <div className="text-3xl">{title}</div>

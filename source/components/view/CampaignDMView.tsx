@@ -23,6 +23,7 @@ import { Tab, TabView } from "../ui/TabView";
 import { TextInput } from "../ui/TextInput";
 import { UIGroup } from "../ui/UIGroup";
 import { NavigationComponent } from "../ui/NavigationComponent";
+import { JournalComponent } from "../JournalComponent";
 
 
 export const CompendiumDashboardElement = (props: IDashboardElement & {
@@ -424,19 +425,19 @@ export const CampaignDMView = (props: IDMAppView & {
                                 ></NavigationComponent>
                             </div>
 
-                            <div className="h-26 w-full px-4 p-2 flex items-center shrink-0 gap-6">
+                            <div className="h-26 w-full px-4 p-2 flex justify-between items-center shrink-0 gap-6">
                                 {
                                     props.campaign.current.adventures.length > selectedAdventure && selectedAdventure != -1 ? (
                                         <>
                                             <div
-                                                className="w-fit h-fit shrink-0 relative rounded-xl shadow-xl overflow-hidden"
+                                                className="w-fit h-full shrink-0 relative rounded-full shadow-xl overflow-hidden"
                                             >
                                                 <img
                                                     className="w-24 h-24"
                                                     src={props.campaign.current.adventures[selectedAdventure].image ?? AdventureIcon}
                                                 />
 
-                                                <div className="bottom-0 h-8 left-0 right-0 flex absolute">
+                                                <div className="bottom-0 h-full left-0 right-0 flex absolute">
                                                     <button
                                                         className="h-full w-full bg-neutral-800/80 opacity-0 hover:opacity-100 transition-all duration-200 ease-in-out text-white flex items-center justify-center"
                                                         onClick={() => {
@@ -475,7 +476,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                     ) : (
                                         <>
                                             <button
-                                                className="w-fit h-fit shrink-0"
+                                                className="w-fit h-full shrink-0"
                                                 onClick={() => {
                                                     // open file dialog 
                                                     const input = document.createElement('input');
@@ -496,7 +497,7 @@ export const CampaignDMView = (props: IDMAppView & {
                                                 }}
                                             >
                                                 <img
-                                                    className="w-24 h-24 rounded-xl shadow-xl"
+                                                    className="w-24 h-24 rounded-full shadow-xl"
                                                     src={props.campaign.current.image ?? CampaignIcon}
                                                     alt="Campaign Image"
                                                 />
@@ -505,7 +506,13 @@ export const CampaignDMView = (props: IDMAppView & {
                                         </>
                                     )
                                 }
-                                <div className="grow"></div>
+                                
+                                <JournalComponent 
+                                    campaign={props.campaign}
+                                    update={props.update}
+                                    dialogHandle={props.dialogHandle}
+                                    className="grow"
+                                />
                                 {
                                     props.campaign.current.calendar ? (
                                         <CalendarComponent
