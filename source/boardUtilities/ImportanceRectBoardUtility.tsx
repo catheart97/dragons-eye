@@ -1,7 +1,6 @@
-import { BoardPosition, IBoardUtility } from "../data/Board"
 import { CanvasBaseSize } from "../components/BoardComponent"
-import { Rect } from "../Rect"
 import { PlayerViewSettings } from "../components/view/IAppView"
+import { BoardPosition, IBoardUtility } from "../data/Board"
 
 /**
  * The goal is that the importance rect is always the core view of the player view.

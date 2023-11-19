@@ -39,7 +39,7 @@ const drawTerrain: BoardCallback = (canvas, board, position, _playerView, rng) =
 
 }
 
-const drawCondition: BoardCallback = (canvas, board, position, _playerView, rng) => {
+const drawCondition: BoardCallback = (canvas, board, position, _playerView, _rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -69,7 +69,7 @@ const drawCondition: BoardCallback = (canvas, board, position, _playerView, rng)
     }
 }
 
-const drawDecorator: BoardCallback = (canvas, board, position, playerView, rng) => {
+const drawDecorator: BoardCallback = (canvas, board, position, playerView, _rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -242,7 +242,7 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView, rng) 
     }
 }
 
-const drawHidden: BoardCallback = (canvas, board, position, playerView, rng) => {
+const drawHidden: BoardCallback = (canvas, board, position, playerView, _rng) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * board.width + position.x;
 
@@ -361,7 +361,7 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView, rng) => 
     }
 }
 
-const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean, rng : Prando) => {
+const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean, _rng : Prando) => {
     if (!board.stamps) return;
 
     for (const stamp of board.stamps) {

@@ -1,9 +1,7 @@
 import { FullWidthButton } from "../components/ui/FullWidthButton";
 import { NumberInput } from "../components/ui/NumberInput";
-import { Switch } from "../components/ui/Switch";
 import { UIContainer } from "../components/ui/UIContainer";
 import { UIGroup } from "../components/ui/UIGroup";
-import { PlayerViewSettings } from "../components/view/IAppView";
 import { Board, IBoardUtility, constructDefaultBoard } from "../data/Board";
 
 

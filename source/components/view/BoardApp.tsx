@@ -1,9 +1,8 @@
-import { BoardDMView } from './BoardDMView';
 import React from 'react';
-import { BoardPlayerView, BoardPlayerViewHandle } from './BoardPlayerView';
 import { Board, OnePageDungeon, constructFromOnePageDungeon } from '../../data/Board';
 import { useForceUpdate } from '../../utility';
-import { Rect } from '../../Rect';
+import { BoardDMView } from './BoardDMView';
+import { BoardPlayerView, BoardPlayerViewHandle } from './BoardPlayerView';
 import { IAppView, PlayerViewSettings } from './IAppView';
 
 const BoardApp = (props: IAppView & {
