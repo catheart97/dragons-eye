@@ -55,9 +55,9 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
     onShapeRelease(position: BoardPosition) {
         const idxTo = position.x + position.y * this.board.width;
 
-        if (this.board.decorators[idxTo] == undefined) {
+        if (this.board.layers[this.board.activeLayer].decorators[idxTo] == undefined) {
             if (this.creatureAttitude == CreatureAttitude.Player) {
-                this.board.decorators[idxTo] = {
+                this.board.layers[this.board.activeLayer].decorators[idxTo] = {
                     type: BoardDecoratorType.Creature,
                     attachment: {
                         type: this.creatureType,
@@ -72,7 +72,7 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                 }
             } else {
                 const statblock = structuredClone(this.creatureStatblock);
-                this.board.decorators[idxTo] = {
+                this.board.layers[this.board.activeLayer].decorators[idxTo] = {
                     type: BoardDecoratorType.Creature,
                     attachment: {
                         type: this.creatureType,

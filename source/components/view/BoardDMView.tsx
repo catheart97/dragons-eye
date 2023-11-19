@@ -1,11 +1,10 @@
 import * as React from 'react';
 
-import { ConditionBoardUtility } from '../../boardUtilities/ConditionBoardUtility';
 import { CreateCreatureDecoratorBoardUtility } from '../../boardUtilities/CreateCreatureDecoratorBoardUtility';
 import { SpellBoardUtility } from '../../boardUtilities/SpellBoardUtility';
 import { TerrainBoardUtility } from '../../boardUtilities/TerrainBoardUtility';
 import { TrashDecoratorBoardUtility } from '../../boardUtilities/TrashDecoratorBoardUtility';
-import { Board, BoardTerrain, IBoardUtility } from '../../data/Board';
+import { Board, BoardTerrain, IBoardUtility, MAX_LAYERS } from '../../data/Board';
 import { BoardComponent, BoardComponentHandle } from '../BoardComponent';
 import { ToolButton } from '../ui/ToolButton';
 
@@ -16,7 +15,6 @@ import { InitiaitveBoardUtility } from '../../boardUtilities/InitiativeBoardUtil
 import { InteractBoardUtility } from '../../boardUtilities/InteractBoardUtility';
 import { Dialog } from '../ui/Dialog';
 import { IDMAppView } from './IAppView';
-import { SizeBoardUtility } from '../../boardUtilities/SizeBoardUtility';
 import { StampBoardUtility } from '../../boardUtilities/StampBoardUtility';
 import { CampaignContext } from '../../data/Campaign';
 import { Adventure } from '../../data/Adventure';
@@ -97,13 +95,10 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                 adventure.current || undefined
             ),
             new TerrainBoardUtility(board.current, BoardTerrain.Grass),
-            new ConditionBoardUtility(board.current, null),
             new StampBoardUtility(board.current),
             null,
             new HiddenBoardUtility(board.current),
             new ImportanceRectUtility(props.playerSettings),
-            null,
-            new SizeBoardUtility(board.current) // needs to be last !!!
         ];
         utilities.current.forEach(element => {
             if (element != null) {
@@ -134,7 +129,7 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                     boardMode
                 >
                     {
-                        utilities.current.slice(0, utilities.current.length - 2).map((v, i) => {
+                        utilities.current.map((v, i) => {
                             if (v != null) {
                                 return (
                                     <ToolButton
@@ -167,20 +162,43 @@ const BoardDMViewRenderer: React.ForwardRefRenderFunction<BoardBoardDMViewHandle
                         <span className='msf'>map</span>
                     </ToolButton>
                     <DividerComponent />
-                    {
-                        utilities.current.length > 0 ? (
-                            <ToolButton
-                                onClick={() => {
-                                    const i = utilities.current.length - 1;
-                                    setCurrentUtility(i);
-                                    utilities.current[i]!.onMount?.call(utilities.current[i]);
-                                }}
-                                active={currentUtility === utilities.current.length - 1}
-                            >
-                                {utilities.current[utilities.current.length - 1]!.icon()}
-                            </ToolButton>
-                        ) : null
-                    }
+                    <ToolButton
+                        onClick={() => {
+
+                            if (props.board.current.activeLayer == MAX_LAYERS - 1) {
+                                return;
+                            }
+
+                            if (props.board.current.layers.length - 1 == props.board.current.activeLayer) {
+                                props.board.current.layers.push({
+                                    terrain: new Array<BoardTerrain>(props.board.current.width * props.board.current.height).fill(BoardTerrain.Air),
+                                    decorators: [],
+                                    hidden: [],
+                                    stamps: [],
+                                });
+                            }
+
+                            props.board.current.activeLayer++;
+                            boardComponentRef.current!.update();
+                            props.update();
+                        }}
+                        active={false}
+                    >
+                        <span className='msf'>expand_less</span>
+                    </ToolButton>
+                    <ToolButton
+                        onClick={() => {
+                            if (props.board.current.activeLayer == 0) {
+                                return;
+                            }
+                            props.board.current.activeLayer--;
+                            boardComponentRef.current!.update();
+                            props.update();
+                        }}
+                        active={false}
+                    >
+                        <span className='msf'>expand_more</span>
+                    </ToolButton>
                 </NavigationComponent>
             </div>
             <BoardComponent

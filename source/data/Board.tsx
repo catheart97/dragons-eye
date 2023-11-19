@@ -3,6 +3,8 @@ import { Item } from "./Item";
 import { Stamp } from "./Stamp";
 import { CreatureCondition, CreatureSize, PlayerStatblock, Statblock } from "./Statblock";
 
+export const MAX_LAYERS = 10;
+
 export type BoardPosition = {
     x: number,
     y: number
@@ -30,19 +32,6 @@ export enum BoardItemType {
     Trap,
     Note,
     Item
-}
-
-export enum MarkerType {
-    Circle,
-    Square
-}
-
-export type BoardMarker = {
-    type: MarkerType,
-    color: string,
-    width: number,
-    height: number,
-    position: BoardPosition
 }
 
 export type DoorData = "locked" | "unlocked";
@@ -76,25 +65,50 @@ export type InitiaitveData = {
     conditions: CreatureCondition[]
 }
 
+export type LegacyBoard_0_5_7 = {
+    width: number,
+    height: number,
+    terrain: Array<BoardTerrain>,
+    decorators: { [key: number]: BoardDecorator }
+    hidden: { [key: number]: boolean }
+    stamps: Array<Stamp>
+    decoratorCounter: number
+    initiative?: InitiaitveData[]
+    initiativeIndex?: number
+}
+
 export type Board = {
     width: number,
     height: number,
     
-    terrain: Array<BoardTerrain>
-
-    conditions: { [key: number]: BoardCondition }
-    
-    decorators: { [key: number]: BoardDecorator }
+    // board / layer data
+    layers: BoardLayer[]
+    activeLayer: number
     decoratorCounter: number
-
-    stamps?: Array<Stamp>
-    
-    hidden?: { [key: number]: boolean }
-    
-    markers?: Array<BoardMarker>
 
     initiative?: InitiaitveData[]
     initiativeIndex?: number
+}
+
+export enum BoardMarkerType {
+    Circle,
+    Square
+}
+
+export type BoardMarker = {
+    type: BoardMarkerType
+    color: string
+    width: number
+    height: number
+    position: BoardPosition
+}
+
+export type BoardLayer = {
+    terrain: Array<BoardTerrain>
+    decorators: { [key: number]: BoardDecorator }
+    hidden: { [key: number]: boolean }
+    stamps: Array<Stamp>
+    drawLayer?: string // base 64 encoded image for drawing
 }
 
 export enum SpellShape {
@@ -136,7 +150,8 @@ export enum BoardTerrain {
     Tile,
     Ice,
     Lava,
-    Snow
+    Snow,
+    Air
 }
 
 export const TerrainColors: { [key in BoardTerrain]: string } = {
@@ -151,58 +166,8 @@ export const TerrainColors: { [key in BoardTerrain]: string } = {
     [BoardTerrain.Tile]: '#ffffff',
     [BoardTerrain.Ice]: '#ffffff',
     [BoardTerrain.Lava]: '#ef4444',
-    [BoardTerrain.Snow]: '#ffffff'
-}
-
-export const ConditionColors: { [key in BoardCondition]: string } = {
-    [BoardCondition.None]: '#ffffff',
-    [BoardCondition.Fire]: '#ef4444',
-    [BoardCondition.Acid]: '#166534',
-    [BoardCondition.Ice]: '#0284c7',
-    [BoardCondition.Lightning]: '#075985',
-    [BoardCondition.Wet]: '#38bdf8',
-    [BoardCondition.Poison]: '#000000',
-    [BoardCondition.Healing]: '#dc2626',
-    [BoardCondition.Oil]: '#000000',
-    [BoardCondition.Fog]: '#1e3a8a',
-    [BoardCondition.Muted]: '#000000',
-    [BoardCondition.Blinded]: '#000000',
-    [BoardCondition.Invulnerable]: '#000000',
-    [BoardCondition.Slow]: '#000000'
-}
-
-export const ConditionIcons: { [key in BoardCondition]: React.ReactNode } = {
-    [BoardCondition.None]: <></>,
-    [BoardCondition.Fire]: <span className="msf text-red-500 rounded-full bg-white m-1">local_fire_department</span>,
-    [BoardCondition.Acid]: <span className="msf text-green-800 rounded-full bg-white m-1">science</span>,
-    [BoardCondition.Ice]: <span className="msf text-sky-600 rounded-full bg-white m-1">ac_unit</span>,
-    [BoardCondition.Lightning]: <span className="msf rounded-full bg-white m-1 text-sky-800">bolt</span>,
-    [BoardCondition.Wet]: <span className="msf rounded-full bg-white m-1 text-sky-400">water_drop</span>,
-    [BoardCondition.Poison]: <span className="msf text-black rounded-full bg-white m-1">skull</span>,
-    [BoardCondition.Healing]: <span className="msf rounded-full bg-white m-1 text-red-600">healing</span>,
-    [BoardCondition.Oil]: <span className="msf text-black rounded-full bg-white m-1">water_drop</span>,
-    [BoardCondition.Fog]: <span className="msf rounded-full bg-white m-1 text-blue-900">cloud</span>,
-    [BoardCondition.Muted]: <span className="msf rounded-full bg-white m-1">volume_off</span>,
-    [BoardCondition.Blinded]: <span className="msf rounded-full bg-white m-1">visibility_off</span>,
-    [BoardCondition.Invulnerable]: <span className="msf rounded-full bg-white m-1">shield</span>,
-    [BoardCondition.Slow]: <span className="msf rounded-full bg-white m-1">speed</span>
-}
-
-export const ConditionCanvasIcons: { [key in BoardCondition]: string } = {
-    [BoardCondition.None]: "",
-    [BoardCondition.Fire]: "local_fire_department",
-    [BoardCondition.Acid]: "science",
-    [BoardCondition.Ice]: "ac_unit",
-    [BoardCondition.Lightning]: "bolt",
-    [BoardCondition.Wet]: "water_drop",
-    [BoardCondition.Poison]: "skull",
-    [BoardCondition.Healing]: "healing",
-    [BoardCondition.Oil]: "water_drop",
-    [BoardCondition.Fog]: "cloud",
-    [BoardCondition.Muted]: "volume_off",
-    [BoardCondition.Blinded]: "visibility_off",
-    [BoardCondition.Invulnerable]: "shield",
-    [BoardCondition.Slow]: "speed"
+    [BoardTerrain.Snow]: '#ffffff',
+    [BoardTerrain.Air]: '#ffffff00'
 }
 
 export const ItemTypeIcons: { [key in BoardItemType]: React.ReactNode } = {
@@ -283,9 +248,15 @@ export const constructRandomBoard = (width: number, height: number): Board => {
         width,
         height,
         decoratorCounter: 0,
-        terrain: board,
-        conditions: {},
-        decorators: {}
+        activeLayer: 0,
+        layers: [
+            {
+                terrain: board,
+                decorators: {},
+                hidden: {},
+                stamps: []
+            }
+        ]
     }
 }
 
@@ -442,10 +413,16 @@ export const constructFromOnePageDungeon = (data: OnePageDungeon): Board => {
     return {
         width: maxY,
         height: maxX,
-        terrain: board,
-        decoratorCounter,
-        conditions: {},
-        decorators
+        activeLayer: 0,
+        layers: [
+            {
+                terrain: board,
+                decorators: decorators,
+                hidden: {},
+                stamps: []
+            }
+        ],
+        decoratorCounter
     };
 }
 
@@ -468,8 +445,14 @@ export const constructDefaultBoard = (w: number, h: number): Board => {
         width: w,
         height: h,
         decoratorCounter: 0,
-        terrain: board,
-        conditions: {},
-        decorators: {}
+        activeLayer: 0,
+        layers: [
+            {
+                terrain: board,
+                decorators: {},
+                hidden: {},
+                stamps: []
+            }
+        ]
     }
 }

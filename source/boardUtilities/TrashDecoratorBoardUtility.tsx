@@ -21,7 +21,7 @@ export class TrashDecoratorBoardUtility implements IBoardUtility {
 
     onShapeRelease(position: BoardPosition) {
         const idxTo = position.x + position.y * this.board.width;
-        delete this.board.decorators[idxTo];
+        delete this.board.layers[this.board.activeLayer].decorators[idxTo];
 
         updateInitiativeOnChange(this.board);
         this.mouseDown = false;

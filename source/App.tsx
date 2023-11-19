@@ -6,7 +6,7 @@ import BoardApp from "./components/view/BoardApp"
 import { CampaignApp } from "./components/view/CampaignApp"
 import { Board, constructDefaultBoard } from "./data/Board"
 import { Campaign, CampaignContext, EmptyCampaign } from "./data/Campaign"
-import { DEFile, DEFileType, makeBoardFile, makeCampaignFile } from "./data/DEFile"
+import { DEFile, DEFileType, makeBoardFile, makeCampaignFile, upgradeBoardFile, upgradeCampaignFile } from "./data/DEFile"
 import { useForceUpdate } from "./utility"
 
 enum AppMode {
@@ -21,7 +21,7 @@ export const App = (props: {
     const forceUpdate = useForceUpdate();
 
     // mode and data depending on mode
-    const mode = React.useRef<AppMode>(AppMode.Campaign);
+    const mode = React.useRef<AppMode>(AppMode.Board);
     const playerViewOpen = React.useRef<boolean>(false);
     
     const board = React.useRef<Board>(constructDefaultBoard(15, 15));
@@ -55,9 +55,15 @@ export const App = (props: {
 
                 if (file.type == DEFileType.BoardFile) {
                     mode.current = AppMode.Board;
+
+                    file = upgradeBoardFile(file);
+
                     board.current = file.data as Board;
                 } else {
                     mode.current = AppMode.Campaign;
+
+                    file = upgradeCampaignFile(file);
+
                     campaign.current = file.data as Campaign;
                 }
                 

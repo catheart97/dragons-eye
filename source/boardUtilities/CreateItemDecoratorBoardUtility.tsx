@@ -52,7 +52,7 @@ export class CreateItemDecoratorBoardUtility implements IBoardUtility {
     onShapeRelease(position: BoardPosition) {
         const idxTo = position.x + position.y * this.board.width;
 
-        if (this.board.decorators[idxTo] == undefined) {
+        if (this.board.layers[this.board.activeLayer].decorators[idxTo] == undefined) {
 
             const data = this.itemType == BoardItemType.Door ? this.doorData : (
                 this.itemType == BoardItemType.Trap ? this.trapData : (
@@ -61,7 +61,7 @@ export class CreateItemDecoratorBoardUtility implements IBoardUtility {
                     )
                 )
             )
-            this.board.decorators[idxTo] = {
+            this.board.layers[this.board.activeLayer].decorators[idxTo] = {
                 type: BoardDecoratorType.Item,
                 attachment: {
                     type: structuredClone(this.itemType),

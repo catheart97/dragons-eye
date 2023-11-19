@@ -28,15 +28,15 @@ export class HiddenBoardUtility implements IBoardUtility {
 
     private setBoardCondition(position: BoardPosition, condition: boolean) {
         if (condition) {
-            if (!this.board.hidden) {
-                this.board.hidden = {}
+            if (!this.board.layers[this.board.activeLayer].hidden) {
+                this.board.layers[this.board.activeLayer].hidden = {}
             }
-            this.board.hidden[position.x + position.y * this.board.width] = condition;
+            this.board.layers[this.board.activeLayer].hidden[position.x + position.y * this.board.width] = condition;
         } else {
-            if (!this.board.hidden) {
-                this.board.hidden = {}
+            if (!this.board.layers[this.board.activeLayer].hidden) {
+                this.board.layers[this.board.activeLayer].hidden = {}
             } else {
-                delete this.board.hidden[position.x + position.y * this.board.width];
+                delete this.board.layers[this.board.activeLayer].hidden[position.x + position.y * this.board.width];
             }
         }
     }

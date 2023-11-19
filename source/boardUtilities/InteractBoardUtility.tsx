@@ -1,7 +1,16 @@
 import { ItemComponent } from "../components/ItemComponent";
 import { RawStatblockComponent } from "../components/StatblockComponent";
-import { Board, BoardCreature, BoardDecoratorType, BoardPosition, CreatureAttitude, IBoardUtility, BoardItemType, TrapData, ItemData } from "../data/Board";
+import { Board, BoardCreature, BoardDecoratorType, BoardPosition, CreatureAttitude, IBoardUtility, BoardItemType, TrapData, ItemData, MAX_LAYERS, BoardTerrain } from "../data/Board";
 import { CanvasBaseSize } from "../components/BoardComponent";
+import { UIContainer } from "../components/ui/UIContainer";
+import { ToolButton } from "../components/ui/ToolButton";
+import { UIGroup } from "../components/ui/UIGroup";
+
+enum InteractMoveMode {
+    None,
+    Up,
+    Down
+}
 
 export class InteractBoardUtility implements IBoardUtility {
 
@@ -11,6 +20,8 @@ export class InteractBoardUtility implements IBoardUtility {
 
     public position: BoardPosition | null = null;
     private downPosition: BoardPosition | null = null;
+
+    private moveMode: InteractMoveMode = InteractMoveMode.None;
 
     constructor(board: Board) {
         this.board = board
@@ -29,7 +40,7 @@ export class InteractBoardUtility implements IBoardUtility {
 
         this.position = position;
         if (this.downPosition!.x == position.x && this.downPosition!.y == position.y) {
-            const decorator = this.board.decorators[position.x + this.board.width * position.y];
+            const decorator = this.board.layers[this.board.activeLayer].decorators[position.x + this.board.width * position.y];
             if (decorator) {
 
                 if (decorator.type == BoardDecoratorType.Item && decorator.attachment.type == BoardItemType.Door) {
@@ -97,7 +108,7 @@ export class InteractBoardUtility implements IBoardUtility {
                                     uniqueKey={decorator.key}
                                     statblock={(decorator.attachment as BoardCreature).statblock}
                                     updateStatblock={(s) => {
-                                        (this.board.decorators[position.x + this.board.width * position.y].attachment as BoardCreature).statblock = s;
+                                        (this.board.layers[this.board.activeLayer].decorators[position.x + this.board.width * position.y].attachment as BoardCreature).statblock = s;
                                     }}
                                     player={
                                         attachment.attitude == CreatureAttitude.Player
@@ -114,9 +125,28 @@ export class InteractBoardUtility implements IBoardUtility {
             if (this.downPosition) {
                 const idxFrom = this.downPosition!.x + this.downPosition!.y * this.board.width;
 
-                if (this.board.decorators[idxFrom] && this.board.decorators[idxTo] == undefined) {
-                    this.board.decorators[idxTo] = this.board.decorators[idxFrom];
-                    delete this.board.decorators[idxFrom];
+                let targetLayer = this.board.activeLayer;
+                if (this.moveMode == InteractMoveMode.Up && 
+                    this.board.activeLayer != MAX_LAYERS - 2) {
+                
+                    if (this.board.layers.length - 1 == this.board.activeLayer) {
+                        this.board.layers.push({
+                            terrain: new Array<BoardTerrain>(this.board.width * this.board.height).fill(BoardTerrain.Air),
+                            decorators: [],
+                            hidden: [],
+                            stamps: [],
+                        });
+                    }
+
+                    targetLayer++;
+                } else if (this.moveMode == InteractMoveMode.Down) {
+                    targetLayer--;
+                    targetLayer = targetLayer < 0 ? 0 : targetLayer;
+                }
+
+                if (this.board.layers[this.board.activeLayer].decorators[idxFrom] && this.board.layers[targetLayer].decorators[idxTo] == undefined) {
+                    this.board.layers[targetLayer].decorators[idxTo] = this.board.layers[this.board.activeLayer].decorators[idxFrom];
+                    delete this.board.layers[this.board.activeLayer].decorators[idxFrom];
                 }
             }
             this.forceUpdate?.call(this);
@@ -129,8 +159,8 @@ export class InteractBoardUtility implements IBoardUtility {
         this.position = position;
 
         if (!this.downPosition) {
-            const decorator = this.board.decorators[position.x + this.board.width * position.y];
-            const hidden = this.board.hidden ? this.board.hidden[position.x + this.board.width * position.y] : false;
+            const decorator = this.board.layers[this.board.activeLayer].decorators[position.x + this.board.width * position.y];
+            const hidden = this.board.layers[this.board.activeLayer].hidden ? this.board.layers[this.board.activeLayer].hidden[position.x + this.board.width * position.y] : false;
             if (decorator && !hidden && !this.helper) {
                 this.component = (
                     <div
@@ -242,10 +272,46 @@ export class InteractBoardUtility implements IBoardUtility {
         </>
     }
 
-
     forceUpdate: (() => void) | null = null;
     userInterface() {
-        return <></>
+        return (
+            <UIContainer>
+                <UIGroup title="Placement">
+                    <div className="flex w-full">
+                        <ToolButton
+                            className="grow"
+                            onClick={() => {
+                                this.moveMode = InteractMoveMode.None;
+                                this.forceUpdate?.call(null);
+                            }}
+                            active={this.moveMode == InteractMoveMode.None}
+                        >
+                            <span className="mso">horizontal_rule</span>
+                        </ToolButton>
+                        <ToolButton
+                            className="grow"
+                            onClick={() => {
+                                this.moveMode = InteractMoveMode.Up;
+                                this.forceUpdate?.call(null);
+                            }}
+                            active={this.moveMode == InteractMoveMode.Up}
+                        >
+                            <span className="mso">expand_less</span>
+                        </ToolButton>
+                        <ToolButton
+                            className="grow"
+                            onClick={() => {
+                                this.moveMode = InteractMoveMode.Down;
+                                this.forceUpdate?.call(null);
+                            }}
+                            active={this.moveMode == InteractMoveMode.Down}
+                        >
+                            <span className="mso">expand_more</span>
+                        </ToolButton>
+                    </div>
+                </UIGroup>
+            </UIContainer>
+        )
     }
 
     description() {

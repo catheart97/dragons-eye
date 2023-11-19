@@ -58,11 +58,13 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                                 props.board.current.initiative.map((v, i) => {
 
                                     let decorator: BoardDecorator | null = null;
-                                    let decorators = Object.values(props.board.current.decorators)
-                                    for (let i = 0; i < decorators.length; i++) {
-                                        if (decorators[i].key == v.id) {
-                                            decorator = decorators[i];
-                                            break;
+                                
+                                    for (const layer of props.board.current.layers) {
+                                        for (const d in layer.decorators) {
+                                            if (layer.decorators[d].key == v.id) {
+                                                decorator = layer.decorators[d];
+                                                break;
+                                            }
                                         }
                                     }
 

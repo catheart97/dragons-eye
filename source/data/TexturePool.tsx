@@ -79,6 +79,7 @@ export class TexturePool {
             [BoardTerrain.Ice]: await LoadImage(IceTexture),
             [BoardTerrain.Lava]: await LoadImage(LavaTexture),
             [BoardTerrain.Snow]: await LoadImage(SnowTexture),
+            [BoardTerrain.Air]: await LoadImage(GrassTexture),
         }
 
         const StampTextures: {[key: string]: HTMLImageElement} = {};

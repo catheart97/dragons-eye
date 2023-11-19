@@ -19,7 +19,7 @@ export class TerrainBoardUtility implements IBoardUtility {
 
     onShapeClick(position: BoardPosition) {
         this.downTile = position;
-        this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
+        this.board.layers[this.board.activeLayer].terrain[position.x + position.y * this.board.width] = this.targetTerrain;
         console.log("down");
     }
 
@@ -36,11 +36,11 @@ export class TerrainBoardUtility implements IBoardUtility {
         console.log(this.downTile);
 
         if (position.x === this.downTile?.x && position.y === this.downTile?.y) {
-            this.board.terrain[position.x + position.y * this.board.width] = this.targetTerrain;
+            this.board.layers[this.board.activeLayer].terrain[position.x + position.y * this.board.width] = this.targetTerrain;
         } else {
             for (let x = Math.min(position.x, this.downTile!.x); x <= Math.max(position.x, this.downTile!.x); x++) {
                 for (let y = Math.min(position.y, this.downTile!.y); y <= Math.max(position.y, this.downTile!.y); y++) {
-                    this.board.terrain[x + y * this.board.width] = this.targetTerrain;
+                    this.board.layers[this.board.activeLayer].terrain[x + y * this.board.width] = this.targetTerrain;
                 }
             }
         }

@@ -36,8 +36,8 @@ export class StampBoardUtility implements IBoardUtility {
             const img = TexturePool.getInstance().get()?.StampTextures[this.selected]!;
             const w = img.width * this.scale;
             const h = img.height * this.scale;
-            if (!this.board.stamps) this.board.stamps = [];
-            this.board.stamps.push(
+            if (!this.board.layers[this.board.activeLayer].stamps) this.board.layers[this.board.activeLayer].stamps = [];
+            this.board.layers[this.board.activeLayer].stamps.push(
                 {
                     position: {
                         x: (this.mousePosition.x - w / 2) / this.zoom,
@@ -50,7 +50,7 @@ export class StampBoardUtility implements IBoardUtility {
             );
             this.forceUpdate?.call(this);
         } else if (this.mousePosition && this.toDeleteIndex != -1) {
-            this.board.stamps?.splice(this.toDeleteIndex, 1);
+            this.board.layers[this.board.activeLayer].stamps?.splice(this.toDeleteIndex, 1);
             this.toDeleteIndex = -1;
             this.forceUpdate?.call(this);
         } 
@@ -85,12 +85,12 @@ export class StampBoardUtility implements IBoardUtility {
             )
         } else if (this.mousePosition) {
 
-            if (!this.board.stamps) return <></>
+            if (!this.board.layers[this.board.activeLayer].stamps) return <></>
 
             // delete mode // search for stamp 
             let stampIndex = -1;
-            for (let i = 0; i < this.board.stamps?.length ?? 0; i++) {
-                const stamp = this.board.stamps![i];
+            for (let i = 0; i < this.board.layers[this.board.activeLayer].stamps?.length ?? 0; i++) {
+                const stamp = this.board.layers[this.board.activeLayer].stamps![i];
                 const w = stamp.width;
                 const h = stamp.height;
                 if (this.posInRect(this.mousePosition.x, this.mousePosition.y, {
@@ -107,7 +107,7 @@ export class StampBoardUtility implements IBoardUtility {
             // draw outline 
             if (stampIndex >= 0) {
                 this.toDeleteIndex = stampIndex;
-                const stamp = this.board.stamps![stampIndex];
+                const stamp = this.board.layers[this.board.activeLayer].stamps![stampIndex];
                 const w = stamp.width;
                 const h = stamp.height;
 

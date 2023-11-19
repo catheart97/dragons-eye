@@ -13,30 +13,32 @@ export const updateInitiativeOnChange = (board: Board) => {
     // checking if the decorators are still on the board
     // or if new decorators have been added or removed and auto roll for them
 
-    
+
     if (board.initiative == undefined) return;
-    
+
     const activeKey = board.initiative[board.initiativeIndex!].id;
 
     // add decorators that are not on the initiative list
-    for (const key in board.decorators) {
-        if (board.decorators[key].type == BoardDecoratorType.Creature) {
-            const attachment = board.decorators[key].attachment as BoardCreature;
-            if (attachment.attitude != CreatureAttitude.Player) {
-                let found = false;
-                for (const i of board.initiative) {
-                    if (i.id == board.decorators[key].key) {
-                        found = true;
-                        break;
+    for (const layer of board.layers) {
+        for (const key in layer.decorators) {
+            if (layer.decorators[key].type == BoardDecoratorType.Creature) {
+                const attachment = layer.decorators[key].attachment as BoardCreature;
+                if (attachment.attitude != CreatureAttitude.Player) {
+                    let found = false;
+                    for (const i of board.initiative) {
+                        if (i.id == layer.decorators[key].key) {
+                            found = true;
+                            break;
+                        }
                     }
-                }
-                if (!found) {
-                    const statblock = attachment.statblock as Statblock
-                    board.initiative.push({
-                        id: board.decorators[key].key,
-                        initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
-                        conditions: []
-                    });
+                    if (!found) {
+                        const statblock = attachment.statblock as Statblock
+                        board.initiative.push({
+                            id: layer.decorators[key].key,
+                            initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
+                            conditions: []
+                        });
+                    }
                 }
             }
         }
@@ -45,10 +47,12 @@ export const updateInitiativeOnChange = (board: Board) => {
     // delete initiatives that are no longer on the board
     board.initiative = board.initiative.filter((v) => {
         let found = false;
-        for (const key in board.decorators) {
-            if (board.decorators[key].key == v.id) {
-                found = true;
-                break;
+        for (const layer of board.layers) {
+            for (const key in layer.decorators) {
+                if (layer.decorators[key].key == v.id) {
+                    found = true;
+                    break;
+                }
             }
         }
         return found;
@@ -119,10 +123,12 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                 this.board.initiative.map((v, i) => {
                                     // find decorator which has the key id 
                                     let decorator: BoardDecorator | null = null;
-                                    for (const key in this.board.decorators) {
-                                        if (this.board.decorators[key].key == v.id) {
-                                            decorator = this.board.decorators[key];
-                                            break;
+                                    for (const layer of this.board.layers) {
+                                        for (const key in layer.decorators) {
+                                            if (layer.decorators[key].key == v.id) {
+                                                decorator = layer.decorators[key];
+                                                break;
+                                            }
                                         }
                                     }
                                     if (decorator == null) {
@@ -268,11 +274,14 @@ export class InitiaitveBoardUtility implements IBoardUtility {
         } else {
             // get players from board
             const players: BoardDecorator[] = [];
-            for (const key in this.board.decorators) {
-                if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
-                    const attachment = this.board.decorators[key].attachment as BoardCreature;
-                    if (attachment.attitude == CreatureAttitude.Player) {
-                        players.push(this.board.decorators[key]);
+
+            for (const layer of this.board.layers) {
+                for (const key in layer.decorators) {
+                    if (layer.decorators[key].type == BoardDecoratorType.Creature) {
+                        const attachment = layer.decorators[key].attachment as BoardCreature;
+                        if (attachment.attitude == CreatureAttitude.Player) {
+                            players.push(layer.decorators[key]);
+                        }
                     }
                 }
             }
@@ -310,16 +319,18 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                 <FullWidthButton
                                     onClick={() => {
                                         // roll initiative for npcs and monsters
-                                        for (const key in this.board.decorators) {
-                                            if (this.board.decorators[key].type == BoardDecoratorType.Creature) {
-                                                const attachment = this.board.decorators[key].attachment as BoardCreature;
-                                                if (attachment.attitude != CreatureAttitude.Player) {
-                                                    const statblock = attachment.statblock as Statblock
-                                                    this.initiatives.push({
-                                                        id: this.board.decorators[key].key,
-                                                        initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
-                                                        conditions: []
-                                                    });
+                                        for (const layer of this.board.layers) {
+                                            for (const key in layer.decorators) {
+                                                if (layer.decorators[key].type == BoardDecoratorType.Creature) {
+                                                    const attachment = layer.decorators[key].attachment as BoardCreature;
+                                                    if (attachment.attitude != CreatureAttitude.Player) {
+                                                        const statblock = attachment.statblock as Statblock
+                                                        this.initiatives.push({
+                                                            id: layer.decorators[key].key,
+                                                            initiative: Math.floor(Math.random() * 20) + 1 + statblock.stats[Stat.Dexterity],
+                                                            conditions: []
+                                                        });
+                                                    }
                                                 }
                                             }
                                         }

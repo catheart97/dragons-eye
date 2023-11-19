@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Rect } from "../Rect";
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, CanvasCreatureTypeIcons, ConditionCanvasIcons, ConditionColors, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, BoardLayer, BoardTerrain, CanvasCreatureTypeIcons, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
 import { CreatureSize } from "../data/Statblock";
 import { TexturePool } from "../data/TexturePool";
 import { useForceUpdate } from "../utility";
@@ -13,14 +13,17 @@ const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-type BoardCallback = (canvas: HTMLCanvasElement, board: Board, position: { x: number, y: number }, playerView: boolean, rng: Prando) => void;
+type BoardCallback = (canvas: HTMLCanvasElement, w : number, h :number, board: BoardLayer, position: { x: number, y: number }, playerView: boolean, rng: Prando) => void;
 
-const drawTerrain: BoardCallback = (canvas, board, position, _playerView, rng) => {
+const drawTerrain: BoardCallback = (canvas, w, _h, boardLayer, position, _playerView, rng) => {
     const ctx = canvas.getContext('2d')!;
-    const idx = position.y * board.width + position.x;
+    const idx = position.y * w + position.x;
 
     // render terrain
-    const terrain = board.terrain[idx]
+    const terrain = boardLayer.terrain[idx]
+
+    if (terrain == BoardTerrain.Air) return;
+
     const texturePool = TexturePool.getInstance().get();
     if (!texturePool) {
         return;
@@ -39,39 +42,9 @@ const drawTerrain: BoardCallback = (canvas, board, position, _playerView, rng) =
 
 }
 
-const drawCondition: BoardCallback = (canvas, board, position, _playerView, _rng) => {
+const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView, _rng) => {
     const ctx = canvas.getContext('2d')!;
-    const idx = position.y * board.width + position.x;
-
-    // render condition
-    const condition = board.conditions[idx];
-    if (condition) {
-        const height = 32;
-        ctx.fillStyle = '#ffffff';
-        ctx.lineWidth = 0;
-        ctx.beginPath();
-        ctx.arc(
-            position.x * CanvasBaseSize + LineWidth + height / 2,
-            position.y * CanvasBaseSize + LineWidth + height / 2,
-            height / 2,
-            0,
-            2 * Math.PI
-        )
-        ctx.fill();
-        ctx.stroke();
-        ctx.font = `${height - 2}px Material Symbols`;
-        ctx.fillStyle = ConditionColors[condition];
-        ctx.fillText(
-            ConditionCanvasIcons[condition],
-            position.x * CanvasBaseSize + LineWidth + 1,
-            position.y * CanvasBaseSize + LineWidth + 1 + height - 2
-        );
-    }
-}
-
-const drawDecorator: BoardCallback = (canvas, board, position, playerView, _rng) => {
-    const ctx = canvas.getContext('2d')!;
-    const idx = position.y * board.width + position.x;
+    const idx = position.y * w + position.x;
 
     // render decorator 
     const decorator = board.decorators[idx];
@@ -242,9 +215,9 @@ const drawDecorator: BoardCallback = (canvas, board, position, playerView, _rng)
     }
 }
 
-const drawHidden: BoardCallback = (canvas, board, position, playerView, _rng) => {
+const drawHidden: BoardCallback = (canvas, w, _h, board, position, playerView, _rng) => {
     const ctx = canvas.getContext('2d')!;
-    const idx = position.y * board.width + position.x;
+    const idx = position.y * w + position.x;
 
     // render hidden
     if (board.hidden && board.hidden[idx]) {
@@ -258,90 +231,6 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView, _rng) =>
 
         let texture: HTMLImageElement = pool.FogTextures.center;
         let angle = 0;
-        const top = board.hidden[idx + board.width] != undefined;
-        const bottom = board.hidden[idx - board.width] != undefined;
-        const left = board.hidden[idx - 1] != undefined;
-        const right = board.hidden[idx + 1] != undefined;
-
-        if (top && bottom && left && right) {
-            texture = pool.FogTextures.center;
-            angle = 0;
-        }
-
-        if (!top && bottom && left && right) {
-            texture = pool.FogTextures.side;
-            angle = Math.PI / 2;
-        }
-
-        if (top && !bottom && left && right) {
-            texture = pool.FogTextures.side;
-            angle = 3 * Math.PI / 2;
-        }
-
-        if (top && bottom && !left && right) {
-            texture = pool.FogTextures.side;
-            angle = Math.PI;
-        }
-
-        if (top && bottom && left && !right) {
-            texture = pool.FogTextures.side;
-            angle = 0;
-        }
-
-        if (top && bottom && !left && !right) {
-            texture = pool.FogTextures.tunnel;
-            angle = 0;
-        }
-
-        if (!top && !bottom && left && right) {
-            texture = pool.FogTextures.tunnel;
-            angle = Math.PI / 2;
-        }
-
-        if (!top && bottom && !left && right) {
-            texture = pool.FogTextures.corner;
-            angle = Math.PI;
-        }
-
-        if (!top && bottom && left && !right) {
-            texture = pool.FogTextures.corner;
-            angle = Math.PI / 2;
-        }
-
-        if (top && !bottom && !left && right) {
-            texture = pool.FogTextures.corner;
-            angle = 3 * Math.PI / 2;
-        }
-
-        if (top && !bottom && left && !right) {
-            texture = pool.FogTextures.corner;
-            angle = 0;
-        }
-
-        if (!top && !bottom && !left && !right) {
-            texture = pool.FogTextures.none;
-            angle = 0;
-        }
-
-        if (!top && !bottom && !left && right) {
-            texture = pool.FogTextures.single;
-            angle = Math.PI;
-        }
-
-        if (!top && !bottom && left && !right) {
-            texture = pool.FogTextures.single;
-            angle = 0;
-        }
-
-        if (!top && bottom && !left && !right) {
-            texture = pool.FogTextures.single;
-            angle = Math.PI / 2;
-        }
-
-        if (top && !bottom && !left && !right) {
-            texture = pool.FogTextures.single;
-            angle = 3 * Math.PI / 2;
-        }
 
         ctx.translate(
             position.x * CanvasBaseSize + CanvasBaseSize / 2,
@@ -361,7 +250,7 @@ const drawHidden: BoardCallback = (canvas, board, position, playerView, _rng) =>
     }
 }
 
-const drawStamps = (canvas: HTMLCanvasElement, board: Board, _playerView: boolean, _rng : Prando) => {
+const drawStamps = (canvas: HTMLCanvasElement, board: BoardLayer, _playerView: boolean, _rng : Prando) => {
     if (!board.stamps) return;
 
     for (const stamp of board.stamps) {
@@ -392,26 +281,32 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
     ctx.clearRect(0, 0, width, height);
 
     // draw helper
-    const forEachTile = (callback: BoardCallback) => {
+    const forEachTile = (callback: BoardCallback, layer : BoardLayer) => {
         for (let i = 0; i < board.height; i++) {
             for (let j = 0; j < board.width; j++) {
-                callback(canvas, board, { x: j, y: i }, playerView, rng);
+                callback(canvas, board.width, board.height, layer, { x: j, y: i }, playerView, rng);
             }
         }
     }
 
-
     // draw scene
-    forEachTile(drawTerrain);
-    drawStamps(canvas, board, playerView, rng);
-    if (playerView) {
-        forEachTile(drawDecorator);
-        forEachTile(drawCondition);
-    } else {
-        forEachTile(drawCondition);
-        forEachTile(drawDecorator);
+    for (let i = 0; i <= board.activeLayer; i++) {
+        const layer = board.layers[i];
+
+        forEachTile(drawTerrain, layer);
+        drawStamps(canvas, layer, playerView, rng);
+        forEachTile(drawDecorator, layer);
+        forEachTile(drawHidden, layer);
+
+        // draw black overlay
+        if (i != board.activeLayer) {
+            ctx.fillStyle = '#000000';
+            ctx.globalAlpha = .5;
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalAlpha = 1;
+        }
     }
-    forEachTile(drawHidden);
+
 
     // draw grid
     ctx.lineWidth = LineWidth;
