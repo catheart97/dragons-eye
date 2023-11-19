@@ -40,7 +40,7 @@ export const CampaignApp = (props: IAppView & {
 
             <div className={
                 [
-                    "grid grid-rows-1 h-full",
+                    "grid grid-rows-1 grow h-0",
                     props.playerViewOpen.current ? "grid-cols-2" : "grid-cols-1"
                 ].join(" ")
             }>
