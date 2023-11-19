@@ -10,6 +10,7 @@ export class StampBoardUtility implements IBoardUtility {
     keys: string[] = [];
     selected: string | null = null;
     mousePosition: { x: number, y: number } | null = null;
+    rotation = 0;
     scale = 5;
     zoom = 1;
     toDeleteIndex = -1;
@@ -43,6 +44,7 @@ export class StampBoardUtility implements IBoardUtility {
                         x: (this.mousePosition.x - w / 2) / this.zoom,
                         y: (this.mousePosition.y - h / 2) / this.zoom
                     },
+                    rotation: this.rotation,
                     width: w,
                     height: h,
                     image: this.selected,
@@ -79,7 +81,8 @@ export class StampBoardUtility implements IBoardUtility {
                         height: h,
                         left: ((this.mousePosition.x - w / 2) / zoom!) + "px",
                         top: ((this.mousePosition.y - h / 2) / zoom!) + "px",
-                        imageRendering: "pixelated"
+                        imageRendering: "pixelated",
+                        transform: "rotate(" + this.rotation + "deg)"
                     }}
                 />
             )
@@ -150,6 +153,19 @@ export class StampBoardUtility implements IBoardUtility {
                             type="range"
                             onChange={(e) => {
                                 this.scale = e.target.valueAsNumber;
+                                this.forceUpdate?.call(null);
+                            }}
+                        />
+                    </UIGroup>
+                    <UIGroup title="Rotation">
+                        <input
+                            min={0}
+                            max={359}
+                            step={1}
+                            defaultValue={this.rotation}
+                            type="range"
+                            onChange={(e) => {
+                                this.rotation = e.target.valueAsNumber;
                                 this.forceUpdate?.call(null);
                             }}
                         />

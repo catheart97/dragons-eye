@@ -3,6 +3,7 @@ export type Stamp = {
         x: number
         y: number
     }
+    rotation?: number
     width: number  // in px
     height: number // in px
     /**

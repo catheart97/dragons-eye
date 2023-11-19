@@ -303,13 +303,25 @@ const drawStamps = (canvas: HTMLCanvasElement, board: BoardLayer, _playerView: b
             return;
         }
         ctx.imageSmoothingEnabled = false;
+
+        ctx.save();
+
+        // rotate
+        ctx.translate(
+            stamp.position.x + stamp.width / 2,
+            stamp.position.y + stamp.height / 2
+        );
+        ctx.rotate((stamp.rotation ?? 0) * Math.PI / 180);
+
         ctx.drawImage(
             texturePool.StampTextures[stamp.image],
-            stamp.position.x,
-            stamp.position.y,
+            -stamp.width / 2,
+            -stamp.height / 2,
             stamp.width,
             stamp.height
         );
+
+        ctx.restore();
         ctx.imageSmoothingEnabled = false;
     }
 }
