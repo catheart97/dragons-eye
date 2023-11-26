@@ -1,5 +1,5 @@
 import { CreatureCondition, Stat, Statblock } from "../data/Statblock";
-import { EnumEditorComponent, RawStatblockComponent } from "../components/StatblockComponent";
+import { EnumEditorComponent } from "../components/StatblockComponent";
 import { NumberInput } from "../components/ui/NumberInput";
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIContainer } from "../components/ui/UIContainer";
@@ -13,7 +13,6 @@ export const updateInitiativeOnChange = (board: Board) => {
     // checking if the decorators are still on the board
     // or if new decorators have been added or removed and auto roll for them
 
-
     if (board.initiative == undefined) return;
 
     const activeKey = board.initiative[board.initiativeIndex!].id;
@@ -21,6 +20,10 @@ export const updateInitiativeOnChange = (board: Board) => {
     // add decorators that are not on the initiative list
     for (const layer of board.layers) {
         for (const key in layer.decorators) {
+            if (layer.decorators[key] == undefined) {
+                delete layer.decorators[key];
+                continue;
+            }
             if (layer.decorators[key].type == BoardDecoratorType.Creature) {
                 const attachment = layer.decorators[key].attachment as BoardCreature;
                 if (attachment.attitude != CreatureAttitude.Player) {
@@ -125,6 +128,10 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                     let decorator: BoardDecorator | null = null;
                                     for (const layer of this.board.layers) {
                                         for (const key in layer.decorators) {
+                                            if (layer.decorators[key] == undefined) {
+                                                delete layer.decorators[key];
+                                                continue;
+                                            }
                                             if (layer.decorators[key].key == v.id) {
                                                 decorator = layer.decorators[key];
                                                 break;
@@ -157,85 +164,65 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                         </div>
                                     )
 
-                                    if (this.board.initiativeIndex == i) {
-                                        return (
-                                            <div className="w-full rounded-xl border-2 border-orange-600 bg-white" key={"p" + i}>
-                                                <div className="p-2">
-                                                    <RawStatblockComponent
-                                                        uniqueKey={decorator.key}
-                                                        updateStatblock={(s) => {
-                                                            attachment.statblock = s;
-                                                            this.forceUpdate?.call(this);
-                                                        }}
-                                                        statblock={statblock}
-                                                        player={attachment.attitude == CreatureAttitude.Player}
-                                                    />
+
+                                    return (
+                                        <div className={"w-full rounded-xl bg-neutral-50 opacity-[90%] " + (this.board.initiativeIndex == i ? "border-2 border-orange-600" : "")} key={i}>
+                                            <div className="text-xl p-2">{statblock.name}</div>
+                                            <div className="flex justify-between items-end p-2">
+                                                <div className="text-xs">Attitude: {attachment.attitude}</div>
+                                                <div className="text-xs">
+                                                    {
+                                                        [
+                                                            "HP: " + (
+                                                                statblock.hitPoints ? (
+                                                                    statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
+                                                                ) : "-"),
+                                                            "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
+                                                            "ID: " + decorator.key
+                                                        ].join(", ")
+                                                    }
                                                 </div>
-                                                <div className="pl-2">
-                                                    <UIGroup title="Conditions" className="text-orange-600" />
+                                            </div>
+
+                                            {
+                                                attachment.attitude == CreatureAttitude.Player ? (
+                                                    null
+                                                ) : (
+                                                    <div className="w-full p-2 flex h-6 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="bg-green-500"
+                                                            style={{
+                                                                width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                        <div
+                                                            className="bg-green-700"
+                                                            style={{
+                                                                width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                        <div
+                                                            className="bg-red-500"
+                                                            style={{
+                                                                width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
+                                                                height: "100%"
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                )
+                                            }
+
+                                            <div className="flex flex-col text-xs w-full items-end">
+                                                <div className="text-xs px-2">Conditions</div>
+                                                <div className="w-full">
                                                     {conditionEdit}
                                                 </div>
                                             </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div className="w-full rounded-xl bg-neutral-50 opacity-[90%]" key={i}>
-                                                <div className="text-xl p-2">{statblock.name}</div>
-                                                <div className="flex justify-between items-end p-2">
-                                                    <div className="text-xs">Attitude: {attachment.attitude}</div>
-                                                    <div className="text-xs">
-                                                        {
-                                                            [
-                                                                "HP: " + (
-                                                                    statblock.hitPoints ? (
-                                                                        statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
-                                                                    ) : "-"),
-                                                                "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
-                                                                "ID: " + decorator.key
-                                                            ].join(", ")
-                                                        }
-                                                    </div>
-                                                </div>
+                                        </div>
+                                    )
 
-                                                {
-                                                    attachment.attitude == CreatureAttitude.Player ? (
-                                                        null
-                                                    ) : (
-                                                        <div className="w-full p-2 flex h-6 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="bg-green-500"
-                                                                style={{
-                                                                    width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                                    height: "100%"
-                                                                }}
-                                                            ></div>
-                                                            <div
-                                                                className="bg-green-700"
-                                                                style={{
-                                                                    width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                                    height: "100%"
-                                                                }}
-                                                            ></div>
-                                                            <div
-                                                                className="bg-red-500"
-                                                                style={{
-                                                                    width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
-                                                                    height: "100%"
-                                                                }}
-                                                            ></div>
-                                                        </div>
-                                                    )
-                                                }
-
-                                                <div className="flex flex-col text-xs w-full items-end">
-                                                    <div className="text-xs px-2">Conditions</div>
-                                                    <div className="w-full">
-                                                        {conditionEdit}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
                                 })
                             }
                         </div>
@@ -277,6 +264,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
 
             for (const layer of this.board.layers) {
                 for (const key in layer.decorators) {
+                    if (layer.decorators[key] == undefined) continue;
                     if (layer.decorators[key].type == BoardDecoratorType.Creature) {
                         const attachment = layer.decorators[key].attachment as BoardCreature;
                         if (attachment.attitude == CreatureAttitude.Player) {
@@ -321,6 +309,7 @@ export class InitiaitveBoardUtility implements IBoardUtility {
                                         // roll initiative for npcs and monsters
                                         for (const layer of this.board.layers) {
                                             for (const key in layer.decorators) {
+                                                if (layer.decorators[key] == undefined) continue;
                                                 if (layer.decorators[key].type == BoardDecoratorType.Creature) {
                                                     const attachment = layer.decorators[key].attachment as BoardCreature;
                                                     if (attachment.attitude != CreatureAttitude.Player) {

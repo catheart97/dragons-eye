@@ -61,6 +61,7 @@ const BoardPlayerViewRenderer: React.ForwardRefRenderFunction<BoardPlayerViewHan
                                 
                                     for (const layer of props.board.current.layers) {
                                         for (const d in layer.decorators) {
+                                            if (layer.decorators[d] == undefined) continue;
                                             if (layer.decorators[d].key == v.id) {
                                                 decorator = layer.decorators[d];
                                                 break;
