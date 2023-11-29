@@ -112,8 +112,8 @@ const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView
 
                 ctx.drawImage(
                     image,
-                    x * CanvasBaseSize + LineWidth,
-                    y * CanvasBaseSize + LineWidth,
+                    x * CanvasBaseSize + CanvasBaseSize / 2 - dim / 2,
+                    y * CanvasBaseSize + CanvasBaseSize / 2 - dim / 2,
                     dim - LineWidth * 2,
                     dim - LineWidth * 2
                 )
