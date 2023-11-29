@@ -51,5 +51,8 @@ export default defineConfig({
   ],
   define: {
     APP_VERSION: JSON.stringify(require('./package.json').version),
+  },
+  build: {
+    chunkSizeWarningLimit: 50000 
   }
 })
