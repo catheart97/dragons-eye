@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Rect } from "../Rect";
-import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, BoardLayer, BoardMarkerType, BoardTerrain, CanvasCreatureTypeIcons, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
+import { Board, BoardCreature, BoardDecoratorType, BoardItem, BoardItemType, BoardLayer, BoardMarkerType, BoardTerrain, CreatureAttitudeColors, DoorData, IBoardUtility, TrapData } from "../data/Board";
 import { CreatureSize } from "../data/Statblock";
 import { TexturePool } from "../data/TexturePool";
 import { useForceUpdate } from "../utility";
@@ -13,9 +13,27 @@ const scale = 1;
 export const CanvasBaseSize = 72 * scale;
 const LineWidth = 2 * scale;
 
-type BoardCallback = (canvas: HTMLCanvasElement, w : number, h :number, board: BoardLayer, position: { x: number, y: number }, playerView: boolean, rng: Prando) => void;
+class ImageLoader {
+    image: HTMLImageElement;
+    loaded: boolean;
 
-const drawTerrain: BoardCallback = (canvas, w, _h, boardLayer, position, _playerView, rng) => {
+    constructor(private path: string) {
+        this.loaded = false;
+        this.image = new Image();
+        this.image.onload = () => {
+            this.loaded = true;
+        }
+        this.image.src = this.path;
+    }
+
+    getIf() {
+        return this.loaded ? this.image : undefined;
+    }
+}
+
+type BoardCallback = (canvas: HTMLCanvasElement, w : number, h :number, board: BoardLayer, position: { x: number, y: number }, playerView: boolean, rng: Prando, images: {[key: string] : ImageLoader}) => void;
+
+const drawTerrain: BoardCallback = (canvas, w, _h, boardLayer, position, _playerView, rng, _images) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * w + position.x;
 
@@ -42,7 +60,7 @@ const drawTerrain: BoardCallback = (canvas, w, _h, boardLayer, position, _player
 
 }
 
-const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView, _rng) => {
+const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView, _rng, images) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * w + position.x;
 
@@ -70,6 +88,50 @@ const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView
             }
             dim *= modifier;
 
+            let image: HTMLImageElement | undefined = undefined;
+            console.log(attachment.statblock)
+            if (attachment.statblock.image != "") {
+                if (!images[attachment.statblock.image]) {
+                    images[attachment.statblock.image] = new ImageLoader(attachment.statblock.image);
+                }
+                image = images[attachment.statblock.image].getIf();
+            }
+
+            if (image) {
+                ctx.save();
+
+                ctx.beginPath();
+                ctx.arc(
+                    x * CanvasBaseSize + CanvasBaseSize / 2,
+                    y * CanvasBaseSize + CanvasBaseSize / 2,
+                    (dim / 2 - LineWidth * 2),
+                    0,
+                    2 * Math.PI
+                )
+                ctx.clip();
+
+                ctx.drawImage(
+                    image,
+                    x * CanvasBaseSize + LineWidth,
+                    y * CanvasBaseSize + LineWidth,
+                    dim - LineWidth * 2,
+                    dim - LineWidth * 2
+                )
+
+                // draw CreatureAttitudeColors[attachment.attitude] colored rect with op 0.4 to lower third of circle
+                ctx.fillStyle = CreatureAttitudeColors[attachment.attitude];
+                ctx.globalAlpha = 0.4;
+                ctx.fillRect(
+                    x * CanvasBaseSize + LineWidth,
+                    y * CanvasBaseSize + dim / 2,
+                    dim - LineWidth * 2,
+                    dim / 2 - LineWidth
+                )
+
+                ctx.restore();
+                ctx.globalAlpha = 0.2;
+            }
+
             ctx.fillStyle = CreatureAttitudeColors[attachment.attitude];
             ctx.beginPath();
             ctx.strokeStyle = '#000000';
@@ -84,41 +146,51 @@ const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView
             ctx.fill();
             ctx.stroke();
 
+            if (image) {
+                ctx.globalAlpha = 1;
+            }
+
 
             ctx.lineWidth = LineWidth;
             ctx.strokeStyle = '#000000';
 
-            let height = 60 * modifier * scale;
+            let height = 55 * modifier * scale;
             ctx.font = `${height - 2}px Material Symbols`;
 
             const color = CreatureAttitudeColors[attachment.attitude];
             const darkenedColor = color.replace(/([0-9a-f]{2})/g, (_match, p1) => {
-                return Math.floor((parseInt(p1, 16) * .5)).toString(16).padStart(2, '0');
+                return Math.floor((parseInt(p1, 16) * .8)).toString(16).padStart(2, '0');
             });
 
             ctx.fillStyle = darkenedColor;
             ctx.textAlign = 'center';
-            ctx.fillText(
-                CanvasCreatureTypeIcons[attachment.type],
-                x * CanvasBaseSize + CanvasBaseSize / 2,
-                y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 16,
-            )
 
-            ctx.fillStyle = '#DDDDDD';
-            height = 28 * modifier * scale;
-            ctx.font = `${height - 2}px Fira Sans`;
-            ctx.fillText(
-                attachment.statblock.name.charAt(0).toUpperCase() + attachment.statblock.name.charAt(1).toLowerCase(),
-                x * CanvasBaseSize + CanvasBaseSize / 2,
-                y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - height / 8
-            )
+            if (!image) {
+                ctx.fillText(
+                    "hub",
+                    x * CanvasBaseSize + CanvasBaseSize / 2 + 1,
+                    y * CanvasBaseSize + CanvasBaseSize / 2 + height / 2 - 1,
+                )
+            }
+
+            ctx.fillStyle = '#FFFFFF';
+            if (!image) {
+                height = 32 * modifier * scale;
+                ctx.font = `${height - 2}px Fira Sans`;
+                ctx.fillText(
+                    attachment.statblock.name.charAt(0).toUpperCase() + attachment.statblock.name.charAt(1).toLowerCase(),
+                    x * CanvasBaseSize + CanvasBaseSize / 2,
+                    y * CanvasBaseSize + CanvasBaseSize / 2
+                )
+            }
+
             
-            height = 16 * modifier * scale;
+            height = 20 * modifier * scale;
             ctx.font = `${height - 2}px Fira Sans`;
             ctx.fillText(
                 "~" + decorator.key.toString() + "~",
                 x * CanvasBaseSize + CanvasBaseSize / 2,
-                y * CanvasBaseSize + CanvasBaseSize / 2 - 2 * height / 3
+                y * CanvasBaseSize + CanvasBaseSize / 2 +  height
             )
         } else {
             ctx.textAlign = 'left';
@@ -215,7 +287,7 @@ const drawDecorator: BoardCallback = (canvas, w, _h, board, position, playerView
     }
 }
 
-const drawHidden: BoardCallback = (canvas, w, _h, board, position, playerView, _rng) => {
+const drawHidden: BoardCallback = (canvas, w, _h, board, position, playerView, _rng, _images) => {
     const ctx = canvas.getContext('2d')!;
     const idx = position.y * w + position.x;
 
@@ -326,7 +398,26 @@ const drawStamps = (canvas: HTMLCanvasElement, board: BoardLayer, _playerView: b
     }
 }
 
-const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean) => {
+const drawGrid = (canvas: HTMLCanvasElement, board: Board, w: number, h: number) => {
+
+    const ctx = canvas.getContext('2d')!;
+
+    // draw grid
+    ctx.lineWidth = LineWidth;
+    ctx.strokeStyle = '#888888';
+    ctx.beginPath();
+    for (let i = 0; i <= board.height; i++) {
+        ctx.moveTo(0, i * CanvasBaseSize);
+        ctx.lineTo(w, i * CanvasBaseSize);
+    }
+    for (let i = 0; i <= board.width; i++) {
+        ctx.moveTo(i * CanvasBaseSize, 0);
+        ctx.lineTo(i * CanvasBaseSize, h);
+    }
+    ctx.stroke();
+}
+
+const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean, images: {[key: string] : ImageLoader}) => {
 
     // set random seed to 42 
     const rng = new Prando(42);
@@ -339,7 +430,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
     const forEachTile = (callback: BoardCallback, layer : BoardLayer) => {
         for (let i = 0; i < board.height; i++) {
             for (let j = 0; j < board.width; j++) {
-                callback(canvas, board.width, board.height, layer, { x: j, y: i }, playerView, rng);
+                callback(canvas, board.width, board.height, layer, { x: j, y: i }, playerView, rng, images);
             }
         }
     }
@@ -349,6 +440,7 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
         const layer = board.layers[i];
 
         forEachTile(drawTerrain, layer);
+        drawGrid(canvas, board, width, height);
         drawMarkers(canvas, board.width, board.height, layer, playerView, rng);
         drawStamps(canvas, layer, playerView, rng);
         forEachTile(drawDecorator, layer);
@@ -362,21 +454,6 @@ const drawBoard = (canvas: HTMLCanvasElement, board: Board, playerView: boolean)
             ctx.globalAlpha = 1;
         }
     }
-
-
-    // draw grid
-    ctx.lineWidth = LineWidth;
-    ctx.strokeStyle = '#000000';
-    ctx.beginPath();
-    for (let i = 0; i <= board.height; i++) {
-        ctx.moveTo(0, i * CanvasBaseSize);
-        ctx.lineTo(width, i * CanvasBaseSize);
-    }
-    for (let i = 0; i <= board.width; i++) {
-        ctx.moveTo(i * CanvasBaseSize, 0);
-        ctx.lineTo(i * CanvasBaseSize, height);
-    }
-    ctx.stroke();
 }
 
 export type BoardComponentProps = {
@@ -397,12 +474,15 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
     const renderUI = useForceUpdate();
     const rootRef = React.useRef<HTMLDivElement>(null);
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
+    const images = React.useRef<{
+        [key: string]: ImageLoader
+    }>({});
 
     const draw = () => {
         if (canvasRef.current) {
             canvasRef.current!.width = props.board.width * CanvasBaseSize;
             canvasRef.current!.height = props.board.height * CanvasBaseSize;
-            drawBoard(canvasRef.current!, props.board, props.playerView ?? false);
+            drawBoard(canvasRef.current!, props.board, props.playerView ?? false, images.current);
         }
     }
 
@@ -460,7 +540,7 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
         }
     }, [props.playerSettings.current.importanceRect])
 
-    const [zoom, setZoom] = React.useState<number>(.2);
+    const [zoom, setZoom] = React.useState<number>(1);
 
     React.useEffect(() => {
         rectRef.current?.scrollIntoView({

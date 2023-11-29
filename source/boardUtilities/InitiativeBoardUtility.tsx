@@ -117,113 +117,132 @@ export class InitiaitveBoardUtility implements IBoardUtility {
 
     userInterface() {
         if (this.board.initiative != undefined) {
+            // construct initiative such that current initiative is first
+            const initiativeA: InitiaitveData[] = [];
+            for (let i = this.board.initiativeIndex!; i < this.board.initiative.length; i++) {
+                initiativeA.push(this.board.initiative[i]);
+            }
+            const initiativeB: InitiaitveData[] = [];
+            for (let i = 0; i < this.board.initiativeIndex!; i++) {
+                initiativeB.push(this.board.initiative[i]);
+            }
+
+            const renderInitiative = (highlight: boolean, v : InitiaitveData, i : number) => {
+                // find decorator which has the key id 
+                let decorator: BoardDecorator | null = null;
+                for (const layer of this.board.layers) {
+                    for (const key in layer.decorators) {
+                        if (layer.decorators[key] == undefined) {
+                            delete layer.decorators[key];
+                            continue;
+                        }
+                        if (layer.decorators[key].key == v.id) {
+                            decorator = layer.decorators[key];
+                            break;
+                        }
+                    }
+                }
+                if (decorator == null) {
+                    return <></>;
+                }
+
+                const attachment = decorator.attachment as BoardCreature;
+                const statblock = attachment.statblock as Statblock;
+
+                const conditionEdit = (
+                    <div className="p-2">
+                        <EnumEditorComponent
+                            hideTitle
+                            enumObj={CreatureCondition}
+                            title="Conditions"
+                            process={(condition) => {
+                                v.conditions.push(condition);
+                                this.forceUpdate?.call(this);
+                            }}
+                            editMode={true}
+                            data={v.conditions}
+                            update={() => {
+                                this.forceUpdate?.call(this);
+                            }}
+                        />
+                    </div>
+                )
+
+
+                return (
+                    <div className={"w-full rounded-xl bg-neutral-50 opacity-[90%] " + (highlight && i == 0 ? "border-2 border-orange-600" : "")} key={"#" + decorator.key}>
+                        <div className="text-xl p-2">{statblock.name}</div>
+                        <div className="flex justify-between items-end p-2">
+                            <div className="text-xs">Attitude: {
+                                (attachment.attitude == CreatureAttitude.Player ? "Player" : (
+                                    attachment.attitude == CreatureAttitude.Enemy ? "Enemy" : "NPC"
+                                ))
+                            }</div>
+                            <div className="text-xs">
+                                {
+                                    [
+                                        "HP: " + (
+                                            statblock.hitPoints ? (
+                                                statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
+                                            ) : "-"),
+                                        "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
+                                        "ID: " + decorator.key
+                                    ].join(", ")
+                                }
+                            </div>
+                        </div>
+
+                        {
+                            attachment.attitude == CreatureAttitude.Player ? (
+                                null
+                            ) : (
+                                <div className="w-full p-2 flex h-6 rounded-full overflow-hidden">
+                                    <div
+                                        className="bg-green-500"
+                                        style={{
+                                            width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                            height: "100%"
+                                        }}
+                                    ></div>
+                                    <div
+                                        className="bg-green-700"
+                                        style={{
+                                            width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
+                                            height: "100%"
+                                        }}
+                                    ></div>
+                                    <div
+                                        className="bg-red-500"
+                                        style={{
+                                            width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
+                                            height: "100%"
+                                        }}
+                                    ></div>
+                                </div>
+                            )
+                        }
+
+                        <div className="flex flex-col text-xs w-full items-end">
+                            <div className="text-xs px-2">Conditions</div>
+                            <div className="w-full">
+                                {conditionEdit}
+                            </div>
+                        </div>
+                    </div>
+                )
+
+            }
 
             return (
                 <UIContainer>
                     <div className="flex w-full h-full flex-col gap-2">
                         <div className="flex flex-col gap-2 grow overflow-y-scroll">
                             {
-                                this.board.initiative.map((v, i) => {
-                                    // find decorator which has the key id 
-                                    let decorator: BoardDecorator | null = null;
-                                    for (const layer of this.board.layers) {
-                                        for (const key in layer.decorators) {
-                                            if (layer.decorators[key] == undefined) {
-                                                delete layer.decorators[key];
-                                                continue;
-                                            }
-                                            if (layer.decorators[key].key == v.id) {
-                                                decorator = layer.decorators[key];
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (decorator == null) {
-                                        return <></>;
-                                    }
-
-                                    const attachment = decorator.attachment as BoardCreature;
-                                    const statblock = attachment.statblock as Statblock;
-
-                                    const conditionEdit = (
-                                        <div className="p-2">
-                                            <EnumEditorComponent
-                                                hideTitle
-                                                enumObj={CreatureCondition}
-                                                title="Conditions"
-                                                process={(condition) => {
-                                                    v.conditions.push(condition);
-                                                    this.forceUpdate?.call(this);
-                                                }}
-                                                editMode={true}
-                                                data={v.conditions}
-                                                update={() => {
-                                                    this.forceUpdate?.call(this);
-                                                }}
-                                            />
-                                        </div>
-                                    )
-
-
-                                    return (
-                                        <div className={"w-full rounded-xl bg-neutral-50 opacity-[90%] " + (this.board.initiativeIndex == i ? "border-2 border-orange-600" : "")} key={i}>
-                                            <div className="text-xl p-2">{statblock.name}</div>
-                                            <div className="flex justify-between items-end p-2">
-                                                <div className="text-xs">Attitude: {attachment.attitude}</div>
-                                                <div className="text-xs">
-                                                    {
-                                                        [
-                                                            "HP: " + (
-                                                                statblock.hitPoints ? (
-                                                                    statblock.hitPoints.current + "/" + (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))
-                                                                ) : "-"),
-                                                            "AC: " + (statblock.armorClass ? statblock.armorClass : "-"),
-                                                            "ID: " + decorator.key
-                                                        ].join(", ")
-                                                    }
-                                                </div>
-                                            </div>
-
-                                            {
-                                                attachment.attitude == CreatureAttitude.Player ? (
-                                                    null
-                                                ) : (
-                                                    <div className="w-full p-2 flex h-6 rounded-full overflow-hidden">
-                                                        <div
-                                                            className="bg-green-500"
-                                                            style={{
-                                                                width: (statblock.hitPoints.current / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                                height: "100%"
-                                                            }}
-                                                        ></div>
-                                                        <div
-                                                            className="bg-green-700"
-                                                            style={{
-                                                                width: ((statblock.hitPoints.temporary ?? 0) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100 + "%",
-                                                                height: "100%"
-                                                            }}
-                                                        ></div>
-                                                        <div
-                                                            className="bg-red-500"
-                                                            style={{
-                                                                width: (((statblock.hitPoints.maximum - statblock.hitPoints.current) / (statblock.hitPoints.maximum + (statblock.hitPoints.temporary ?? 0))) * 100) + "%",
-                                                                height: "100%"
-                                                            }}
-                                                        ></div>
-                                                    </div>
-                                                )
-                                            }
-
-                                            <div className="flex flex-col text-xs w-full items-end">
-                                                <div className="text-xs px-2">Conditions</div>
-                                                <div className="w-full">
-                                                    {conditionEdit}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-
-                                })
+                                initiativeA.map((v, i) => renderInitiative(true, v, i))
+                            }
+                            <div className="w-full h-1 rounded-full bg-orange-600 shrink-0"></div>
+                            {
+                                initiativeB.map((v, i) => renderInitiative(false, v, i))
                             }
                         </div>
                         <div className="flex justify-end">

@@ -65,7 +65,7 @@ export class CreateCreatureDecoratorBoardUtility implements IBoardUtility {
                         statblock: {
                             size: this.creatureStatblock.size,
                             name: this.creatureStatblock.name,
-                            image: ""
+                            image: this.creatureStatblock.image,
                         }
                     },
                     key: this.board.decoratorCounter++
