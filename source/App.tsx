@@ -21,12 +21,12 @@ export const App = (props: {
     const forceUpdate = useForceUpdate();
 
     // mode and data depending on mode
-    const mode = React.useRef<AppMode>(AppMode.Board);
+    const mode = React.useRef<AppMode>(AppMode.Campaign);
     const playerViewOpen = React.useRef<boolean>(false);
-    
+
     const board = React.useRef<Board>(constructDefaultBoard(15, 15));
     const campaign = React.useRef<Campaign>(structuredClone(EmptyCampaign));
-    
+
     // handle for dialogs (these shall only be shown on dm views)
     const dialogHandle: React.MutableRefObject<DialogHandle | null> = React.useRef<DialogHandle | null>(null);
     const fileName = React.useRef<string>("");
@@ -66,7 +66,7 @@ export const App = (props: {
 
                     campaign.current = file.data as Campaign;
                 }
-                
+
                 fileName.current = fn;
                 forceUpdate();
             } catch (e: any) {
@@ -164,20 +164,8 @@ export const App = (props: {
             <CampaignContext.Provider
                 value={campaign}
             >
-                {
-                    campaignBoard.current ? (
-                        <div className="h-full w-full relative">
-                            <BoardApp
-                                board={campaignBoard as React.MutableRefObject<Board>}
-                                playerViewOpen={playerViewOpen}
-                                dialogHandle={dialogHandle}
-                                isMac={props.isMac}
-                                back={() => {
-                                    loadCampaignBoard(null);
-                                }}
-                            />
-                        </div>
-                    ) : (
+                <div className="h-full w-full relative">
+                    <div className="absolute left-0 right-0 top-0 bottom-0">
                         <CampaignApp
                             campaign={campaign}
                             loadCampaignBoard={loadCampaignBoard}
@@ -185,8 +173,23 @@ export const App = (props: {
                             playerViewOpen={playerViewOpen}
                             isMac={props.isMac}
                         />
-                    )
-                }
+                    </div>
+                    {
+                        campaignBoard.current ? (
+                            <div className="absolute left-0 right-0 top-0 bottom-0 z-10">
+                                <BoardApp
+                                    board={campaignBoard as React.MutableRefObject<Board>}
+                                    playerViewOpen={playerViewOpen}
+                                    dialogHandle={dialogHandle}
+                                    isMac={props.isMac}
+                                    back={() => {
+                                        loadCampaignBoard(null);
+                                    }}
+                                />
+                            </div>
+                        ) : null
+                    }
+                </div>
             </CampaignContext.Provider>
         )
     )

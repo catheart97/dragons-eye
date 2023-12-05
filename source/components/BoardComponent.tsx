@@ -48,6 +48,8 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
 
     React.useEffect(() => {
 
+        console.log("init", initialized.current)
+
         if (initialized.current) return;
         initialized.current = true;
 
@@ -79,6 +81,10 @@ const BoardComponentRenderer: React.ForwardRefRenderFunction<BoardComponentHandl
                 left: (rootRef.current.scrollWidth - viewportRect.width) / 2,
                 behavior: 'smooth'
             })
+        }
+
+        return () => {
+            worker.current?.terminate();
         }
     }, [])
 
