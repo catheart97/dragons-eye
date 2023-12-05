@@ -1,7 +1,7 @@
 import { ItemComponent } from "../components/ItemComponent";
 import { RawStatblockComponent } from "../components/StatblockComponent";
 import { Board, BoardCreature, BoardDecoratorType, BoardPosition, CreatureAttitude, IBoardUtility, BoardItemType, TrapData, ItemData, MAX_LAYERS, BoardTerrain } from "../data/Board";
-import { CanvasBaseSize } from "../components/BoardComponent";
+import { CanvasBaseSize } from "../components/BoardConstants";
 import { UIContainer } from "../components/ui/UIContainer";
 import { ToolButton } from "../components/ui/ToolButton";
 import { UIGroup } from "../components/ui/UIGroup";

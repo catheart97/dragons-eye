@@ -74,7 +74,7 @@ export class StampBoardUtility implements IBoardUtility {
             const h = img.height * this.scale;
             return (
                 <img
-                    src={TexturePool.getInstance().get()?.StampTextures[this.selected].src}
+                    src={(TexturePool.getInstance().get()?.StampTextures[this.selected] as HTMLImageElement).src}
                     className="absolute pointer-events-none opacity-50"
                     style={{
                         width: w,
@@ -92,7 +92,7 @@ export class StampBoardUtility implements IBoardUtility {
 
             // delete mode // search for stamp 
             let stampIndex = -1;
-            for (let i = 0; i < this.board.layers[this.board.activeLayer].stamps?.length ?? 0; i++) {
+            for (let i = 0; i < this.board.layers[this.board.activeLayer].stamps?.length; i++) {
                 const stamp = this.board.layers[this.board.activeLayer].stamps![i];
                 const w = stamp.width;
                 const h = stamp.height;
@@ -188,7 +188,7 @@ export class StampBoardUtility implements IBoardUtility {
                                             imageRendering: "pixelated"
                                         }}
                                         className="w-full h-auto m-auto bg-transparent"
-                                        src={TexturePool.getInstance().get()?.StampTextures[key].src}
+                                        src={(TexturePool.getInstance().get()?.StampTextures[key] as HTMLImageElement).src}
                                     />
                                 </button>
                             ))

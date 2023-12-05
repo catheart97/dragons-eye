@@ -1,6 +1,6 @@
 import { Board, BoardMarkerType, BoardPosition, IBoardUtility, MarkerTypeIcons } from "../data/Board"
 import { ToolButton } from "../components/ui/ToolButton"
-import { CanvasBaseSize } from "../components/BoardComponent"
+import { CanvasBaseSize } from "../components/BoardConstants"
 import { UIContainer } from "../components/ui/UIContainer"
 import { UIGroup } from "../components/ui/UIGroup"
 

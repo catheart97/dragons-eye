@@ -1,4 +1,4 @@
-import { CanvasBaseSize } from "../components/BoardComponent";
+import { CanvasBaseSize } from "../components/BoardConstants";
 import { SpellList } from "../components/SpellComponent";
 import { Tab, TabView } from "../components/ui/TabView";
 import { ToolButton } from "../components/ui/ToolButton";

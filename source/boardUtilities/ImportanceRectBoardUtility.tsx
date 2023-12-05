@@ -1,4 +1,4 @@
-import { CanvasBaseSize } from "../components/BoardComponent"
+import { CanvasBaseSize } from "../components/BoardConstants"
 import { PlayerViewSettings } from "../components/view/IAppView"
 import { BoardPosition, IBoardUtility } from "../data/Board"
 

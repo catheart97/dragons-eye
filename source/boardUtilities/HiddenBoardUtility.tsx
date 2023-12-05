@@ -1,6 +1,6 @@
 import { Board, BoardPosition, IBoardUtility } from "../data/Board"
 import { ToolButton } from "../components/ui/ToolButton"
-import { CanvasBaseSize } from "../components/BoardComponent"
+import { CanvasBaseSize } from "../components/BoardConstants"
 import { UIContainer } from "../components/ui/UIContainer"
 
 export class HiddenBoardUtility implements IBoardUtility {

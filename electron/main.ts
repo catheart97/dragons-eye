@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, HandlerDetails, ipcMain, Menu, MenuItem } f
 import path from 'node:path';
 import NPMLicenses from '../license.json?raw';
 import fsExtra from 'fs-extra';
+import { session } from 'electron';
 
 type License = {
     name: string;
@@ -69,6 +70,16 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 function createWindow() {
 
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+        callback({
+            responseHeaders: {
+                ...details.responseHeaders,
+                'Cross-Origin-Opener-Policy': 'same-origin', 
+                'Cross-Origin-Embedder-Policy': 'require-corp'
+            }
+        })
+    });
+
     ipcMain.handle("m-userData", (_event, _arg) => {
         // const path = isProd ? () : (app.getPath("userData") + "/Dragon's Eye/");
         const path = app.getPath("documents") + "/Dragon's Eye/";
@@ -85,7 +96,8 @@ function createWindow() {
     win = new BrowserWindow({
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            sandbox: false
+            sandbox: false,
+            contextIsolation: true
         },
         // remove title bar if mac 
         titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default'

@@ -49,10 +49,17 @@ export default defineConfig({
     fullReloadAlways,
     base64Plugin
   ],
+  worker: {
+    format: 'es',
+  },
   define: {
     APP_VERSION: JSON.stringify(require('./package.json').version),
   },
   build: {
     chunkSizeWarningLimit: 50000 
+  },
+  // disable hmr
+  server: {
+    hmr: false,
   }
 })

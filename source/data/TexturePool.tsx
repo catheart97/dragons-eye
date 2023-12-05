@@ -27,92 +27,115 @@ import GrassAltTexture from "../../resources/textures/terrain/grass_alt.png";
 
 const StampTexturePaths = import.meta.glob('../../resources/textures/stamps/*.png');
 
+type AImage = HTMLImageElement | ImageBitmap;
+
+// T either ImageBitmap or HTMLImageElement
 type TexturePoolData = {
-    TerrainTextures: {[key in BoardTerrain]: HTMLImageElement}
-    AltTerrainTextures: {[key in BoardTerrain]: HTMLImageElement}
+    TerrainTextures: {[key in BoardTerrain]: AImage}
+    AltTerrainTextures: {[key in BoardTerrain]: AImage}
     DoorTextures: {
-        open: HTMLImageElement,
-        closed: HTMLImageElement
+        open: AImage,
+        closed: AImage
     }
     FogTextures: {
-        center: HTMLImageElement,
-        side: HTMLImageElement,
-        corner: HTMLImageElement,
-        tunnel: HTMLImageElement
-        none: HTMLImageElement,
-        single: HTMLImageElement,
+        center: AImage,
+        side: AImage,
+        corner: AImage,
+        tunnel: AImage
+        none: AImage,
+        single: AImage,
     },
-    StampTextures: {[key: string]: HTMLImageElement}
+    StampTextures: {[key: string]: AImage}
 }
 
-export const LoadImage = async (src: string) => {
+export function LoadImage(src: string) : Promise<HTMLImageElement> {
     return new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image();
+        const image = document.createElement('img');
         image.onload = () => resolve(image);
         image.onerror = reject;
         image.src = src;
     });
+    
+}
+
+export async function LoadBitmap(src: string) : Promise<ImageBitmap> {
+    const response = await fetch(src);
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+    return bitmap;
 }
 
 export class TexturePool {
 
     private static _instance: TexturePool;
-    private _texturePool: TexturePoolData | null = null;
+    private _texturePoolImage: TexturePoolData | null = null;
+    private _texturePoolBitmap: TexturePoolData | null = null;
 
     private constructor() {}
 
-    public async constructTexturePool() {
-        if (this._texturePool) {
-            return this._texturePool;
+    public async constructTexturePool(bitmap?: boolean) {
+
+        let loadFunc : (p: string) => Promise<AImage> = bitmap ? LoadBitmap : LoadImage;
+        if (bitmap && this._texturePoolBitmap) {
+            return this._texturePoolBitmap;
+        } else if (!bitmap && this._texturePoolImage) {
+            return this._texturePoolImage;
         }
     
         const TerrainTextures = {
-            [BoardTerrain.Grass]: await LoadImage(GrassTexture),
-            [BoardTerrain.Dirt]: await LoadImage(DirtTexture),
-            [BoardTerrain.Sand]: await LoadImage(SandTexture),
-            [BoardTerrain.Scrub]: await LoadImage(ScrubTexture),
-            [BoardTerrain.Stone]: await LoadImage(StoneTexture),
-            [BoardTerrain.Wood]: await LoadImage(WoodTexture),
-            [BoardTerrain.Wall]: await LoadImage(WallTexture),
-            [BoardTerrain.Water]: await LoadImage(WaterTexture),
-            [BoardTerrain.Tile]: await LoadImage(TileTexture),
-            [BoardTerrain.Ice]: await LoadImage(IceTexture),
-            [BoardTerrain.Lava]: await LoadImage(LavaTexture),
-            [BoardTerrain.Snow]: await LoadImage(SnowTexture),
-            [BoardTerrain.Air]: await LoadImage(GrassTexture),
+            [BoardTerrain.Grass]: await loadFunc(GrassTexture),
+            [BoardTerrain.Dirt]: await loadFunc(DirtTexture),
+            [BoardTerrain.Sand]: await loadFunc(SandTexture),
+            [BoardTerrain.Scrub]: await loadFunc(ScrubTexture),
+            [BoardTerrain.Stone]: await loadFunc(StoneTexture),
+            [BoardTerrain.Wood]: await loadFunc(WoodTexture),
+            [BoardTerrain.Wall]: await loadFunc(WallTexture),
+            [BoardTerrain.Water]: await loadFunc(WaterTexture),
+            [BoardTerrain.Tile]: await loadFunc(TileTexture),
+            [BoardTerrain.Ice]: await loadFunc(IceTexture),
+            [BoardTerrain.Lava]: await loadFunc(LavaTexture),
+            [BoardTerrain.Snow]: await loadFunc(SnowTexture),
+            [BoardTerrain.Air]: await loadFunc(GrassTexture),
         }
 
-        const StampTextures: {[key: string]: HTMLImageElement} = {};
+        const StampTextures: {[key: string]: AImage} = {};
         for (const path in StampTexturePaths) {
             const key = path.match(/\/(\w+)\.png$/)?.[1];
             if (key) {
-                StampTextures[key] = await LoadImage(((await StampTexturePaths[path]()) as any).default as string);
+                StampTextures[key] = await loadFunc(((await StampTexturePaths[path]()) as any).default as string);
             }
         }
 
 
-        this._texturePool = {
+        const fogCenter = await loadFunc(FogCenterTexture);
+        const pool = {
             TerrainTextures,
             AltTerrainTextures: {
                 ...TerrainTextures,
-                [BoardTerrain.Grass]: await LoadImage(GrassAltTexture)
+                [BoardTerrain.Grass]: await loadFunc(GrassAltTexture)
             },
             DoorTextures: {
-                open: await LoadImage(DoorOpenTexture),
-                closed: await LoadImage(DoorClosedTexture)
+                open: await loadFunc(DoorOpenTexture),
+                closed: await loadFunc(DoorClosedTexture)
             },
             FogTextures: {
-                center: await LoadImage(FogCenterTexture),
-                side: await LoadImage(FogSideTexture),
-                corner: await LoadImage(FogCornerTexture),
-                tunnel: await LoadImage(FogTunnelTexture),
-                none: await LoadImage(FogNoneTexture),
-                single: await LoadImage(FogSingleTexture),
+                center: fogCenter,
+                side: fogCenter,
+                corner: fogCenter,
+                tunnel: fogCenter,
+                none: fogCenter,
+                single: fogCenter,
             },
             StampTextures
         }
+
+        if (bitmap) {
+            this._texturePoolBitmap = pool;
+        } else {
+            this._texturePoolImage = pool;
+        }
     
-        return this._texturePool;
+        return pool;
     }
 
     static getInstance() : TexturePool {
@@ -122,8 +145,8 @@ export class TexturePool {
         return this._instance;
     }
 
-    public get() : TexturePoolData | null {
-        return this._texturePool;
+    public get(bitmap?: boolean) : TexturePoolData | null {
+        return bitmap ? this._texturePoolBitmap : this._texturePoolImage;
     }
 
 }
